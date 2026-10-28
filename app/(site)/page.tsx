@@ -7,6 +7,7 @@ import { Services } from "@/components/sections/services";
 import { Testimonials } from "@/components/sections/testimonials";
 import { Work } from "@/components/sections/work";
 import { Hero } from "@/components/hero/hero";
+import { homeJsonLd, JsonLd } from "@/components/site/json-ld";
 import {
   getArchiveProjects,
   getFaqs,
@@ -37,6 +38,7 @@ export default async function HomePage() {
       <Testimonials items={testimonials} />
       <FaqSection items={faqs} />
       <Contact settings={settings} />
+      <JsonLd data={homeJsonLd(settings, featured)} />
     </main>
   );
 }
