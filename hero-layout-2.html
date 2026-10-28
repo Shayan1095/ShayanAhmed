@@ -1,0 +1,256 @@
+<title>Hero Layout 2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Hanken+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a presentation board. One large desktop frame of the magazine-cover hero, a three-frame scroll storyboard under it, and a phone frame beside the notes. Single committed light look. */
+:root{
+  --paper:#F3EADB; --hi:#FBF6EC; --lo:#E4D8C3; --edge:#CDBFA6;
+  --ink:#111111; --muted:#675E52; --muted-ink:#A89D8B; --led:#FF5B1F;
+  --board:#E9DFCD;
+  --font-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --font-body:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --raised: inset 0 1px 0 rgba(255,255,255,.9), 0 1px 1px rgba(17,17,17,.08), 0 12px 24px -12px rgba(17,17,17,.3), 0 30px 60px -30px rgba(17,17,17,.35);
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--board);color:var(--ink);font-family:var(--font-body);line-height:1.6;-webkit-font-smoothing:antialiased}
+.page{max-width:1280px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 80px;display:flex;flex-direction:column;gap:40px}
+.mono{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase}
+.head h1{margin:8px 0 6px;font-family:var(--font-display);font-weight:800;font-variation-settings:"wdth" 112;font-size:clamp(28px,4vw,44px);letter-spacing:-.02em;line-height:1.05}
+.head p{margin:0;color:var(--muted);max-width:44em}
+.cap{display:flex;align-items:baseline;gap:12px;margin-bottom:12px;color:var(--muted)}
+.cap b{font-family:var(--font-display);font-variation-settings:"wdth" 108;font-size:17px;color:var(--ink);letter-spacing:0;text-transform:none}
+
+/* ---------- frame ---------- */
+.frame{container-type:inline-size;border-radius:18px;overflow:hidden;background:#d8ccb6;padding:10px;box-shadow:0 40px 80px -40px rgba(17,17,17,.5)}
+.chrome-bar{display:flex;gap:6px;padding:2px 6px 10px}
+.chrome-bar i{width:9px;height:9px;border-radius:50%;background:#bfb196}
+.screen{position:relative;aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:radial-gradient(110% 80% at 62% 40%,var(--hi) 0%,var(--paper) 55%,#ECE1CD 100%)}
+
+.top{position:absolute;top:3cqw;left:4cqw;right:4cqw;display:flex;justify-content:space-between;align-items:center;z-index:4}
+.brand{display:flex;align-items:center;gap:1cqw;font-family:var(--font-display);font-weight:700;font-variation-settings:"wdth" 110;font-size:1.25cqw}
+.badge{width:2.7cqw;height:2.7cqw;border-radius:.8cqw;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:.95cqw;font-weight:800}
+.clock{display:flex;align-items:center;gap:.7cqw;font-family:var(--font-mono);font-size:.82cqw;letter-spacing:.14em;color:var(--muted)}
+.led{width:.6cqw;height:.6cqw;border-radius:50%;background:var(--led);box-shadow:0 0 .8cqw rgba(255,91,31,.75)}
+.nav{display:flex;align-items:center;gap:2.2cqw;font-size:1.05cqw;color:var(--muted)}
+.pill{background:linear-gradient(180deg,#2A2826,var(--ink));color:var(--paper);padding:.8cqw 1.4cqw;border-radius:.9cqw;font-weight:600;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 .15cqw 0 #000}
+
+.mast{position:absolute;left:4cqw;top:9.5cqw;z-index:1;margin:0;font-family:var(--font-display);font-weight:800;font-variation-settings:"wdth" 118;font-size:10.4cqw;line-height:.84;letter-spacing:-.045em;text-transform:uppercase}
+.mast span{display:block}
+.mast em{font-style:italic;font-variation-settings:"wdth" 96;font-weight:750}
+.mast .dot{display:inline-block;width:.15em;height:.15em;border-radius:50%;background:var(--led);margin-left:.04em;box-shadow:0 0 .2em rgba(255,91,31,.7)}
+
+.bottom{position:absolute;left:4cqw;right:4cqw;bottom:3cqw;display:flex;justify-content:space-between;align-items:flex-end;z-index:4;gap:3cqw}
+.lede{max-width:30cqw;font-size:1.15cqw;line-height:1.55;color:var(--muted)}
+.lede strong{color:var(--ink);font-weight:600}
+.ctas{display:flex;gap:1cqw;margin-top:1.4cqw}
+.b{padding:1cqw 1.6cqw;border-radius:.9cqw;font-size:1.05cqw;font-weight:600}
+.b.ink{background:linear-gradient(180deg,#2A2826,var(--ink));color:var(--paper);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 .15cqw 0 #000}
+.b.paper{background:linear-gradient(180deg,var(--hi),var(--paper));box-shadow:var(--raised)}
+.spec{display:flex;gap:2.4cqw;font-family:var(--font-mono);font-size:.78cqw;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding-bottom:.4cqw}
+.spec b{display:block;color:var(--ink);font-weight:500}
+.chip{display:flex;align-items:center;gap:.9cqw;padding:.6cqw 1.2cqw .6cqw .6cqw;border-radius:5cqw;background:linear-gradient(180deg,var(--hi),var(--paper));box-shadow:var(--raised)}
+.avatar{width:3cqw;height:3cqw;border-radius:50%;background:repeating-linear-gradient(135deg,var(--lo) 0 4px,var(--paper) 4px 8px);box-shadow:inset 0 1px 2px rgba(17,17,17,.25)}
+.chip small{display:block;font-family:var(--font-mono);font-size:.7cqw;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.chip span{font-size:1cqw;font-weight:600}
+
+/* device (CSS stand-in for the 3D device) */
+.dev-wrap{position:absolute;right:6cqw;top:12.5cqw;width:39cqw;z-index:3;perspective:120cqw}
+.dev{position:relative;width:100%;aspect-ratio:3.4/2.3;border-radius:3.2cqw;background:linear-gradient(155deg,var(--hi) 0%,var(--paper) 45%,var(--lo) 100%);box-shadow:inset 0 .25cqw 0 rgba(255,255,255,.95),inset 0 -.35cqw 0 rgba(17,17,17,.07),0 2cqw 3cqw -1.5cqw rgba(17,17,17,.4),0 5cqw 7cqw -3.5cqw rgba(17,17,17,.45);transform:rotateY(-16deg) rotateX(7deg);transform-style:preserve-3d}
+.dev .lcd{position:absolute;left:5.9%;top:9.6%;width:58.8%;height:56.5%;border-radius:1.2cqw;background:radial-gradient(120% 90% at 50% 0%,#24211d 0%,#0e0d0c 70%);box-shadow:0 0 0 .5cqw #1a1917,inset 0 0 2cqw rgba(0,0,0,.7);overflow:hidden;padding:1.3cqw 1.5cqw;font-family:var(--font-mono);font-size:.82cqw;line-height:1.85;color:var(--paper)}
+.dev .lcd::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px),linear-gradient(115deg,rgba(255,255,255,.08),transparent 40%)}
+.lcd .hdr{display:flex;justify-content:space-between;color:var(--muted-ink);font-size:.68cqw;letter-spacing:.14em;border-bottom:1px dashed rgba(243,234,219,.18);padding-bottom:.6cqw;margin-bottom:.5cqw}
+.lcd .ln{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 .6cqw rgba(243,234,219,.35)}
+.lcd .t{color:#857b6d;margin-right:.8cqw}.lcd .g{color:var(--led);margin-right:.8cqw;text-shadow:0 0 .6cqw rgba(255,91,31,.7)}
+.knob{position:absolute;left:74%;top:16%;width:15%;aspect-ratio:1;border-radius:50%;background:conic-gradient(var(--hi),var(--lo),var(--hi),var(--lo),var(--hi));box-shadow:var(--raised),0 0 0 .5cqw var(--lo)}
+.knob::after{content:"";position:absolute;left:47%;top:8%;width:6%;height:22%;border-radius:2px;background:var(--ink)}
+.sw{position:absolute;top:58%;width:4.4%;height:17%;border-radius:.5cqw;background:#1a1917}
+.sw::after{content:"";position:absolute;left:-10%;right:-10%;top:-10%;height:52%;border-radius:.4cqw;background:linear-gradient(180deg,var(--hi),var(--paper));box-shadow:0 .2cqw .4cqw rgba(17,17,17,.35)}
+.sw.a{left:71%}.sw.b{left:80%}.sw.c{left:89%}
+.dev .grille{position:absolute;left:6%;top:75%;width:58%;height:9%;background-image:radial-gradient(circle,rgba(17,17,17,.4) 32%,transparent 36%);background-size:2.2% 34%}
+.dev .tag{position:absolute;left:6%;top:3.2%;font-family:var(--font-mono);font-size:.62cqw;letter-spacing:.14em;color:var(--muted)}
+.dev .live{position:absolute;right:5%;top:3%;display:flex;gap:.5cqw;align-items:center;font-family:var(--font-mono);font-size:.62cqw;letter-spacing:.14em;color:var(--muted)}
+.floor{position:absolute;left:8%;right:4%;bottom:-9%;height:14%;background:radial-gradient(closest-side,rgba(60,45,30,.35),transparent);filter:blur(2px);z-index:-1}
+
+.callout{position:absolute;z-index:6;display:flex;align-items:center;gap:.6cqw;font-family:var(--font-mono);font-size:.78cqw;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);background:var(--hi);border-radius:.6cqw;padding:.5cqw .8cqw;box-shadow:0 .2cqw .8cqw rgba(17,17,17,.18)}
+.callout i{display:grid;place-items:center;width:1.5cqw;height:1.5cqw;border-radius:50%;background:var(--led);color:#fff;font-style:normal;font-size:.8cqw;font-weight:600}
+.callouts-off .callout{display:none}
+
+.toggle{align-self:flex-start;display:inline-flex;gap:4px;padding:4px;border-radius:12px;background:var(--lo);box-shadow:inset 0 2px 4px rgba(17,17,17,.14)}
+.toggle button{border:0;background:transparent;min-height:40px;padding:0 16px;border-radius:9px;font:inherit;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer}
+.toggle button[aria-pressed="true"]{background:linear-gradient(180deg,var(--hi),var(--paper));color:var(--ink);box-shadow:var(--raised)}
+
+/* ---------- storyboard ---------- */
+.story{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+@media (max-width:860px){.story{grid-template-columns:minmax(0,1fr)}}
+.sb{display:flex;flex-direction:column;gap:12px}
+.sbf{container-type:inline-size;position:relative;aspect-ratio:16/10;border-radius:12px;overflow:hidden;background:var(--paper);box-shadow:0 20px 40px -24px rgba(17,17,17,.45)}
+.sbf.dark{background:var(--ink)}
+.sbf .t1{position:absolute;left:6cqw;top:16cqw;font-family:var(--font-display);font-weight:800;font-variation-settings:"wdth" 118;text-transform:uppercase;font-size:10cqw;line-height:.84;letter-spacing:-.045em}
+.sbf .mini{position:absolute;width:36cqw;aspect-ratio:3.4/2.3;border-radius:3cqw;background:linear-gradient(155deg,var(--hi),var(--lo));box-shadow:0 2cqw 4cqw -2cqw rgba(17,17,17,.5)}
+.sbf .mini::before{content:"";position:absolute;left:6%;top:10%;width:59%;height:56%;border-radius:1cqw;background:#121110}
+.slab{position:absolute;width:30cqw;aspect-ratio:3.4/2.3;border-radius:2.6cqw;transform:skewY(-8deg)}
+.slab.s1{left:14cqw;top:22cqw;background:linear-gradient(155deg,var(--hi),var(--lo));box-shadow:0 2cqw 4cqw -2cqw rgba(17,17,17,.5)}
+.slab.s1::before{content:"";position:absolute;left:6%;top:10%;width:59%;height:56%;border-radius:1cqw;background:#121110}
+.slab.s2{left:35cqw;top:20cqw;background:#1b1a18;box-shadow:inset 0 0 0 .4cqw #2b2824}
+.slab.s3{left:56cqw;top:18cqw;background:var(--lo);box-shadow:0 2cqw 4cqw -2cqw rgba(17,17,17,.4)}
+.slab.s3::before{content:"";position:absolute;left:38%;top:30%;width:24%;height:40%;border-radius:.6cqw;background:#23211e;box-shadow:0 0 0 .6cqw rgba(255,91,31,.85),0 0 3cqw rgba(255,91,31,.6)}
+.lab{position:absolute;font-family:var(--font-mono);font-size:2.4cqw;letter-spacing:.1em;text-transform:uppercase;padding:.8cqw 1.4cqw;border-radius:1cqw;background:var(--hi);box-shadow:0 .6cqw 1.4cqw rgba(17,17,17,.2)}
+.part{position:absolute;font-family:var(--font-display);font-weight:800;font-variation-settings:"wdth" 118;text-transform:uppercase;font-size:7cqw;letter-spacing:-.04em;color:rgba(17,17,17,.13)}
+.sb p{margin:0;font-size:14.5px;color:var(--muted)}
+.sb p b{color:var(--ink);font-weight:600}
+
+/* ---------- phone + notes ---------- */
+.duo{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:40px;align-items:start}
+@media (max-width:860px){.duo{grid-template-columns:minmax(0,1fr)}}
+.phone{container-type:inline-size;width:100%;max-width:320px;border-radius:40px;padding:10px;background:#cdbfa6;box-shadow:0 40px 80px -40px rgba(17,17,17,.5)}
+.pscreen{position:relative;aspect-ratio:390/844;border-radius:32px;overflow:hidden;background:radial-gradient(120% 70% at 50% 60%,var(--hi),var(--paper) 60%)}
+.pscreen .ptop{position:absolute;top:8cqw;left:6cqw;right:6cqw;display:flex;justify-content:space-between;align-items:center;font-family:var(--font-display);font-weight:700;font-size:4.4cqw}
+.pscreen .ptop i{width:9cqw;height:9cqw;border-radius:2.6cqw;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-style:normal;font-size:3.4cqw;font-weight:800}
+.pscreen .pclock{position:absolute;top:22cqw;left:6cqw;font-family:var(--font-mono);font-size:2.8cqw;letter-spacing:.14em;color:var(--muted);display:flex;gap:1.6cqw;align-items:center}
+.pscreen .pclock span{width:2cqw;height:2cqw;border-radius:50%;background:var(--led)}
+.pscreen h2{position:absolute;left:6cqw;top:30cqw;margin:0;font-family:var(--font-display);font-weight:800;font-variation-settings:"wdth" 112;text-transform:uppercase;font-size:15.5cqw;line-height:.86;letter-spacing:-.045em}
+.pscreen h2 em{font-style:italic;font-variation-settings:"wdth" 94}
+.pscreen .pdev{position:absolute;left:12cqw;top:104cqw;width:80cqw;aspect-ratio:3.4/2.3;border-radius:7cqw;background:linear-gradient(155deg,var(--hi),var(--paper) 45%,var(--lo));box-shadow:0 6cqw 10cqw -5cqw rgba(17,17,17,.45);transform:rotate(-4deg)}
+.pscreen .pdev::before{content:"";position:absolute;left:6%;top:10%;width:59%;height:56%;border-radius:2.4cqw;background:#121110;box-shadow:0 0 0 1.2cqw #1a1917}
+.pscreen .pdev::after{content:"";position:absolute;left:74%;top:16%;width:15%;aspect-ratio:1;border-radius:50%;background:var(--lo);box-shadow:0 .6cqw 1.4cqw rgba(17,17,17,.3)}
+.pscreen .pcta{position:absolute;left:6cqw;right:6cqw;bottom:10cqw;display:flex;flex-direction:column;gap:3cqw}
+.pscreen .pcta span{display:grid;place-items:center;height:13cqw;border-radius:3.4cqw;font-weight:600;font-size:4cqw}
+.pscreen .pcta .k{background:var(--ink);color:var(--paper)}
+.pscreen .pcta .w{background:var(--hi);box-shadow:var(--raised)}
+.notes{display:flex;flex-direction:column;gap:14px}
+.notes h2{margin:0 0 4px;font-family:var(--font-display);font-weight:800;font-variation-settings:"wdth" 110;font-size:26px;letter-spacing:-.02em}
+.note{display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;padding:16px 18px;border-radius:14px;background:linear-gradient(180deg,var(--hi),var(--paper));box-shadow:var(--raised)}
+.note i{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--led);color:#fff;font-style:normal;font-size:13px;font-weight:600}
+.note b{display:block;margin-bottom:2px}
+.note p{margin:0;font-size:14.5px;color:var(--muted)}
+</style>
+
+<div class="page">
+  <header class="head">
+    <span class="mono" style="color:var(--muted)">Hero · Layout 2 · Magazine cover</span>
+    <h1>The headline is the backdrop. The device stands in front of it.</h1>
+    <p>Static frames of the layout. The device here is a flat stand-in for the 3D one, so judge the composition, the type scale and the overlap, not the rendering.</p>
+  </header>
+
+  <section>
+    <div class="cap mono"><b>Desktop, at rest</b><span>1440 × 900</span></div>
+    <div class="frame" id="frame">
+      <div class="chrome-bar"><i></i><i></i><i></i></div>
+      <div class="screen">
+        <div class="top">
+          <div class="brand"><span class="badge">SA</span>Shayan Ahmed</div>
+          <div class="clock"><span class="led"></span>KARACHI 16:32 · TAKING PROJECTS</div>
+          <div class="nav"><span>Work</span><span>Services</span><span>About</span><span class="pill">Start a project</span></div>
+        </div>
+
+        <h2 class="mast" aria-label="Websites with the systems built in.">
+          <span>Websites with</span>
+          <span>the systems</span>
+          <span><em>built in</em><i class="dot"></i></span>
+        </h2>
+
+        <div class="dev-wrap" aria-hidden="true">
+          <div class="dev">
+            <span class="tag">SA-01 · OPERATIONS UNIT</span>
+            <span class="live"><span class="led"></span>LIVE</span>
+            <div class="lcd">
+              <div class="hdr"><span>ALL CHANNELS</span><span>09:31</span></div>
+              <div class="ln"><span class="t">09:02</span><span class="g">BRIEF</span>Daily briefing ready</div>
+              <div class="ln"><span class="t">09:14</span><span class="g">ORDER</span>#1042 flagged: duplicate</div>
+              <div class="ln"><span class="t">09:22</span><span class="g">LEAD</span>Follow-up sent to 12 leads</div>
+              <div class="ln"><span class="t">09:31</span><span class="g">STOCK</span>Restock alert: 3 items</div>
+            </div>
+            <span class="knob"></span>
+            <span class="sw a"></span><span class="sw b"></span><span class="sw c"></span>
+            <span class="grille"></span>
+            <span class="floor"></span>
+          </div>
+        </div>
+
+        <div class="bottom">
+          <div>
+            <p class="lede" style="margin:0">I'm <strong>Shayan Ahmed</strong>, a full-stack developer. I build the website your customers see and the system your team runs on.</p>
+            <div class="ctas"><span class="b ink">Start a project →</span><span class="b paper">See the work</span></div>
+          </div>
+          <div class="spec"><div>Stack<b>Next.js · MERN</b></div><div>Clients<b>Pakistan and abroad</b></div><div>Scroll<b>Take it apart ↓</b></div></div>
+          <div class="chip"><span class="avatar"></span><div><small>Available</small><span>Book a call</span></div></div>
+        </div>
+
+        <span class="callout" style="left:4cqw;top:6.6cqw"><i>1</i>Local clock for overseas clients</span>
+        <span class="callout" style="left:22cqw;top:42cqw"><i>2</i>Type runs full width behind the device</span>
+        <span class="callout" style="right:7cqw;top:9.2cqw"><i>3</i>3D device overlaps only line endings</span>
+        <span class="callout" style="right:4cqw;bottom:8.4cqw"><i>4</i>Portrait chip builds trust</span>
+      </div>
+    </div>
+    <div class="toggle" role="group" aria-label="Callouts" style="margin-top:14px">
+      <button type="button" aria-pressed="true" id="c-on">Show callouts</button>
+      <button type="button" aria-pressed="false" id="c-off">Clean view</button>
+    </div>
+  </section>
+
+  <section>
+    <div class="cap mono"><b>Scroll storyboard</b><span>Hero pinned for about 1.5 screens</span></div>
+    <div class="story">
+      <div class="sb">
+        <div class="sbf">
+          <div class="t1">Websites with<br>the systems<br><em style="font-style:italic">built in.</em></div>
+          <div class="mini" style="right:6cqw;top:24cqw;transform:rotate(-6deg)"></div>
+        </div>
+        <p><b>Entrance, 0 to 1.4s.</b> Each headline line rises from behind a mask. The device drops into place in front of the type, its light blinks twice and the screen boots.</p>
+      </div>
+      <div class="sb">
+        <div class="sbf">
+          <span class="part" style="left:-4cqw;top:6cqw">Websites</span>
+          <span class="part" style="right:-6cqw;top:44cqw">Systems</span>
+          <div class="slab s1"></div><div class="slab s2"></div><div class="slab s3"></div>
+          <span class="lab" style="left:15cqw;top:11cqw">Website</span>
+          <span class="lab" style="left:38cqw;top:9cqw">System</span>
+          <span class="lab" style="left:58cqw;top:7cqw">Automation</span>
+        </div>
+        <p><b>Scroll 30 to 70%.</b> The headline splits and slides off left and right, clearing the stage. The device turns and separates into its three labelled layers.</p>
+      </div>
+      <div class="sb">
+        <div class="sbf dark">
+          <div style="position:absolute;inset:14cqw 10cqw;border-radius:3cqw;box-shadow:0 0 0 1.2cqw #1a1917, 0 0 0 30cqw var(--paper)"></div>
+          <div style="position:absolute;left:16cqw;top:24cqw;font-family:var(--font-mono);font-size:2.6cqw;line-height:1.9;color:var(--paper)"><span style="color:var(--led)">ORDER</span> #1042 flagged<br><span style="color:var(--led)">LEAD</span> Follow-up sent</div>
+        </div>
+        <p><b>Scroll 70 to 100%.</b> The layers rejoin, the device faces you and the camera pushes into the screen. Its dark glass fills the view and becomes the services section.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="duo">
+    <div>
+      <div class="cap mono"><b>Phone</b><span>390 × 844</span></div>
+      <div class="phone">
+        <div class="pscreen">
+          <div class="ptop"><i>SA</i><span>Menu</span></div>
+          <div class="pclock"><span></span>KARACHI 16:32</div>
+          <h2>Websites with the systems <em>built in.</em></h2>
+          <div class="pdev" aria-hidden="true"></div>
+          <div class="pcta"><span class="k">Start a project</span><span class="w">See the work</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <h2>Why this layout works</h2>
+      <div class="note"><i>1</i><div><b>The type carries the page</b><p>At this size the headline reads as a poster, so the hero still says what you do before the 3D finishes loading.</p></div></div>
+      <div class="note"><i>2</i><div><b>Overlap creates depth</b><p>The device covers only the ends of the first two lines. Every word stays readable, and the layering makes the 3D look like it sits in the room rather than in a box.</p></div></div>
+      <div class="note"><i>3</i><div><b>The split gives the scroll a purpose</b><p>The headline moving out of the way is what makes room for the teardown, so the two motions read as one move.</p></div></div>
+      <div class="note"><i>4</i><div><b>Phones get a still device</b><p>On mobile the headline stacks above a pre-rendered device image. Same composition, no 3D cost.</p></div></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  var on = document.getElementById('c-on'), off = document.getElementById('c-off'), f = document.getElementById('frame');
+  function set(show){ f.classList.toggle('callouts-off', !show); on.setAttribute('aria-pressed', show ? 'true' : 'false'); off.setAttribute('aria-pressed', show ? 'false' : 'true'); }
+  on.addEventListener('click', function(){ set(true); });
+  off.addEventListener('click', function(){ set(false); });
+})();
+</script>

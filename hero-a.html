@@ -1,0 +1,636 @@
+<title>Hero Concept A</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Hanken+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a pinned 3D stage; the cream operations device powers on, turns, comes apart into its three layers (website, system, automation), then the camera dives into its screen, which becomes the dark section below. */
+:root{
+  --paper:#F3EADB; --hi:#FBF6EC; --lo:#E4D8C3; --edge:#CDBFA6;
+  --ink:#111111; --ink-2:#1E1C1A; --muted:#675E52; --muted-ink:#A89D8B; --led:#FF5B1F;
+  --font-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --font-body:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --raised: inset 0 1px 0 rgba(255,255,255,.9), 0 1px 1px rgba(17,17,17,.08), 0 10px 22px -10px rgba(17,17,17,.3), 0 24px 48px -26px rgba(17,17,17,.35);
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--paper)}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--led);outline-offset:3px;border-radius:8px}
+.mono{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase}
+
+.hero{position:relative;height:260vh}
+.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:radial-gradient(120% 80% at 70% 45%,var(--hi) 0%,var(--paper) 55%,#EDE2CF 100%)}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y}
+.chrome{position:absolute;inset:0;pointer-events:none;z-index:2}
+
+.topbar{position:absolute;top:calc(env(safe-area-inset-top,0px) + 18px);left:0;right:0;display:flex;justify-content:space-between;align-items:center;gap:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));pointer-events:auto}
+.brand{display:flex;align-items:center;gap:12px;font-family:var(--font-display);font-weight:700;font-variation-settings:"wdth" 110;font-size:15px}
+.badge{width:36px;height:36px;border-radius:10px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:13px;font-weight:800;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 3px 8px rgba(17,17,17,.3)}
+.top-right{display:flex;align-items:center;gap:14px}
+.plate{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:7px 11px;border-radius:8px;background:var(--lo);color:var(--muted);box-shadow:inset 0 2px 4px rgba(17,17,17,.12),inset 0 -1px 0 rgba(255,255,255,.7)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 22px;border-radius:12px;font-weight:600;font-size:15px;border:0;cursor:pointer;transition:transform .12s,box-shadow .12s;pointer-events:auto}
+.btn-ink{background:linear-gradient(180deg,#2A2826,var(--ink));color:var(--paper);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 #000,0 12px 24px -10px rgba(17,17,17,.6)}
+.btn-ink:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 0 #000}
+.btn-paper{background:linear-gradient(180deg,var(--hi),var(--paper));color:var(--ink);box-shadow:var(--raised),0 2px 0 var(--edge)}
+.btn-paper:active{transform:translateY(2px)}
+.btn-sm{min-height:42px;padding:0 16px;font-size:14px}
+
+.copy-pos{position:absolute;left:0;top:52%;transform:translateY(-50%);width:min(640px,50%);padding-left:max(16px,env(safe-area-inset-left,0px));z-index:3}
+@media (min-width:900px){.copy-pos{padding-left:max(56px,env(safe-area-inset-left,0px))}.topbar{padding-left:max(56px,env(safe-area-inset-left,0px));padding-right:max(56px,env(safe-area-inset-right,0px))}}
+.copy{will-change:transform,opacity}
+.kicker{display:flex;align-items:center;gap:10px;margin-bottom:26px}
+.kicker .dot{width:8px;height:8px;border-radius:50%;background:var(--led);box-shadow:0 0 10px 1px rgba(255,91,31,.7)}
+.kicker span:last-child{color:var(--muted)}
+h1{margin:0;font-family:var(--font-display);font-weight:800;font-variation-settings:"wdth" 116;font-size:clamp(46px,6.1vw,98px);line-height:.92;letter-spacing:-.035em;text-wrap:balance}
+h1 .line{display:block;overflow:hidden;padding-bottom:.07em}
+h1 .word{display:inline-block}
+h1 em{font-style:italic;font-variation-settings:"wdth" 92;font-weight:700}
+h1 .ledot{display:inline-block;width:.16em;height:.16em;border-radius:50%;background:var(--led);margin-left:.05em;box-shadow:0 0 .25em rgba(255,91,31,.8);vertical-align:baseline}
+.sub{margin-top:24px;color:var(--ink)}
+.lede{margin-top:18px;font-size:18px;color:var(--muted);max-width:30em}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+
+.rail{position:absolute;right:max(28px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px}
+.rail li{display:flex;align-items:center;justify-content:flex-end;gap:10px;color:var(--muted);opacity:.55;transition:opacity .3s,color .3s}
+.rail li i{width:7px;height:7px;border-radius:50%;background:var(--edge);box-shadow:inset 0 1px 1px rgba(17,17,17,.3);transition:background .3s,box-shadow .3s}
+.rail li.on{opacity:1;color:var(--ink)}
+.rail li.on i{background:var(--led);box-shadow:0 0 8px rgba(255,91,31,.8)}
+
+.tagc{position:absolute;left:0;top:0;width:236px;padding:14px 16px 15px;border-radius:14px;background:linear-gradient(180deg,var(--hi),var(--paper));box-shadow:var(--raised);opacity:0;will-change:transform,opacity}
+.tagc::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:38px;background:var(--ink);opacity:.45}
+.tagc::before{content:"";position:absolute;left:50%;top:calc(100% + 36px);width:7px;height:7px;margin-left:-3px;border-radius:50%;background:var(--led);box-shadow:0 0 8px rgba(255,91,31,.8)}
+.tagc .mono{color:var(--muted);font-size:10.5px}
+.tagc b{display:block;font-family:var(--font-display);font-variation-settings:"wdth" 112;font-weight:800;font-size:26px;line-height:1.05;margin:6px 0 6px}
+.tagc p{margin:0;font-size:13.5px;line-height:1.5;color:var(--muted)}
+
+.cap{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 40px);transform:translateX(-50%);text-align:center;opacity:0;white-space:nowrap}
+.cap strong{display:block;font-family:var(--font-display);font-variation-settings:"wdth" 110;font-weight:700;font-size:20px;margin-top:6px}
+
+.mstack{position:absolute;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 18px);display:none;flex-direction:column;gap:8px;opacity:0}
+.mrow{display:flex;align-items:baseline;gap:12px;padding:12px 14px;border-radius:12px;background:linear-gradient(180deg,var(--hi),var(--paper));box-shadow:var(--raised);opacity:.35}
+.mrow b{font-family:var(--font-display);font-variation-settings:"wdth" 110;font-size:18px;min-width:96px}
+.mrow span{font-size:13px;color:var(--muted)}
+
+.hint{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 28px);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--muted)}
+.hint i{display:block;width:1px;height:38px;background:linear-gradient(var(--ink),transparent);animation:drip 1.8s ease-in-out infinite;transform-origin:top}
+@keyframes drip{0%{transform:scaleY(0)}50%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
+
+.dive{position:absolute;inset:0;background:var(--ink);opacity:0;pointer-events:none;z-index:5}
+.nogl{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 90px);max-width:300px;padding:14px 16px;border-radius:12px;background:var(--lo);color:var(--muted);font-size:14px}
+
+@media (max-width:899px){
+  .copy-pos{top:calc(env(safe-area-inset-top,0px) + 86px);transform:none;width:100%;padding-right:max(16px,env(safe-area-inset-right,0px))}
+  h1{font-size:clamp(38px,10.5vw,60px)}
+  .kicker{margin-bottom:16px}
+  .lede{display:none}
+  .sub{margin-top:16px}
+  .cta{margin-top:22px}
+  .rail,.top-right .plate,.cap,.tagc{display:none}
+  .mstack{display:flex}
+  .hint{display:none}
+}
+
+/* section after the dive */
+.after{background:var(--ink);color:var(--paper);position:relative}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+@media (min-width:900px){.wrap{padding-left:max(56px,env(safe-area-inset-left,0px));padding-right:max(56px,env(safe-area-inset-right,0px))}}
+.after .wrap{padding-block:110px 120px}
+.after .mono{color:var(--muted-ink)}
+.after h2{margin:18px 0 0;font-family:var(--font-display);font-weight:800;font-variation-settings:"wdth" 114;font-size:clamp(36px,5vw,68px);line-height:.98;letter-spacing:-.03em;text-wrap:balance;max-width:14em}
+.after .intro{color:var(--muted-ink);font-size:17px;max-width:34em;margin:22px 0 0}
+.layers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:56px}
+@media (max-width:900px){.layers{grid-template-columns:minmax(0,1fr)}}
+.layer{border-radius:20px;padding:28px;background:linear-gradient(180deg,#252320,var(--ink-2));box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 30px 60px -30px rgba(0,0,0,.9);display:flex;flex-direction:column;gap:14px}
+.layer h3{margin:0;font-family:var(--font-display);font-weight:750;font-variation-settings:"wdth" 108;font-size:26px}
+.layer p{margin:0;color:var(--muted-ink);font-size:15px}
+.layer ul{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:8px;font-family:var(--font-mono);font-size:12.5px;color:#D9CFC0}
+.layer li::before{content:"→ ";color:var(--led)}
+.end{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;margin-top:64px;padding-top:28px;border-top:1px solid #2C2925;color:var(--muted-ink);font-size:14px}
+.replay{background:transparent;border:1px solid #3A352F;color:var(--paper);min-height:44px;padding:0 18px;border-radius:10px;cursor:pointer}
+.replay:hover{border-color:var(--led)}
+@media (prefers-reduced-motion:reduce){.hint i{animation:none}}
+</style>
+
+<section class="hero" id="hero" aria-label="Introduction">
+  <div class="stage" id="stage">
+    <canvas id="gl" aria-hidden="true"></canvas>
+    <div class="chrome">
+      <div class="topbar">
+        <a class="brand" href="#hero"><span class="badge">SA</span>Shayan Ahmed</a>
+        <div class="top-right"><span class="plate">Hero concept A</span><a class="btn btn-ink btn-sm" href="#after">Start a project</a></div>
+      </div>
+
+      <div class="copy-pos">
+        <div class="copy" id="copy">
+          <div class="kicker reveal-up"><span class="dot"></span><span class="mono">Full-stack developer · Taking projects</span></div>
+          <h1 id="headline" aria-label="Websites with the systems built in.">
+            <span class="line"><span class="word">Websites</span> <span class="word">with</span></span>
+            <span class="line"><span class="word">the systems</span></span>
+            <span class="line"><span class="word"><em>built in</em><span class="ledot"></span></span></span>
+          </h1>
+          <p class="sub mono reveal-up">Web development · Business systems · Automation</p>
+          <p class="lede reveal-up">I build the website your customers see and the system your team runs on, with agents that handle the repetitive work while you approve every action.</p>
+          <div class="cta reveal-up"><a class="btn btn-ink" href="#after">Start a project →</a><a class="btn btn-paper" href="#after">See the work</a></div>
+        </div>
+      </div>
+
+      <ul class="rail mono" id="rail" aria-hidden="true">
+        <li class="on">Power on<i></i></li>
+        <li>Turn<i></i></li>
+        <li>Teardown<i></i></li>
+        <li>Dive<i></i></li>
+      </ul>
+
+      <div class="tagc"><span class="mono">Layer 1 · Shell</span><b>Website</b><p>Storefront, pages and checkout your customers use.</p></div>
+      <div class="tagc"><span class="mono">Layer 2 · Board</span><b>System</b><p>Dashboards, orders, leads and records your team runs on.</p></div>
+      <div class="tagc"><span class="mono">Layer 3 · Core</span><b>Automation</b><p>Agents flag orders, send reminders and prepare restocks. You approve.</p></div>
+
+      <div class="cap" id="cap"><span class="mono" style="color:var(--muted)">Every build ships with</span><strong>all three layers, designed together.</strong></div>
+
+      <div class="mstack" id="mstack">
+        <div class="mrow"><b>Website</b><span>What customers see</span></div>
+        <div class="mrow"><b>System</b><span>What your team runs on</span></div>
+        <div class="mrow"><b>Automation</b><span>What runs without you</span></div>
+      </div>
+
+      <div class="hint mono" id="hint">Scroll to take it apart<i></i></div>
+      <p class="nogl" id="nogl" hidden>The 3D device needs WebGL, which this browser has turned off. The headline and layout still show the concept.</p>
+    </div>
+    <div class="dive" id="dive"></div>
+  </div>
+</section>
+
+<section class="after" id="after">
+  <div class="wrap">
+    <span class="mono">Services · the section the dive lands in</span>
+    <h2>Three layers. One developer. One build.</h2>
+    <p class="intro">Most sites stop at the shell. Each project I take on can ship with the system behind it and the automations inside it.</p>
+    <div class="layers">
+      <article class="layer"><span class="mono">Layer 1</span><h3>Website</h3><p>Fast, well-built sites that explain what you sell and turn visitors into enquiries.</p><ul><li>Agency and business sites</li><li>E-commerce storefronts</li><li>Landing pages</li></ul></article>
+      <article class="layer"><span class="mono">Layer 2</span><h3>System</h3><p>Dashboards, roles and records your team works from every day.</p><ul><li>School and restaurant systems</li><li>Subscriber billing</li><li>Admin panels</li></ul></article>
+      <article class="layer"><span class="mono">Layer 3</span><h3>Automation</h3><p>Agents and workflows that take repetitive work off your plate.</p><ul><li>Operations agents</li><li>Lead follow-ups</li><li>Email campaigns</li></ul></article>
+    </div>
+    <div class="end"><span>Prototype of hero concept A. Try the three switches on the device, then scroll.</span><button class="replay" id="replay" type="button">Replay from the top</button></div>
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(function(){
+  var $ = function(s){ return document.querySelector(s); };
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fine = window.matchMedia('(pointer: fine)').matches;
+  var hero = $('#hero'), stage = $('#stage'), canvas = $('#gl');
+  var copy = $('#copy'), hint = $('#hint'), dive = $('#dive'), cap = $('#cap'), mstack = $('#mstack');
+  var railItems = [].slice.call(document.querySelectorAll('#rail li'));
+  var cards = [].slice.call(document.querySelectorAll('.tagc'));
+  var mrows = [].slice.call(document.querySelectorAll('.mrow'));
+
+  var clamp = function(v, a, b){ a = a === undefined ? 0 : a; b = b === undefined ? 1 : b; return Math.min(b, Math.max(a, v)); };
+  var ss = function(a, b, v){ var t = clamp((v - a) / (b - a)); return t * t * (3 - 2 * t); };
+  var mix = function(a, b, t){ return a + (b - a) * t; };
+
+  /* smooth scroll */
+  var lenis = null;
+  if (!reduce && window.Lenis) { try { lenis = new Lenis({ duration: 1.15, smoothWheel: true }); } catch (e) { lenis = null; } }
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      var el = document.querySelector(a.getAttribute('href')); if (!el) return;
+      e.preventDefault();
+      if (lenis) lenis.scrollTo(el, { duration: 1.6 }); else el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+    });
+  });
+
+  /* ---------- console content ---------- */
+  var streams = {
+    site: [['SITE','New enquiry from the contact form'],['SITE','Product page published'],['SITE','Checkout completed, order #1058']],
+    ops: [['ORDER','#1042 flagged: duplicate address'],['REMIND','Checkout reminder sent with code'],['ORDER','#1051 dispatched in one click'],['STOCK','Restock alert: 3 items running low'],['RETURN','Return triaged, awaiting approval'],['BRIEF','Daily briefing ready for owner']],
+    leads: [['LEAD','Follow-up sent to 12 new leads'],['LEAD','Welcome email sent to prospect'],['LEAD','Query answered from template']]
+  };
+  var on = { site: true, ops: true, leads: true };
+  var lines = [], typing = null, clock = 9 * 60 + 2, evIdx = 0, typingStarted = false;
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function fmt(m){ return pad(Math.floor(m / 60) % 24) + ':' + pad(m % 60); }
+  function modeLabel(){ var a = Object.keys(on).filter(function(k){ return on[k]; }); return a.length === 3 ? 'All channels' : (a.length ? a.join(' + ') : 'Standby'); }
+  function nextEvent(){
+    var pool = []; Object.keys(on).forEach(function(k){ if (on[k]) pool = pool.concat(streams[k]); });
+    clock += 3 + (evIdx * 7) % 9;
+    if (!pool.length) return { t: fmt(clock), tag: 'SYS', msg: 'All channels off. Flip a switch.' };
+    var ev = pool[evIdx++ % pool.length];
+    return { t: fmt(clock), tag: ev[0], msg: ev[1] };
+  }
+  function queueLine(){
+    if (typing) lines.push(typing.line);
+    while (lines.length > 6) lines.shift();
+    typing = { line: nextEvent(), n: 0 };
+  }
+  function startTyping(){
+    if (typingStarted) return; typingStarted = true;
+    queueLine();
+    setInterval(queueLine, reduce ? 3500 : 1700);
+  }
+
+  /* ---------- entrance ---------- */
+  var boot = { rise: 1, led: 1, screen: 1 };
+  var tl = null;
+  function buildEntrance(){
+    if (!window.gsap || reduce) { startTyping(); return; }
+    boot.rise = 0; boot.led = 0; boot.screen = 0.03;
+    tl = gsap.timeline();
+    tl.from('#headline .word', { yPercent: 115, duration: 1.05, stagger: .08, ease: 'expo.out' }, 0.15)
+      .to(boot, { rise: 1, duration: 1.6, ease: 'expo.out' }, 0.2)
+      .to(boot, { led: 1, duration: .05 }, 0.5).to(boot, { led: .04, duration: .07 }, 0.58).to(boot, { led: 1, duration: .05 }, 0.68)
+      .to(boot, { screen: .6, duration: .04 }, 0.8).to(boot, { screen: .06, duration: .05 }, 0.86)
+      .to(boot, { screen: .85, duration: .04 }, 0.93).to(boot, { screen: .25, duration: .04 }, 0.99)
+      .to(boot, { screen: 1, duration: .35, ease: 'power2.out' }, 1.04)
+      .add(startTyping, 1.05)
+      .from('.reveal-up', { y: 26, duration: .85, stagger: .07, ease: 'expo.out' }, 0.9);
+  }
+  $('#replay').addEventListener('click', function(){
+    if (lenis) lenis.scrollTo(0, { immediate: true }); else window.scrollTo(0, 0);
+    ps = 0;
+    if (tl) { boot.rise = 0; boot.led = 0; boot.screen = 0.03; lines = []; typing = null; tl.restart(); }
+  });
+
+  /* ---------- 3D ---------- */
+  var renderer = null;
+  try {
+    if (!window.THREE) throw new Error('no three');
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+  } catch (e) { renderer = null; $('#nogl').hidden = false; }
+
+  var scene, camera, root, tilt, shellG, boardG, coreG, screenMat, ledMat, coreGlowMat, coreLight, shadow, knob, screenMesh;
+  var levers = [], chLeds = [], screenTex, sctx;
+  var L = { wide: true, dist0: 9.2, distT: 10.2, x0: 1.8, y0: 0, aspect: 1.6 };
+
+  function rr(w, h, r, cx, cy, asPath){
+    cx = cx || 0; cy = cy || 0;
+    var s = asPath ? new THREE.Path() : new THREE.Shape();
+    var x = cx - w / 2, y = cy - h / 2;
+    s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+    s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+    s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+    return s;
+  }
+  function ext(shape, depth, bevel){
+    var g = new THREE.ExtrudeGeometry(shape, { depth: depth, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 5, curveSegments: 18 });
+    g.translate(0, 0, -depth / 2);
+    return g;
+  }
+  function canvasTex(w, h){
+    var c = document.createElement('canvas'); c.width = w; c.height = h;
+    var t = new THREE.CanvasTexture(c); t.anisotropy = 4;
+    return { c: c, x: c.getContext('2d'), t: t };
+  }
+  function rand(seed){ return function(){ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }; }
+
+  var W = 3.4, H = 2.3, SW = 2.0, SH = 1.3, SX = -0.5, SY = 0.15;
+  var face, board, core, chipTop;
+
+  function drawFace(){
+    var x = face.x, U = 400, X = function(v){ return (v + 1.7) * U; }, Y = function(v){ return (1.15 - v) * U; };
+    x.clearRect(0, 0, 1360, 920);
+    x.fillStyle = 'rgba(17,17,17,.6)'; x.font = '500 24px "IBM Plex Mono", monospace'; x.textAlign = 'left';
+    x.fillText('SA-01  ·  OPERATIONS UNIT', X(-1.5), Y(0.92));
+    x.textAlign = 'right'; x.fillText('LIVE', X(1.36), Y(0.92));
+    x.textAlign = 'center'; x.font = '500 18px "IBM Plex Mono", monospace';
+    ['SITE', 'ORDERS', 'LEADS'].forEach(function(l, i){ x.fillText(l, X(0.8 + 0.3 * i), Y(-0.7)); });
+    x.fillText('SCROLL', X(1.1), Y(0.03));
+    x.strokeStyle = 'rgba(17,17,17,.45)'; x.lineWidth = 3;
+    for (var k = 0; k <= 10; k++) {
+      var a = (-135 + k * 27) * Math.PI / 180 - Math.PI / 2;
+      x.beginPath(); x.moveTo(X(1.1) + Math.cos(a) * 0.32 * U, Y(0.42) + Math.sin(a) * 0.32 * U);
+      x.lineTo(X(1.1) + Math.cos(a) * 0.37 * U, Y(0.42) + Math.sin(a) * 0.37 * U); x.stroke();
+    }
+    for (var r = 0; r < 3; r++) for (var c = 0; c < 26; c++) {
+      var px = X(-1.44 + c * 0.075), py = Y(-0.78 - r * 0.075);
+      x.fillStyle = 'rgba(255,255,255,.75)'; x.beginPath(); x.arc(px, py + 1.6, 6.4, 0, Math.PI * 2); x.fill();
+      x.fillStyle = 'rgba(17,17,17,.42)'; x.beginPath(); x.arc(px, py, 6.4, 0, Math.PI * 2); x.fill();
+    }
+    x.textAlign = 'right'; x.fillStyle = 'rgba(17,17,17,.38)'; x.font = '500 16px "IBM Plex Mono", monospace';
+    x.fillText('S/N 2026-SA · MADE IN KARACHI', X(1.55), Y(-1.0));
+    face.t.needsUpdate = true;
+  }
+
+  function drawBoard(){
+    var x = board.x, R = rand(42), U = 1024 / 3.15;
+    var X = function(v){ return (v + 1.575) * U; }, Y = function(v){ return (1.025 - v) * U; };
+    x.fillStyle = '#1b1a18'; x.fillRect(0, 0, 1024, 666);
+    x.lineCap = 'round'; x.lineJoin = 'round';
+    for (var i = 0; i < 80; i++) {
+      var px = Math.round(R() * 64) * 16, py = Math.round(R() * 42) * 16;
+      x.strokeStyle = R() > .8 ? 'rgba(228,216,195,.55)' : 'rgba(205,191,166,.24)'; x.lineWidth = R() > .7 ? 4 : 2.5;
+      x.beginPath(); x.moveTo(px, py);
+      for (var s = 0; s < 4; s++) { if (s % 2) py += (R() - .5) * 220; else px += (R() - .5) * 300; x.lineTo(px, py); }
+      x.stroke();
+      x.fillStyle = 'rgba(228,216,195,.6)'; x.beginPath(); x.arc(px, py, 5, 0, Math.PI * 2); x.fill();
+    }
+    x.strokeStyle = 'rgba(243,234,219,.55)'; x.lineWidth = 2;
+    [[-0.6, 0.2, 0.8, 0.8], [0.5, 0.45, 0.6, 0.38], [0.5, 0.0, 0.6, 0.38], [0.3, -0.6, 1.0, 0.33]].forEach(function(b){
+      x.strokeRect(X(b[0] - b[2] / 2), Y(b[1] + b[3] / 2), b[2] * U, b[3] * U);
+    });
+    x.fillStyle = 'rgba(243,234,219,.62)'; x.font = '500 20px "IBM Plex Mono", monospace';
+    x.fillText('SA-01 MAINBOARD  REV B', X(-1.45), Y(0.88));
+    x.fillText('MCU', X(-1.0), Y(-0.32)); x.fillText('MEM', X(0.9), Y(0.72)); x.fillText('I/O', X(0.9), Y(-0.86));
+    board.t.needsUpdate = true;
+  }
+
+  function drawCore(){
+    var x = core.x, U = 400, cx = 680, cy = 460;
+    x.clearRect(0, 0, 1360, 920);
+    var names = ['BRIEF', 'RISK', 'STOCK', 'RETURNS', 'DRAFTS', 'CATALOG', 'MERCH', 'FEEDBACK'];
+    x.strokeStyle = 'rgba(17,17,17,.32)'; x.lineWidth = 3; x.fillStyle = 'rgba(17,17,17,.6)';
+    x.font = '600 16px "IBM Plex Mono", monospace'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    names.forEach(function(n, i){
+      var a = (-90 + 22.5 + i * 45) * Math.PI / 180;
+      var px = cx + Math.cos(a) * 1.28 * U, py = cy + Math.sin(a) * 0.82 * U;
+      x.beginPath(); x.moveTo(cx + Math.cos(a) * 0.62 * U * .9, cy + Math.sin(a) * 0.62 * U * .9); x.lineTo(px, py); x.stroke();
+      x.fillStyle = 'rgba(251,246,236,.95)';
+      x.beginPath(); if (x.roundRect) x.roundRect(px - 76, py - 22, 152, 44, 10); else x.rect(px - 76, py - 22, 152, 44); x.fill();
+      x.strokeStyle = 'rgba(17,17,17,.4)'; x.lineWidth = 2; x.stroke();
+      x.fillStyle = 'rgba(17,17,17,.75)'; x.fillText(n, px, py + 1);
+      x.strokeStyle = 'rgba(17,17,17,.32)'; x.lineWidth = 3;
+    });
+    x.textAlign = 'left'; x.textBaseline = 'alphabetic'; x.font = '500 20px "IBM Plex Mono", monospace'; x.fillStyle = 'rgba(17,17,17,.55)';
+    x.fillText('CORE  ·  8 AGENTS  ·  OWNER APPROVAL', 80, 92);
+    core.t.needsUpdate = true;
+
+    var y = chipTop.x; y.clearRect(0, 0, 256, 256);
+    y.fillStyle = '#F3EADB'; y.textAlign = 'center';
+    y.font = '800 52px "Archivo", sans-serif'; y.fillText('CORE', 128, 132);
+    y.font = '500 18px "IBM Plex Mono", monospace'; y.fillStyle = '#A89D8B'; y.fillText('AGENTS ×8', 128, 168);
+    y.beginPath(); y.arc(36, 36, 8, 0, Math.PI * 2); y.fillStyle = '#A89D8B'; y.fill();
+    chipTop.t.needsUpdate = true;
+  }
+
+  function truncate(ctx, s, max){
+    if (ctx.measureText(s).width <= max) return s;
+    while (s.length && ctx.measureText(s + '…').width > max) s = s.slice(0, -1);
+    return s + '…';
+  }
+  function drawScreen(t){
+    var x = sctx;
+    var g = x.createRadialGradient(512, -40, 40, 512, 333, 820); g.addColorStop(0, '#26231f'); g.addColorStop(1, '#0c0b0a');
+    x.fillStyle = g; x.fillRect(0, 0, 1024, 666);
+    x.font = '500 22px "IBM Plex Mono", monospace'; x.textAlign = 'left'; x.fillStyle = '#A89D8B';
+    x.fillText(modeLabel().toUpperCase(), 48, 64);
+    x.textAlign = 'right'; x.fillText(fmt(clock), 976, 64); x.textAlign = 'left';
+    x.strokeStyle = 'rgba(243,234,219,.16)'; x.lineWidth = 2; x.setLineDash([8, 8]);
+    x.beginPath(); x.moveTo(48, 88); x.lineTo(976, 88); x.stroke(); x.setLineDash([]);
+    x.font = '400 27px "IBM Plex Mono", monospace';
+    var y = 146, all = lines.slice();
+    if (typing) all.push({ t: typing.line.t, tag: typing.line.tag, msg: typing.line.msg.slice(0, typing.n), live: true });
+    all.forEach(function(l){
+      x.shadowBlur = 0; x.fillStyle = '#857b6d'; x.fillText(l.t, 48, y);
+      x.shadowColor = 'rgba(255,91,31,.75)'; x.shadowBlur = 14; x.fillStyle = '#FF5B1F'; x.fillText(l.tag, 170, y);
+      x.shadowColor = 'rgba(243,234,219,.45)'; x.shadowBlur = 10; x.fillStyle = '#F3EADB';
+      var m = truncate(x, l.msg, 976 - 318); x.fillText(m, 318, y);
+      if (l.live && Math.floor(t / 450) % 2 === 0) { var w = x.measureText(m).width; x.fillRect(318 + w + 6, y - 24, 15, 28); }
+      y += 64;
+    });
+    if (!all.length && Math.floor(t / 450) % 2 === 0) { x.fillStyle = '#F3EADB'; x.fillRect(48, y - 24, 15, 28); }
+    x.shadowBlur = 0;
+    x.fillStyle = 'rgba(255,255,255,.035)'; for (var s = 0; s < 666; s += 4) x.fillRect(0, s, 1024, 1);
+    var gl = x.createLinearGradient(0, 0, 700, 666); gl.addColorStop(0, 'rgba(255,255,255,.09)'); gl.addColorStop(.42, 'rgba(255,255,255,0)');
+    x.fillStyle = gl; x.fillRect(0, 0, 1024, 666);
+    screenTex.needsUpdate = true;
+  }
+
+  function build3D(){
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+    renderer.setClearColor(0x000000, 0);
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+
+    scene.add(new THREE.HemisphereLight(0xfffaf0, 0xb3a184, 0.55));
+    var key = new THREE.DirectionalLight(0xfff4e4, 0.62); key.position.set(3, 4.5, 6); scene.add(key);
+    var rim = new THREE.DirectionalLight(0xffffff, 0.35); rim.position.set(-5, 2, -4); scene.add(rim);
+    var fill = new THREE.DirectionalLight(0xf3eadb, 0.18); fill.position.set(-4, -1, 5); scene.add(fill);
+
+    var mCream = new THREE.MeshPhysicalMaterial({ color: 0xF3EADB, roughness: .52, metalness: 0, clearcoat: .35, clearcoatRoughness: .4 });
+    var mHi = new THREE.MeshStandardMaterial({ color: 0xFBF6EC, roughness: .45 });
+    var mLo = new THREE.MeshStandardMaterial({ color: 0xE4D8C3, roughness: .6 });
+    var mInk = new THREE.MeshStandardMaterial({ color: 0x1a1917, roughness: .45 });
+    var mChip = new THREE.MeshStandardMaterial({ color: 0x23211e, roughness: .38 });
+    ledMat = new THREE.MeshStandardMaterial({ color: 0x5a2a18, emissive: 0xFF5B1F, emissiveIntensity: 0 });
+    coreGlowMat = new THREE.MeshStandardMaterial({ color: 0x3a1708, emissive: 0xFF5B1F, emissiveIntensity: .6 });
+
+    root = new THREE.Group(); scene.add(root);
+    tilt = new THREE.Group(); root.add(tilt);
+    shellG = new THREE.Group(); boardG = new THREE.Group(); coreG = new THREE.Group();
+    tilt.add(shellG, boardG, coreG);
+
+    /* shell */
+    var shape = rr(W, H, 0.28);
+    shape.holes.push(rr(SW + 0.16, SH + 0.16, 0.16, SX, SY, true));
+    shellG.add(new THREE.Mesh(ext(shape, 0.2, 0.05), mCream));
+    var ring = rr(SW + 0.16, SH + 0.16, 0.16, SX, SY); ring.holes.push(rr(SW, SH, 0.1, SX, SY, true));
+    var gasket = new THREE.Mesh(ext(ring, 0.03, 0.01), mInk); gasket.position.z = 0.02; shellG.add(gasket);
+    var sc = document.createElement('canvas'); sc.width = 1024; sc.height = 666; sctx = sc.getContext('2d');
+    screenTex = new THREE.CanvasTexture(sc); screenTex.anisotropy = 4;
+    screenMat = new THREE.MeshBasicMaterial({ map: screenTex, color: 0x080808, toneMapped: false });
+    screenMesh = new THREE.Mesh(new THREE.PlaneGeometry(SW, SH), screenMat); screenMesh.position.set(SX, SY, 0.03); shellG.add(screenMesh);
+    face = canvasTex(1360, 920);
+    var decal = new THREE.Mesh(new THREE.PlaneGeometry(W, H), new THREE.MeshBasicMaterial({ map: face.t, transparent: true, depthWrite: false }));
+    decal.position.z = 0.152; shellG.add(decal);
+
+    var screwGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.02, 24), slotGeo = new THREE.BoxGeometry(0.07, 0.012, 0.012);
+    [[-1.5, 0.98], [1.5, 0.98], [-1.5, -0.98], [1.5, -0.98]].forEach(function(p, i){
+      var s = new THREE.Mesh(screwGeo, mLo); s.rotation.x = Math.PI / 2; s.position.set(p[0], p[1], 0.155); shellG.add(s);
+      var sl = new THREE.Mesh(slotGeo, mInk); sl.position.set(p[0], p[1], 0.166); sl.rotation.z = 0.6 + i; shellG.add(sl);
+    });
+
+    knob = new THREE.Group(); knob.position.set(1.1, 0.42, 0.15); shellG.add(knob);
+    var kc = new THREE.Group(); kc.rotation.x = Math.PI / 2; knob.add(kc);
+    var kBase = new THREE.Mesh(new THREE.CylinderGeometry(0.29, 0.29, 0.03, 48), mLo); kBase.position.y = 0.015; kc.add(kBase);
+    var kBody = new THREE.Mesh(new THREE.CylinderGeometry(0.235, 0.25, 0.16, 48), mCream); kBody.position.y = 0.09; kc.add(kBody);
+    var kCap = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.02, 48), mHi); kCap.position.y = 0.175; kc.add(kCap);
+    var kMark = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.012, 0.11), mInk); kMark.position.set(0, 0.186, -0.12); kc.add(kMark);
+
+    var slotG = new THREE.BoxGeometry(0.15, 0.42, 0.04), leverG = new THREE.BoxGeometry(0.13, 0.17, 0.12), miniLed = new THREE.SphereGeometry(0.026, 16, 12);
+    ['site', 'ops', 'leads'].forEach(function(ch, i){
+      var xx = 0.8 + 0.3 * i, yy = -0.33;
+      var slot = new THREE.Mesh(slotG, mInk); slot.position.set(xx, yy, 0.15); shellG.add(slot);
+      var lev = new THREE.Mesh(leverG, mCream); lev.position.set(xx, yy + 0.1, 0.22); lev.userData = { ch: ch, on: true, base: yy }; shellG.add(lev); levers.push(lev);
+      var lm = new THREE.MeshStandardMaterial({ color: 0x5a2a18, emissive: 0xFF5B1F, emissiveIntensity: 1.4 });
+      var ml = new THREE.Mesh(miniLed, lm); ml.position.set(xx, yy + 0.27, 0.16); shellG.add(ml); chLeds.push(lm);
+    });
+    var ledHouse = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.02, 24), mLo); ledHouse.rotation.x = Math.PI / 2; ledHouse.position.set(1.47, 0.95, 0.155); shellG.add(ledHouse);
+    var led = new THREE.Mesh(new THREE.SphereGeometry(0.045, 20, 14), ledMat); led.position.set(1.47, 0.95, 0.17); shellG.add(led);
+
+    /* board */
+    boardG.position.z = -0.21;
+    board = canvasTex(1024, 666);
+    var mPCB = new THREE.MeshStandardMaterial({ map: board.t, roughness: .5 });
+    var mEdge = new THREE.MeshStandardMaterial({ color: 0x2b2824, roughness: .6 });
+    boardG.add(new THREE.Mesh(new THREE.BoxGeometry(3.15, 2.05, 0.05), [mEdge, mEdge, mEdge, mEdge, mPCB, mEdge]));
+    [[-0.6, 0.2, 0.7, 0.7, 0.09], [0.5, 0.45, 0.5, 0.28, 0.06], [0.5, 0.0, 0.5, 0.28, 0.06], [0.3, -0.6, 0.9, 0.24, 0.07]].forEach(function(b){
+      var m = new THREE.Mesh(new THREE.BoxGeometry(b[2], b[3], b[4]), mChip); m.position.set(b[0], b[1], 0.025 + b[4] / 2); boardG.add(m);
+    });
+    var capG = new THREE.CylinderGeometry(0.075, 0.075, 0.18, 24);
+    [[1.2, 0.62], [1.2, 0.32], [1.36, -0.18], [-1.3, -0.62], [-1.3, 0.72]].forEach(function(p){
+      var c = new THREE.Mesh(capG, mCream); c.rotation.x = Math.PI / 2; c.position.set(p[0], p[1], 0.115); boardG.add(c);
+    });
+
+    /* core */
+    coreG.position.z = -0.4;
+    coreG.add(new THREE.Mesh(ext(rr(W, H, 0.28), 0.18, 0.05), mLo));
+    core = canvasTex(1360, 920);
+    var cDecal = new THREE.Mesh(new THREE.PlaneGeometry(W, H), new THREE.MeshBasicMaterial({ map: core.t, transparent: true, depthWrite: false }));
+    cDecal.position.z = 0.142; coreG.add(cDecal);
+    var glow = new THREE.Mesh(new THREE.BoxGeometry(1.04, 1.04, 0.02), coreGlowMat); glow.position.z = 0.15; coreG.add(glow);
+    var chip = new THREE.Mesh(new THREE.BoxGeometry(0.96, 0.96, 0.1), mChip); chip.position.z = 0.21; coreG.add(chip);
+    chipTop = canvasTex(256, 256);
+    var ct = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.9), new THREE.MeshBasicMaterial({ map: chipTop.t, transparent: true, depthWrite: false }));
+    ct.position.z = 0.262; coreG.add(ct);
+    coreLight = new THREE.PointLight(0xFF5B1F, 0, 5, 2); coreLight.position.set(0, 0, 0.9); coreG.add(coreLight);
+
+    /* floor shadow */
+    var sh = canvasTex(256, 256);
+    var rg = sh.x.createRadialGradient(128, 128, 0, 128, 128, 128);
+    rg.addColorStop(0, 'rgba(60,45,30,.55)'); rg.addColorStop(.55, 'rgba(60,45,30,.18)'); rg.addColorStop(1, 'rgba(60,45,30,0)');
+    sh.x.fillStyle = rg; sh.x.fillRect(0, 0, 256, 256); sh.t.needsUpdate = true;
+    shadow = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 2.0), new THREE.MeshBasicMaterial({ map: sh.t, transparent: true, depthWrite: false }));
+    shadow.rotation.x = -Math.PI / 2; shadow.position.y = -1.62; root.add(shadow);
+
+    drawFace(); drawBoard(); drawCore(); drawScreen(0);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ drawFace(); drawBoard(); drawCore(); });
+
+    /* switches */
+    var ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+    function hit(e){
+      var r = canvas.getBoundingClientRect();
+      ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      ray.setFromCamera(ndc, camera);
+      var h = ray.intersectObjects(levers, false); return h.length ? h[0].object : null;
+    }
+    canvas.addEventListener('pointerdown', function(e){
+      var lev = hit(e); if (!lev) return;
+      lev.userData.on = !lev.userData.on; on[lev.userData.ch] = lev.userData.on; queueLine();
+    });
+    if (fine) canvas.addEventListener('pointermove', function(e){ canvas.style.cursor = hit(e) ? 'pointer' : ''; });
+
+    layout();
+    window.addEventListener('resize', layout);
+  }
+
+  function layout(){
+    var w = stage.clientWidth, h = stage.clientHeight, aspect = w / h;
+    L.aspect = aspect; L.wide = w >= 900;
+    if (renderer) { renderer.setSize(w, h, false); camera.aspect = aspect; camera.updateProjectionMatrix(); }
+    var k = 0.536;
+    if (L.wide) {
+      L.dist0 = 9.4; L.distT = 10.6;
+      L.x0 = 0.2 * k * L.dist0 * aspect; L.y0 = -0.15;
+    } else {
+      L.dist0 = Math.max(3.9 / (k * aspect), 9); L.distT = Math.max(5.0 / (k * aspect), L.dist0);
+      L.x0 = 0; L.y0 = -0.2 * k * L.dist0;
+    }
+  }
+
+  /* pointer tilt */
+  var ptr = { x: 0, y: 0 }, ptrS = { x: 0, y: 0 };
+  if (fine && !reduce) window.addEventListener('pointermove', function(e){ ptr.x = e.clientX / window.innerWidth - .5; ptr.y = e.clientY / window.innerHeight - .5; });
+
+  /* ---------- loop ---------- */
+  var ps = 0, v3 = null, look = null, camEnd = null, scW = null, frameN = 0;
+  if (renderer) { build3D(); v3 = new THREE.Vector3(); look = new THREE.Vector3(); camEnd = new THREE.Vector3(); scW = new THREE.Vector3(); }
+  else layout();
+  buildEntrance();
+
+  function frame(t){
+    requestAnimationFrame(frame);
+    if (lenis) lenis.raf(t);
+    var rect = hero.getBoundingClientRect();
+    var total = hero.offsetHeight - window.innerHeight;
+    var p = clamp(-rect.top / total);
+    if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+    ps += (p - ps) * (reduce ? 1 : 0.085);
+    if (Math.abs(p - ps) < 0.0004) ps = p;
+
+    var a = ss(0, 0.3, ps);
+    var e = ss(0.3, 0.5, ps) * (1 - ss(0.62, 0.78, ps));
+    var faceOn = ss(0.66, 0.84, ps);
+    var d = ss(0.74, 1, ps);
+    var hOut = ss(0, 0.22, ps);
+
+    copy.style.transform = 'translate3d(0,' + (-hOut * 70) + 'px,0)';
+    copy.style.opacity = String(1 - hOut);
+    copy.style.visibility = hOut > .99 ? 'hidden' : 'visible';
+    hint.style.opacity = String(1 - ss(0, 0.05, ps));
+    dive.style.opacity = String(ss(0.9, 1, ps));
+    var phase = ps < 0.06 ? 0 : ps < 0.3 ? 1 : ps < 0.72 ? 2 : 3;
+    railItems.forEach(function(li, i){ li.classList.toggle('on', i === phase); });
+    var labelVals = [0, 1, 2].map(function(i){ return ss(0.38 + i * 0.045, 0.46 + i * 0.045, ps) * (1 - ss(0.6, 0.67, ps)); });
+    cap.style.opacity = String(ss(0.5, 0.56, ps) * (1 - ss(0.62, 0.67, ps)));
+    mstack.style.opacity = String(Math.max.apply(null, labelVals));
+    mrows.forEach(function(r, i){ r.style.opacity = String(.35 + .65 * labelVals[i]); });
+
+    if (!renderer) return;
+
+    ptrS.x += (ptr.x - ptrS.x) * 0.06; ptrS.y += (ptr.y - ptrS.y) * 0.06;
+    var calm = 1 - d;
+    var rotY = mix(mix(-0.2, -0.7, a), 0, faceOn) + ptrS.x * 0.22 * calm;
+    var rotX = mix(mix(0.05, 0.2, a), 0, faceOn) + ptrS.y * 0.12 * calm + (1 - boot.rise) * 0.45;
+    tilt.rotation.set(rotX, rotY, 0);
+    root.position.set(mix(L.x0, 0, a), mix(L.y0, 0, a) - (1 - boot.rise) * 0.7, 0);
+    shellG.position.z = 1.3 * e;
+    coreG.position.z = -0.4 - 1.3 * e;
+    boardG.position.y = 0.08 * e;
+    shadow.scale.set(1 + e * 0.5, 1 + e * 0.6, 1);
+    shadow.material.opacity = (0.75 + 0.25 * boot.rise) * (1 - d);
+
+    coreGlowMat.emissiveIntensity = 0.6 + e * 1.6 + Math.sin(t / 380) * 0.15;
+    coreLight.intensity = e * 1.8;
+    ledMat.emissiveIntensity = boot.led * (1.4 + Math.sin(t / 420) * 0.5);
+    screenMat.color.setScalar(boot.screen);
+    knob.rotation.z = -ps * Math.PI * 1.6;
+    levers.forEach(function(lv, i){
+      var target = lv.userData.base + (lv.userData.on ? 0.1 : -0.1);
+      lv.position.y += (target - lv.position.y) * 0.25;
+      chLeds[i].emissiveIntensity += ((lv.userData.on ? 1.5 : 0) - chLeds[i].emissiveIntensity) * 0.2;
+    });
+
+    if (typing && typing.n < typing.line.msg.length) typing.n = Math.min(typing.line.msg.length, typing.n + 2);
+    if (++frameN % 2 === 0) drawScreen(t);
+
+    var dist = mix(L.dist0, L.distT, a);
+    camera.position.set(0, 0.55 * (1 - d), dist);
+    look.set(0, 0, 0);
+    root.updateMatrixWorld(true);
+    if (d > 0) {
+      screenMesh.getWorldPosition(scW);
+      var fill = Math.min(SH / 0.536, SW / (0.536 * L.aspect)) * 0.86;
+      camEnd.set(scW.x, scW.y, scW.z + fill);
+      var tz = Math.pow(d, 1.7);
+      camera.position.lerp(camEnd, tz);
+      look.lerp(scW, Math.min(1, d * 1.4));
+    }
+    camera.lookAt(look);
+
+    if (L.wide) {
+      var w = stage.clientWidth, h = stage.clientHeight;
+      [[shellG, 1.32], [boardG, 1.2], [coreG, 1.32]].forEach(function(pair, i){
+        var el = cards[i], val = labelVals[i];
+        el.style.opacity = String(val);
+        if (val <= 0.001) return;
+        v3.set(0, pair[1], 0.1); pair[0].localToWorld(v3); v3.project(camera);
+        var x = (v3.x + 1) / 2 * w, y = (1 - v3.y) / 2 * h;
+        x = clamp(x, 130, w - 130);
+        el.style.transform = 'translate3d(' + (x - 118) + 'px,' + (y - el.offsetHeight - 44 + (1 - val) * 14) + 'px,0)';
+      });
+    }
+
+    renderer.render(scene, camera);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
