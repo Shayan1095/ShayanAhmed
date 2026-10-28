@@ -345,6 +345,15 @@ body::after {
   animation-duration: 260ms;
 }
 
+/* 404 static noise */
+@keyframes noise-shift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-6%, 4%); }
+  50% { transform: translate(5%, -3%); }
+  75% { transform: translate(-3%, -5%); }
+  100% { transform: translate(0, 0); }
+}
+
 /* SplitText line masks need a little room for descenders. */
 .split-line {
   padding-bottom: 0.06em;
