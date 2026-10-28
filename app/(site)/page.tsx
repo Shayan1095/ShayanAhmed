@@ -6,7 +6,7 @@ import { Process } from "@/components/sections/process";
 import { Services } from "@/components/sections/services";
 import { Testimonials } from "@/components/sections/testimonials";
 import { Work } from "@/components/sections/work";
-import { Label, SplitReveal } from "@/components/system";
+import { Hero } from "@/components/hero/hero";
 import {
   getArchiveProjects,
   getFaqs,
@@ -23,16 +23,11 @@ export default async function HomePage() {
     getTestimonials(),
     getFaqs(),
   ]);
+  const brandsAttire = featured.find((p) => p.slug === "brands-attire");
 
   return (
     <main id="main">
-      {/* Temporary hero. The full 2D hero (DESIGN.md §8 Hero) replaces this next. */}
-      <section id="hero" aria-label="Introduction" className="wrap flex min-h-svh flex-col justify-center pt-28">
-        <Label className="mb-6 block">Full-stack developer · Pakistan</Label>
-        <SplitReveal as="h1" className="type-hero" start="top bottom">
-          Websites with the systems <em>built in</em>.
-        </SplitReveal>
-      </section>
+      <Hero settings={settings} storefront={brandsAttire?.customerView ?? brandsAttire?.cover} />
 
       <Services />
       <Work projects={featured} />

@@ -19,11 +19,19 @@ export const siteSettings: SiteSettings = {
     { label: "Languages", value: "English, Urdu" },
     { label: "Experience", value: "AI team at a software company" },
   ],
+  // Illustrative events from the Brands Attire and SKY Tech builds, shown on the hero slab.
   heroCaptionEvents: [
-    { tag: "Just now", text: "Order #1042 flagged, owner notified" },
-    { tag: "1 min ago", text: "Restock draft ready for 3 items" },
-    { tag: "4 min ago", text: "New lead captured from the contact page" },
-    { tag: "Today", text: "Daily briefing ready for the owner" },
+    { channel: "orders", tag: "Order", text: "#1042 flagged, owner notified" },
+    { channel: "site", tag: "Site", text: "New enquiry from the contact form" },
+    { channel: "orders", tag: "Remind", text: "Cart reminder sent with a code" },
+    { channel: "leads", tag: "Lead", text: "Follow-up sent to 12 leads" },
+    { channel: "orders", tag: "Order", text: "#1051 dispatched in one click" },
+    { channel: "site", tag: "Site", text: "Checkout completed: #1058" },
+    { channel: "orders", tag: "Stock", text: "3 items low, restock drafted" },
+    { channel: "leads", tag: "Lead", text: "Welcome email sent to prospect" },
+    { channel: "orders", tag: "Return", text: "Return triaged for approval" },
+    { channel: "leads", tag: "Lead", text: "Query answered from template" },
+    { channel: "orders", tag: "Brief", text: "Daily briefing ready for owner" },
   ],
   budgetRanges: [],
   projectTypes: [

@@ -78,6 +78,8 @@ export type Faq = {
   published: boolean;
 };
 
+export type HeroChannel = "site" | "orders" | "leads";
+
 export type SiteSettings = {
   /** Shown beside the status light, e.g. "Booking for December". */
   availability: string;
@@ -85,8 +87,8 @@ export type SiteSettings = {
   linkedin?: string;
   /** About section spec sheet. Only true values. */
   specSheet: { label: string; value: string }[];
-  /** Lines the hero screen and live caption cycle through. */
-  heroCaptionEvents: { tag: string; text: string }[];
+  /** Lines the hero screen and live caption cycle through. channel is an extension (SITE / ORDERS / LEADS tabs). */
+  heroCaptionEvents: { tag: string; text: string; channel: HeroChannel }[];
   /** extension: contact form budget options. Hidden while empty. */
   budgetRanges: string[];
   /** extension: contact form project types. */

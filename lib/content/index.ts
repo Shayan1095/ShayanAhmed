@@ -58,4 +58,4 @@ export async function getFaqs(): Promise<Faq[]> {
   return faqs.filter((f) => f.published && f.answer.trim()).sort((a, b) => a.order - b.order);
 }
 
-export type { Faq, ImageRef, Project, SiteSettings, Testimonial, UiFragmentData } from "./types";
+export type { Faq, HeroChannel, ImageRef, Project, SiteSettings, Testimonial, UiFragmentData } from "./types";
