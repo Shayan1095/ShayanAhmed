@@ -1,130 +1,352 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "lenis/dist/lenis.css";
 
-@custom-variant dark (&:is(.dark *));
+/* =========================================================================
+   Design tokens (DESIGN.md §4). The page is a fixed palette, no dark mode.
+   ========================================================================= */
+@theme {
+  --color-paper: #f3eadb;
+  --color-paper-hi: #fbf6ec;
+  --color-paper-lo: #e4d8c3;
+  --color-paper-edge: #cdbfa6;
+  --color-ink: #111111;
+  --color-ink-2: #1e1c1a;
+  --color-ink-3: #2c2925;
+  --color-muted: #675e52;
+  --color-muted-ink: #a89d8b;
+  --color-walnut: #6b4a2f;
+  --color-copper: #c9853f;
+  --color-danger: #b23a12;
+
+  --font-display: var(--font-anybody), "Arial Narrow", system-ui, sans-serif;
+  --font-sans: var(--font-hanken), system-ui, sans-serif;
+  --font-mono: var(--font-martian), ui-monospace, monospace;
+
+  --radius-panel: 22px;
+  --radius-card: 16px;
+  --radius-control: 12px;
+
+  --shadow-raised: inset 0 1px 0 rgb(255 255 255 / 0.85), inset 0 -1px 0 rgb(17 17 17 / 0.06), 0 1px 1px rgb(17 17 17 / 0.08), 0 10px 20px -8px rgb(17 17 17 / 0.22), 0 30px 60px -28px rgb(17 17 17 / 0.3);
+  --shadow-raised-sm: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 1px 1px rgb(17 17 17 / 0.1), 0 4px 10px -4px rgb(17 17 17 / 0.25);
+  --shadow-inset: inset 0 2px 5px rgb(17 17 17 / 0.16), inset 0 1px 1px rgb(17 17 17 / 0.12), inset 0 -1px 0 rgb(255 255 255 / 0.75);
+  --shadow-keycap: inset 0 1px 0 #fff, inset 0 -6px 0 var(--color-paper-lo), 0 6px 0 var(--color-paper-edge), 0 10px 16px -6px rgb(17 17 17 / 0.35);
+  --shadow-screen: inset 0 0 30px rgb(0 0 0 / 0.7);
+  --shadow-ink-raised: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 30px 60px -30px rgb(0 0 0 / 0.9);
+  --shadow-ink-inset: inset 0 2px 6px rgb(0 0 0 / 0.7), inset 0 -1px 0 rgb(255 255 255 / 0.05);
+  --shadow-glow: 0 0 10px 1px rgb(201 133 63 / 0.7);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Tone tokens follow the band a component sits in, so copper never lands on
+   cream and walnut never lands on ink. Use text-tone-* in shared components. */
+:root {
+  --tone-fg: var(--color-ink);
+  --tone-muted: var(--color-muted);
+  --tone-accent: var(--color-walnut);
+  --tone-hairline: var(--color-paper-edge);
+}
+.tone-ink {
+  --tone-fg: var(--color-paper);
+  --tone-muted: var(--color-muted-ink);
+  --tone-accent: var(--color-copper);
+  --tone-hairline: var(--color-ink-3);
+}
+
+/* shadcn/ui tokens, mapped onto the same palette (admin panel and the few
+   restyled public primitives). shadcn's own `bg-muted` is renamed to
+   `bg-subtle` in components/ui, because `muted` is a text colour here.
+   Re-run that rename after adding new shadcn components. */
+:root {
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
+  --card: var(--color-paper-hi);
+  --card-foreground: var(--color-ink);
+  --popover: var(--color-paper-hi);
+  --popover-foreground: var(--color-ink);
+  --primary: var(--color-ink);
+  --primary-foreground: var(--color-paper);
+  --secondary: var(--color-paper-lo);
+  --secondary-foreground: var(--color-ink);
+  --subtle: var(--color-paper-lo);
+  --muted-foreground: var(--color-muted);
+  --accent: var(--color-paper-lo);
+  --accent-foreground: var(--color-ink);
+  --destructive: var(--color-danger);
+  --border: var(--color-paper-edge);
+  --input: var(--color-paper-edge);
+  --ring: var(--color-copper);
+  --radius: 0.75rem;
+}
 
 @theme inline {
+  --color-tone-fg: var(--tone-fg);
+  --color-tone-muted: var(--tone-muted);
+  --color-tone-accent: var(--tone-accent);
+  --color-tone-hairline: var(--tone-hairline);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-subtle: var(--subtle);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-heading: var(--font-display);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
   --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
-
+/* =========================================================================
+   Base
+   ========================================================================= */
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
+    @apply border-border;
   }
   html {
-    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+    color-scheme: light;
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-copper);
+    outline-offset: 3px;
+  }
+  ::selection {
+    background: var(--color-walnut);
+    color: var(--color-paper);
+  }
+  .tone-ink ::selection {
+    background: var(--color-copper);
+    color: var(--color-ink);
+  }
+  [hidden]:not([hidden="until-found"]) {
+    display: none !important;
+  }
+}
+
+/* Paper grain: what makes flat cream read as a material. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.07 0 0 0 0 0.06 0 0 0 0 0.05 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* =========================================================================
+   Layout
+   ========================================================================= */
+@utility wrap {
+  width: 100%;
+  max-width: 1240px;
+  margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+  @media (width >= 900px) {
+    padding-left: max(56px, env(safe-area-inset-left));
+    padding-right: max(56px, env(safe-area-inset-right));
+  }
+}
+
+@utility section-pad {
+  padding-block: 80px;
+  @media (width >= 900px) {
+    padding-block: 120px;
+  }
+}
+
+/* =========================================================================
+   Type (DESIGN.md §4 Type)
+   ========================================================================= */
+@utility type-hero {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 120;
+  text-transform: uppercase;
+  font-size: clamp(56px, 10.4vw, 160px);
+  line-height: 0.88;
+  letter-spacing: -0.035em;
+}
+
+@utility type-section {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 116;
+  text-transform: uppercase;
+  font-size: clamp(36px, 5vw, 72px);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+}
+
+@utility type-card {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 115;
+  text-transform: uppercase;
+  font-size: clamp(24px, 2.4vw, 32px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+@utility type-label {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 11.5px;
+  line-height: 1.4;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+@utility type-body {
+  font-size: 17px;
+  line-height: 1.6;
+  max-width: 65ch;
+}
+
+/* Italic emphasis words inside display type. */
+:where(.type-hero, .type-section, .type-card) em {
+  font-style: italic;
+  font-weight: 700;
+  font-variation-settings: "wdth" 95;
+  color: var(--tone-accent);
+}
+
+/* =========================================================================
+   Materials (DESIGN.md §5). Three only: raised panel, inset track, ink screen.
+   The ink-raised panel is the raised panel's version on an ink band.
+   ========================================================================= */
+@utility raised {
+  background: linear-gradient(180deg, var(--color-paper-hi), var(--color-paper));
+  box-shadow: var(--shadow-raised);
+}
+
+@utility raised-sm {
+  background: linear-gradient(180deg, var(--color-paper-hi), var(--color-paper));
+  box-shadow: var(--shadow-raised-sm);
+}
+
+@utility ink-raised {
+  background: linear-gradient(180deg, #26231f, var(--color-ink-2));
+  box-shadow: var(--shadow-ink-raised);
+}
+
+@utility inset-track {
+  background: var(--color-paper-lo);
+  box-shadow: var(--shadow-inset);
+}
+
+@utility ink-inset {
+  background: #0d0c0b;
+  box-shadow: var(--shadow-ink-inset);
+}
+
+@utility ink-screen {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--color-paper);
+  background: radial-gradient(120% 90% at 50% 0%, #24211d 0%, #0e0d0c 72%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.04), var(--shadow-screen);
+  text-shadow: 0 0 10px rgb(243 234 219 / 0.18);
+  /* scanlines + diagonal gloss */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    border-radius: inherit;
+    background:
+      repeating-linear-gradient(0deg, rgb(255 255 255 / 0.035) 0 1px, transparent 1px 3px),
+      linear-gradient(115deg, rgb(255 255 255 / 0.07), transparent 42%);
+  }
+}
+
+/* Corner screws: hero-level objects only. */
+@utility screw {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 30%, var(--color-paper-hi), var(--color-paper-edge) 70%);
+  box-shadow: inset 0 -1px 1px rgb(17 17 17 / 0.25), 0 1px 0 rgb(255 255 255 / 0.8);
+  &::after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    top: 4px;
+    height: 1px;
+    background: rgb(17 17 17 / 0.35);
+    transform: rotate(-35deg);
+  }
+}
+
+/* =========================================================================
+   Motion primitives
+   ========================================================================= */
+@keyframes status-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* SplitText line masks need a little room for descenders. */
+.split-line {
+  padding-bottom: 0.06em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
