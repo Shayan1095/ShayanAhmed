@@ -19,11 +19,27 @@ export const LAYERS = { glass: 0, board: -0.12, core: -0.26, travel: 1.3 } as co
 export const FOV = 30;
 export const K = 2 * Math.tan(((FOV / 2) * Math.PI) / 180);
 
-/** Where the slab sits in the 2D layout (centre as viewport fraction), so 3D lines up with it. */
-export const ANCHOR = { x: 0.71, y: 0.53 } as const;
+/**
+ * Where the slab sits at rest, mirroring the HTML slab's CSS in hero.tsx:
+ * centre (71%, 53%), width min(47vw, 82vh, 780px); on screens up to 820px
+ * tall it moves to 50% and shrinks to 74vh so the bottom row stays clear.
+ */
+export function slabLayout(w: number, h: number) {
+  const short = h <= 820;
+  return {
+    x: 0.71,
+    y: short ? 0.5 : 0.53,
+    widthPx: Math.min(0.47 * w, (short ? 0.74 : 0.82) * h, 780),
+  };
+}
 
 /** Base tilt at rest (radians), matching the HTML slab's CSS tilt. */
 export const BASE_TILT = { x: 0.087, y: -0.244 } as const;
+
+/** Teardown label cards (px): width, height and the connector up to the layer. */
+export const CARD_W = 240;
+export const CARD_H = 140;
+export const CARD_LINK = 56;
 
 export const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 /** Smoothstep between a and b. */
@@ -47,6 +63,8 @@ export type HeroState = {
   onToggle: (ch: HeroChannel) => void;
   /** Label cards positioned by the scene (outer wrappers). */
   cards: (HTMLElement | null)[];
+  /** Requests a frame. The scene renders on demand, not continuously. */
+  invalidate: () => void;
 };
 
 export function createHeroState(): HeroState {
@@ -56,6 +74,7 @@ export function createHeroState(): HeroState {
     live: { lines: [], channels: { site: true, orders: true, leads: true }, mode: "All channels", clock: "09:02" },
     onToggle: () => {},
     cards: [],
+    invalidate: () => {},
   };
 }
 

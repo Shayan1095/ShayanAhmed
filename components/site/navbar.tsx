@@ -31,16 +31,21 @@ export function Navbar({ availability }: { availability: string }) {
     () => {
       const setProgress = gsap.quickSetter(progress.current, "scaleX");
       let lastY = window.scrollY;
+      let compactNow = false;
+      let hiddenNow = false;
 
+      // Runs every scroll frame: only touch React state when a value actually flips.
       ScrollTrigger.create({
         start: 0,
         end: "max",
         onUpdate: (self) => {
           const y = self.scroll();
           setProgress(self.progress);
-          setCompact(y > 60);
+          const c = y > 60;
+          if (c !== compactNow) setCompact((compactNow = c));
           if (Math.abs(y - lastY) > 4) {
-            setHidden(y > lastY && y > 240);
+            const h = y > lastY && y > 240;
+            if (h !== hiddenNow) setHidden((hiddenNow = h));
             lastY = y;
           }
         },

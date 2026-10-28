@@ -19,7 +19,7 @@ export function FooterSlab() {
   const root = useRef<HTMLDivElement>(null);
   const shade = useRef<HTMLDivElement>(null);
   const led = useRef<HTMLSpanElement>(null);
-  const footState = useRef<FooterState>({ level: 1 });
+  const footState = useRef<FooterState>({ level: 1, invalidate: () => {} });
   const [three, setThree] = useState(false);
   const [near, setNear] = useState(false);
   const [inView, setInView] = useState(false);
@@ -47,7 +47,12 @@ export function FooterSlab() {
           .timeline({ scrollTrigger: { trigger: root.current, start: "top 75%", end: "max", scrub: 0.8 } })
           .to(shade.current, { opacity: 0.94, ease: "power2.in" }, 0)
           .to(led.current, { opacity: 0.15, ease: "power2.in" }, 0)
-          .fromTo(footState.current, { level: 1 }, { level: 0.06, ease: "power2.in" }, 0);
+          .fromTo(
+            footState.current,
+            { level: 1 },
+            { level: 0.06, ease: "power2.in", onUpdate: () => footState.current.invalidate() },
+            0,
+          );
       });
       mm.add(MQ.desktop, () => {
         if (hasWebGL()) setThree(true);

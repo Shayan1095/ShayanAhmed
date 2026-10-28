@@ -35,7 +35,6 @@ export function Work({ projects }: { projects: Project[] }) {
             end: () => `+=${distance()}`,
             pin: true,
             scrub: motionGrammar.scrub,
-            anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
               const n = Math.min(total, Math.floor(self.progress * total) + 1);

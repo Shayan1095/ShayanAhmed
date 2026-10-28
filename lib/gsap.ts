@@ -14,6 +14,16 @@ gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP);
 
 export { gsap, ScrollTrigger, SplitText, useGSAP };
 
+/**
+ * Re-measure every ScrollTrigger in page order. Call after anything that
+ * changes layout above other triggers (a pin created late, fonts loading),
+ * otherwise later sections fire at stale scroll positions.
+ */
+export function refreshScrollTriggers() {
+  ScrollTrigger.sort();
+  ScrollTrigger.refresh();
+}
+
 /** Media queries for gsap.matchMedia(). */
 export const MQ = {
   motion: "(prefers-reduced-motion: no-preference)",

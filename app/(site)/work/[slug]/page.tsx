@@ -115,7 +115,7 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
             )}
 
             {agents.length > 0 && (
-              <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 min-[1000px]:grid-cols-4">
+              <ul className="grid grid-cols-1 gap-4 min-[640px]:grid-cols-2 min-[1000px]:grid-cols-4">
                 {agents.map((a, i) => (
                   <Rise as="li" key={a.name} delay={(i % 4) * 0.05}>
                     <Panel className="flex h-full flex-col gap-3 p-5">
@@ -140,7 +140,7 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
             )}
 
             {features.length > 0 && (
-              <ul className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 min-[1000px]:grid-cols-3">
+              <ul className="mt-10 grid grid-cols-1 gap-4 min-[640px]:grid-cols-2 min-[1000px]:grid-cols-3">
                 {features.map((f) => (
                   <Rise as="li" key={f.title}>
                     <Panel className="h-full p-6">
@@ -159,7 +159,7 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
         <Band tone="ink" aria-label="Results" className="section-pad">
           <div className="wrap">
             <SectionHeader label="Results" title={<>What <em>changed</em></>} />
-            <dl className="grid grid-cols-1 gap-5 sm:grid-cols-2 min-[1000px]:grid-cols-3">
+            <dl className="grid grid-cols-1 gap-5 min-[640px]:grid-cols-2 min-[1000px]:grid-cols-3">
               {project.results.map((r) => (
                 <Panel key={r.label} tone="ink" className="p-7">
                   <dt>

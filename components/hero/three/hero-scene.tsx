@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import type { ImageRef } from "@/lib/content/types";
 import { drawChip, drawCore, drawDash, drawStore, drawStrip, makeCanvas, SCW, STORE_PX, STRIP_PX, tabAt } from "./canvas-art";
-import { ANCHOR, BASE_TILT, clamp, DEV, FOV, K, LAYERS, mix, ss, type HeroState } from "./shared";
+import { BASE_TILT, CARD_H, CARD_LINK, CARD_W, clamp, DEV, FOV, K, LAYERS, mix, slabLayout, ss, type HeroState } from "./shared";
 import { createSlabParts, Slab, type SlabParts, type SlabTextures } from "./slab";
 
 type HeroSceneProps = {
@@ -24,18 +24,19 @@ type HeroSceneProps = {
  * information here is duplicated in HTML.
  */
 export default function HeroScene({ stateRef, storefront, onReady, active }: HeroSceneProps) {
-  const [dpr, setDpr] = useState(1.75);
+  const [dpr, setDpr] = useState(1.5);
   return (
     <Canvas
       aria-hidden="true"
       flat
       dpr={[1, dpr]}
-      frameloop={active ? "always" : "never"}
+      // On demand: frames are requested by scroll, pointer, typing and boot. Nothing renders at rest.
+      frameloop={active ? "demand" : "never"}
       camera={{ fov: FOV, near: 0.1, far: 100, position: [0, 0, 10] }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       style={{ position: "absolute", inset: 0 }}
     >
-      <PerformanceMonitor onDecline={() => setDpr(1)} onIncline={() => setDpr(1.75)} />
+      <PerformanceMonitor onDecline={() => setDpr(1)} onIncline={() => setDpr(1.5)} />
       <SlabLights />
       <Rig stateRef={stateRef} storefront={storefront} onReady={onReady} />
     </Canvas>
@@ -74,7 +75,7 @@ function createArt(): Art {
   };
   const canvases = {
     store: makeCanvas(SCW, STORE_PX),
-    strip: makeCanvas(SCW, STRIP_PX),
+    strip: makeCanvas(Math.round(SCW * 0.6), Math.round(STRIP_PX * 0.6)), // redrawn while typing: keep it light
     dash: makeCanvas(1600, 1000),
     core: makeCanvas(1440, 920),
     chip: makeCanvas(256, 256),
@@ -118,8 +119,10 @@ function paintStrip(art: Art, live: HeroState["live"], typed: number, caretOn: b
   art.textures.strip.needsUpdate = true;
 }
 
+const CARD_GAP = 20;
+
 function Rig({ stateRef, storefront, onReady }: { stateRef: React.RefObject<HeroState>; storefront?: ImageRef; onReady: () => void }) {
-  const { camera, size, gl } = useThree();
+  const { camera, size, gl, invalidate } = useThree();
   const [art] = useState(createArt);
   const [shadowMat] = useState(createShadowMaterial);
   const partsRef = useRef<SlabParts>(createSlabParts());
@@ -141,15 +144,26 @@ function Rig({ stateRef, storefront, onReady }: { stateRef: React.RefObject<Hero
 
   useEffect(() => () => Object.values(art.textures).forEach((t) => t.dispose()), [art]);
 
+  // Let React/GSAP request frames (scroll progress, live strip updates).
+  useEffect(() => {
+    const state = stateRef.current;
+    state.invalidate = invalidate;
+    invalidate();
+    return () => {
+      state.invalidate = () => {};
+    };
+  }, [invalidate, stateRef]);
+
   // Pointer: the slab turns slightly toward the cursor (damped).
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
       pointer.current.x = e.clientX / window.innerWidth - 0.5;
       pointer.current.y = e.clientY / window.innerHeight - 0.5;
+      invalidate();
     };
     window.addEventListener("pointermove", onMove, { passive: true });
     return () => window.removeEventListener("pointermove", onMove);
-  }, []);
+  }, [invalidate]);
 
   // Channel tabs on the 3D strip are clickable (raycast against the strip mesh).
   useEffect(() => {
@@ -191,15 +205,19 @@ function Rig({ stateRef, storefront, onReady }: { stateRef: React.RefObject<Hero
     const { rise, led, screen } = state.boot;
     const cam = camera as THREE.PerspectiveCamera;
 
-    // Layout: match the HTML slab's spot (centre ANCHOR, width min(47vw, 82vh, 780px)).
+    // Layout: match the HTML slab's spot exactly (see slabLayout).
     const w = size.width;
     const h = size.height;
     const aspect = w / h;
-    const slabPx = Math.min(0.47 * w, 0.82 * h, 780);
+    const ANCHOR = slabLayout(w, h);
+    const slabPx = ANCHOR.widthPx;
     const dist0 = DEV.W / ((slabPx / w) * K * aspect);
-    const distT = dist0 * 1.14;
+    // Teardown framing: pull back so the separated layers fit, and lift the slab
+    // above centre so the label cards have room below it.
+    const distT = dist0 * (h < 820 ? 1.62 : 1.36);
     const x0 = (ANCHOR.x - 0.5) * K * dist0 * aspect;
     const y0 = (0.5 - ANCHOR.y) * K * dist0;
+    const yT = (0.5 - 0.4) * K * distT;
 
     // Choreography phases (DESIGN.md §8 Hero scroll table).
     const a = ss(0, 0.3, p); // turn to three-quarter view, move to centre
@@ -219,7 +237,8 @@ function Rig({ stateRef, storefront, onReady }: { stateRef: React.RefObject<Hero
       mix(mix(BASE_TILT.y, -0.7, a), 0, faceOn) + ptr.sx * 0.18 * calm,
       0,
     );
-    root.position.set(mix(x0, 0, a), mix(y0, 0, a) - (1 - rise) * 0.7, 0);
+    // Lifted while apart, back to centre for the dive.
+    root.position.set(mix(x0, 0, a), mix(mix(y0, yT, a), 0, faceOn) - (1 - rise) * 0.7, 0);
 
     glass.position.z = LAYERS.glass + LAYERS.travel * e;
     core.position.z = LAYERS.core - LAYERS.travel * e;
@@ -229,12 +248,13 @@ function Rig({ stateRef, storefront, onReady }: { stateRef: React.RefObject<Hero
       shadow.current.visible = d < 0.6;
     }
 
-    if (glowMat) glowMat.emissiveIntensity = 0.6 + e * 1.6 + Math.sin(t / 380) * 0.15;
+    // Static lighting values (no idle pulses: they would force a frame forever).
+    if (glowMat) glowMat.emissiveIntensity = 0.6 + e * 1.8;
     if (coreLight) coreLight.intensity = e * 6;
-    if (ledMat) ledMat.emissiveIntensity = led * (1.4 + Math.sin(t / 420) * 0.5);
+    if (ledMat) ledMat.emissiveIntensity = led * 1.6;
     for (const m of screenMats) m.color.setScalar(clamp(screen, 0.03, 1));
 
-    // Live strip: redraw only when the visible text, caret or data changes.
+    // Live strip: redraw only when the visible text or data changes.
     const live = state.live;
     const latest = live.lines[live.lines.length - 1];
     const ty = typing.current;
@@ -243,7 +263,8 @@ function Rig({ stateRef, storefront, onReady }: { stateRef: React.RefObject<Hero
       ty.start = latest.id === 0 ? 0 : t; // the server-rendered first line is already typed
     }
     const typed = latest ? Math.min(latest.text.length, Math.floor((t - ty.start) / 26)) : 0;
-    const caretOn = Math.floor(t / 450) % 2 === 0;
+    const typingNow = Boolean(latest && typed < latest.text.length);
+    const caretOn = typingNow; // caret shows while typing, then rests
     const key = `${latest?.id}|${typed}|${caretOn}|${live.mode}|${live.clock}|${live.channels.site}${live.channels.orders}${live.channels.leads}`;
     if (key !== ty.lastDrawn) {
       ty.lastDrawn = key;
@@ -265,40 +286,47 @@ function Rig({ stateRef, storefront, onReady }: { stateRef: React.RefObject<Hero
     cam.lookAt(v.look);
     cam.updateMatrixWorld();
 
-    // Label cards follow their layers on screen.
-    const anchors: [THREE.Object3D | null, number][] = [
-      [glass, 1.32],
-      [board, 1.2],
-      [core, 1.32],
-    ];
-    // Project each layer's top point, then keep the cards at least one card apart.
-    const CARD = 240;
-    const GAP = 20;
-    const spots = anchors.map(([obj, yOff]) => {
-      if (!obj) return null;
-      v.a.set(0, yOff, 0.1);
-      obj.localToWorld(v.a);
-      v.a.project(cam);
-      return { x: ((v.a.x + 1) / 2) * w, y: ((1 - v.a.y) / 2) * h };
-    });
-    let prev = -Infinity;
-    const xs = spots.map((s) => {
-      if (!s) return 0;
-      prev = Math.max(s.x, prev + CARD + GAP);
-      return prev;
-    });
-    const overflow = Math.max(0, (xs[xs.length - 1] ?? 0) - (w - 140));
-    spots.forEach((s, i) => {
-      const el = state.cards[i];
-      if (!el || !s) return;
-      const x = clamp(xs[i] - overflow, 140, w - 140);
-      el.style.transform = `translate3d(${x - CARD / 2}px, ${s.y - el.offsetHeight - 44}px, 0)`;
-    });
+    // Label cards: only while the layers are apart. Each hangs below its layer's
+    // bottom edge on a connector; positions are kept one card apart and inside the stage.
+    if (e > 0.001) {
+      const anchors: [THREE.Object3D | null, number][] = [
+        [glass, -1.12],
+        [board, -1.0],
+        [core, -1.12],
+      ];
+      const spots = anchors.map(([obj, yOff]) => {
+        if (!obj) return null;
+        v.a.set(0, yOff, 0.1);
+        obj.localToWorld(v.a);
+        v.a.project(cam);
+        return { x: ((v.a.x + 1) / 2) * w, y: ((1 - v.a.y) / 2) * h };
+      });
+      let prev = -Infinity;
+      const xs = spots.map((s) => {
+        if (!s) return 0;
+        prev = Math.max(s.x, prev + CARD_W + CARD_GAP);
+        return prev;
+      });
+      const overflow = Math.max(0, (xs[xs.length - 1] ?? 0) - (w - CARD_W / 2 - 24));
+      spots.forEach((s, i) => {
+        const el = state.cards[i];
+        if (!el || !s) return;
+        const x = clamp(xs[i] - overflow, CARD_W / 2 + 24, w - CARD_W / 2 - 24);
+        const y = Math.min(s.y, h - CARD_H - CARD_LINK - 24);
+        el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      });
+    }
 
     if (!ready.current) {
       ready.current = true;
       requestAnimationFrame(onReady);
     }
+
+    // Keep rendering only while something is still moving.
+    const settling =
+      rise < 1 || led < 1 || screen < 1 || typingNow ||
+      Math.abs(ptr.x - ptr.sx) > 0.0008 || Math.abs(ptr.y - ptr.sy) > 0.0008;
+    if (settling) invalidate();
   });
 
   return (

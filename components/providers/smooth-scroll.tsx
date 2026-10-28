@@ -2,7 +2,7 @@
 
 import Lenis from "lenis";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from "react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { gsap, refreshScrollTriggers, ScrollTrigger } from "@/lib/gsap";
 import { useReducedMotion } from "@/hooks/use-media-query";
 
 type ScrollTarget = string | HTMLElement | number;
@@ -23,6 +23,15 @@ const SmoothScrollContext = createContext<SmoothScrollApi | null>(null);
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
   const reduce = useReducedMotion();
   const lenisRef = useRef<Lenis | null>(null);
+
+  // Web fonts change text heights (and SplitText lines), so re-measure every trigger once they load.
+  useEffect(() => {
+    let cancelled = false;
+    document.fonts?.ready.then(() => !cancelled && refreshScrollTriggers());
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (reduce) return;

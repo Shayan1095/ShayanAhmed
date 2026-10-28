@@ -147,6 +147,9 @@ export function tabAt(px: number, py: number): HeroChannel | null {
 export function drawStrip(c: HTMLCanvasElement, live: HeroState["live"], typed: number, caretOn: boolean) {
   const x = c.getContext("2d")!;
   const F = fonts();
+  // The canvas may be smaller than the design size; draw in design units.
+  const k = c.width / SCW;
+  x.setTransform(k, 0, 0, k, 0, 0);
   const g = x.createLinearGradient(0, 0, 0, STRIP_PX);
   g.addColorStop(0, "#1d1b18");
   g.addColorStop(1, "#0c0b0a");
@@ -184,22 +187,17 @@ export function drawStrip(c: HTMLCanvasElement, live: HeroState["live"], typed: 
     const latest = i === lines.length - 1;
     const text = latest ? l.text.slice(0, typed) : l.text;
     x.font = `500 40px ${F.mono}`;
-    x.shadowColor = "rgba(201,133,63,.75)";
-    x.shadowBlur = latest ? 14 : 0;
     x.fillStyle = latest ? C.copper : "rgba(201,133,63,.6)";
     const tag = l.tag.toUpperCase();
     x.fillText(tag, 70, y);
     const tw = x.measureText(`${tag}  `).width;
     x.font = `400 40px ${F.mono}`;
-    x.shadowColor = "rgba(243,234,219,.45)";
-    x.shadowBlur = latest ? 10 : 0;
     x.fillStyle = latest ? C.paper : C.mutedInk;
     const m = truncate(x, text, SCW - 140 - tw);
     x.fillText(m, 70 + tw, y);
     if (latest && caretOn) x.fillRect(70 + tw + x.measureText(m).width + 10, y - 32, 20, 40);
     y += 82;
   });
-  x.shadowBlur = 0;
   x.fillStyle = "rgba(255,255,255,.03)";
   for (let s = 0; s < STRIP_PX; s += 4) x.fillRect(0, s, SCW, 1);
 }

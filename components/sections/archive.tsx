@@ -49,7 +49,7 @@ export function Archive({ projects }: { projects: Project[] }) {
           aside={<InsetToggle label="Filter projects" options={available} value={filter} onChange={setFilter} />}
           className="min-[900px]:mb-[34px]"
         />
-        <motion.ul layout className="grid grid-cols-1 gap-[22px] sm:grid-cols-2 min-[980px]:grid-cols-3">
+        <motion.ul layout className="grid grid-cols-1 gap-[22px] min-[640px]:grid-cols-2 min-[980px]:grid-cols-3">
           <AnimatePresence mode="popLayout" initial={false} onExitComplete={() => ScrollTrigger.refresh()}>
             {shown.map((p, i) => (
               <motion.li

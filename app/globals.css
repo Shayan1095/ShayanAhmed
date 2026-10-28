@@ -162,14 +162,17 @@
   }
 }
 
-/* Paper grain: what makes flat cream read as a material. */
+/* Paper grain: what makes flat cream read as a material.
+   Normal blending on its own compositor layer: a blend mode here would force
+   the whole screen (including the 3D canvas) to be re-blended every frame. */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 90;
   pointer-events: none;
-  mix-blend-mode: multiply;
+  will-change: transform;
+  transform: translateZ(0);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.07 0 0 0 0 0.06 0 0 0 0 0.05 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -343,6 +346,12 @@ body::after {
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 260ms;
+}
+
+/* After the 3D dive the hero ends as a full ink screen: Services follows
+   straight on instead of adding its usual top padding of empty ink. */
+body:has([data-hero-3d]) #services {
+  padding-top: 32px;
 }
 
 /* 404 static noise */

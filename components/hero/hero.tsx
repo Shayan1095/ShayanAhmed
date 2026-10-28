@@ -8,11 +8,11 @@ import type { ImageRef, SiteSettings } from "@/lib/content/types";
 import { useSmoothScroll } from "@/components/providers/smooth-scroll";
 import { Button, Keycap, Label, StatusLight, type ScreenHandle } from "@/components/system";
 import { useFinePointer, useReducedMotion } from "@/hooks/use-media-query";
-import { gsap, MQ, useGSAP } from "@/lib/gsap";
+import { gsap, MQ, refreshScrollTriggers, useGSAP } from "@/lib/gsap";
 import { motionGrammar } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { HeroSlab } from "./hero-slab";
-import { createHeroState, hasWebGL, type HeroState } from "./three/shared";
+import { CARD_H, CARD_LINK, CARD_W, createHeroState, hasWebGL, type HeroState } from "./three/shared";
 import { useHeroConsole } from "./use-hero-console";
 
 // The 3D chunk loads only on capable desktops, after the page is interactive.
@@ -21,7 +21,7 @@ const HeroScene = dynamic(() => import("./three/hero-scene"), { ssr: false });
 const layerCards = [
   { label: "Layer 1 · Glass", title: "Website", text: "Storefront, pages and checkout your customers use." },
   { label: "Layer 2 · Board", title: "System", text: "Dashboards, orders, leads and records your team runs on." },
-  { label: "Layer 3 · Core", title: "Automation", text: "Agents flag orders, send reminders and prepare restocks. You approve." },
+  { label: "Layer 3 · Core", title: "Automation", text: "Agents flag orders and prepare restocks. You approve." },
 ];
 
 type HeroProps = {
@@ -61,21 +61,6 @@ export function Hero({ settings, storefront }: HeroProps) {
     return () => io.disconnect();
   }, []);
 
-  // Pointer tilt (desktop): Motion owns the slab's rotation.
-  const rx = useSpring(useMotionValue(BASE_TILT.x), { stiffness: 60, damping: 18 });
-  const ry = useSpring(useMotionValue(BASE_TILT.y), { stiffness: 60, damping: 18 });
-  useEffect(() => {
-    if (!fine || reduce) return;
-    const onMove = (e: PointerEvent) => {
-      const px = e.clientX / window.innerWidth - 0.5;
-      const py = e.clientY / window.innerHeight - 0.5;
-      rx.set(BASE_TILT.x - py * 6);
-      ry.set(BASE_TILT.y + px * 10);
-    };
-    window.addEventListener("pointermove", onMove, { passive: true });
-    return () => window.removeEventListener("pointermove", onMove);
-  }, [fine, reduce, rx, ry]);
-
   // 3D mode: desktop, motion allowed, WebGL available. Decided after mount.
   const [three, setThree] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
@@ -84,7 +69,23 @@ export function Hero({ settings, storefront }: HeroProps) {
   useEffect(() => {
     heroState.current.live = { lines: live.lines, channels: live.channels, mode: live.mode, clock: live.clock };
     heroState.current.onToggle = live.toggle;
+    heroState.current.invalidate();
   }, [live.lines, live.channels, live.mode, live.clock, live.toggle]);
+
+  // Pointer tilt of the HTML slab (desktop): Motion owns its rotation. Off once the 3D slab is up.
+  const rx = useSpring(useMotionValue(BASE_TILT.x), { stiffness: 60, damping: 18 });
+  const ry = useSpring(useMotionValue(BASE_TILT.y), { stiffness: 60, damping: 18 });
+  useEffect(() => {
+    if (!fine || reduce || sceneReady) return;
+    const onMove = (e: PointerEvent) => {
+      const px = e.clientX / window.innerWidth - 0.5;
+      const py = e.clientY / window.innerHeight - 0.5;
+      rx.set(BASE_TILT.x - py * 6);
+      ry.set(BASE_TILT.y + px * 10);
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onMove);
+  }, [fine, reduce, sceneReady, rx, ry]);
 
   // Entrance (~1.4s). GSAP owns the anchor, lines, foot and the 3D boot values; never the tilt layer.
   useGSAP(
@@ -142,6 +143,7 @@ export function Hero({ settings, storefront }: HeroProps) {
           q("[data-hero-row]").forEach((row, i) => gsap.to(row, { xPercent: dirs[i] * 45, ease: "none", scrollTrigger: st }));
           gsap.to(q("[data-hero-foot]"), { y: 60, opacity: 0, ease: "none", scrollTrigger: { ...st, end: "40% top" } });
           gsap.to(q("[data-hero-anchor]"), { yPercent: -12, ease: "none", scrollTrigger: st });
+          requestAnimationFrame(refreshScrollTriggers);
           return;
         }
         heroState.current.p = 0;
@@ -153,20 +155,23 @@ export function Hero({ settings, storefront }: HeroProps) {
             end: `+=${motionGrammar.maxPin * 100}%`,
             pin: true,
             scrub: motionGrammar.scrub,
-            anticipatePin: 1,
+            // Measured first: everything below depends on the space this pin adds.
+            refreshPriority: 1,
           },
         });
-        tl.to(heroState.current, { p: 1, duration: 1 }, 0)
+        tl.to(heroState.current, { p: 1, duration: 1, onUpdate: () => heroState.current.invalidate() }, 0)
           .to(q("[data-hero-kicker]"), { opacity: 0, duration: 0.08 }, 0)
           .to(q("[data-hero-caption]"), { opacity: 0, duration: 0.12 }, 0)
           .to(q("[data-hero-foot]"), { y: 60, opacity: 0, duration: 0.22 }, 0);
-        q("[data-hero-row]").forEach((row, i) => tl.to(row, { xPercent: dirs[i] * 80, duration: 0.22, ease: "power1.in" }, 0));
+        q("[data-hero-row]").forEach((row, i) => tl.to(row, { xPercent: dirs[i] * 115, duration: 0.24, ease: "power1.in" }, 0));
         q("[data-hero-card]").forEach((card, i) =>
           tl.fromTo(card, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.08 }, 0.38 + i * 0.045).to(card, { opacity: 0, duration: 0.07 }, 0.6),
         );
         tl.fromTo(q("[data-hero-tdcap]"), { opacity: 0 }, { opacity: 1, duration: 0.06 }, 0.5)
           .to(q("[data-hero-tdcap]"), { opacity: 0, duration: 0.05 }, 0.62)
           .fromTo(q("[data-hero-dive]"), { opacity: 0 }, { opacity: 1, duration: 0.1 }, 0.9);
+        // The pin adds 1.6 screens of scroll above every other section: re-measure them all.
+        requestAnimationFrame(refreshScrollTriggers);
       });
     },
     { scope: root, dependencies: [three], revertOnUpdate: true },
@@ -178,6 +183,7 @@ export function Hero({ settings, storefront }: HeroProps) {
     <section
       ref={root}
       id="hero"
+      data-hero-3d={three || undefined}
       aria-labelledby="hero-title"
       className="group/hero relative flex flex-col overflow-clip bg-[radial-gradient(110%_80%_at_68%_52%,var(--color-paper-hi)_0%,var(--color-paper)_55%,#ece1cd_100%)] pb-14 min-[900px]:block min-[900px]:h-svh min-[900px]:min-h-[680px] min-[900px]:pb-0"
     >
@@ -211,7 +217,7 @@ export function Hero({ settings, storefront }: HeroProps) {
       {/* Slab + live caption */}
       <div
         data-hero-anchor
-        className="@container relative z-[2] order-3 mx-auto mt-10 w-[min(92vw,560px)] px-0 min-[900px]:absolute min-[900px]:left-[71%] min-[900px]:top-[53%] min-[900px]:mt-0 min-[900px]:w-[min(47vw,82vh,780px)] min-[900px]:-translate-x-1/2 min-[900px]:-translate-y-1/2"
+        className="@container relative z-[2] order-3 mx-auto mt-10 w-[min(92vw,560px)] px-0 min-[900px]:absolute min-[900px]:left-[71%] min-[900px]:top-[53%] min-[900px]:mt-0 min-[900px]:w-[min(47vw,82vh,780px)] min-[900px]:-translate-x-1/2 min-[900px]:-translate-y-1/2 [@media(min-width:900px)_and_(max-height:820px)]:top-[50%] [@media(min-width:900px)_and_(max-height:820px)]:w-[min(47vw,74vh,780px)]"
       >
         {/* HTML slab. Hidden once the 3D slab is up, but shown again for keyboard focus. */}
         <div
@@ -233,7 +239,7 @@ export function Hero({ settings, storefront }: HeroProps) {
         <p
           data-hero-caption
           aria-live="polite"
-          className="raised-sm mt-4 flex items-center gap-2.5 rounded-control bg-paper-hi/80 px-3.5 py-2.5 text-[13.5px] leading-snug backdrop-blur-md min-[900px]:absolute min-[900px]:bottom-[16%] min-[900px]:right-[calc(100%+12px)] min-[900px]:mt-0 min-[900px]:w-[300px]"
+          className="raised-sm mt-4 flex items-center gap-2.5 rounded-control bg-paper-hi px-3.5 py-2.5 text-[13.5px] leading-snug min-[900px]:absolute min-[900px]:bottom-[16%] min-[900px]:right-[calc(100%+12px)] min-[900px]:mt-0 min-[900px]:w-[300px]"
         >
           <span aria-hidden="true" className="text-copper">
             ●
@@ -265,27 +271,37 @@ export function Hero({ settings, storefront }: HeroProps) {
                 heroState.current.cards[i] = el;
               }}
               aria-hidden="true"
-              className="pointer-events-none absolute left-0 top-0 z-[4] w-60 will-change-transform"
+              // A zero-size point placed at the layer's bottom edge; the card hangs below it.
+              className="pointer-events-none absolute left-0 top-0 z-[4] size-0 will-change-transform"
             >
-              <div data-hero-card className="raised relative rounded-[14px] px-4 pb-[15px] pt-3.5 opacity-0">
+              <div
+                data-hero-card
+                style={{ width: CARD_W, height: CARD_H, top: CARD_LINK, left: -CARD_W / 2 }}
+                className="raised absolute rounded-[14px] px-4 pb-[15px] pt-3.5 opacity-0"
+              >
+                {/* connector up to the layer, with a copper contact dot */}
+                <span style={{ height: CARD_LINK }} className="absolute bottom-full left-1/2 w-px bg-ink/35" />
+                <span
+                  style={{ top: -CARD_LINK - 3 }}
+                  className="absolute left-1/2 -ml-[3px] size-[7px] rounded-full bg-copper shadow-glow"
+                />
                 <Label>{c.label}</Label>
                 <b className="my-[7px] block font-display text-2xl font-extrabold uppercase leading-none [font-variation-settings:'wdth'_115]">
                   {c.title}
                 </b>
                 <p className="text-[13.5px] leading-normal text-muted">{c.text}</p>
-                <span className="absolute left-1/2 top-full h-[38px] w-px bg-ink/40" />
-                <span className="absolute left-1/2 top-[calc(100%+36px)] -ml-[3px] size-[7px] rounded-full bg-copper shadow-glow" />
               </div>
             </div>
           ))}
           <div
             data-hero-tdcap
             aria-hidden="true"
-            className="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+44px)] left-1/2 z-[4] -translate-x-1/2 whitespace-nowrap text-center opacity-0"
+            // Top centre: the cards hang below the slab, the navbar is hidden while scrolling down.
+            className="pointer-events-none absolute left-1/2 top-[calc(env(safe-area-inset-top)+40px)] z-[4] -translate-x-1/2 whitespace-nowrap text-center opacity-0"
           >
             <Label>Every build ships with</Label>
-            <strong className="mt-1.5 block font-display text-xl font-bold [font-variation-settings:'wdth'_110]">
-              all three layers, designed together.
+            <strong className="mt-1.5 block font-display text-[clamp(22px,2.2vw,30px)] font-extrabold uppercase leading-none tracking-[-0.02em] [font-variation-settings:'wdth'_112]">
+              all three layers, <em className="font-bold italic text-walnut [font-variation-settings:'wdth'_94]">designed together.</em>
             </strong>
           </div>
           {/* The dive lands in the Services band, which is ink. */}
@@ -328,7 +344,7 @@ export function Hero({ settings, storefront }: HeroProps) {
           </div>
         </div>
 
-        <div data-rise-in className="hidden items-end gap-7 min-[1100px]:flex">
+        <div data-rise-in className="hidden items-end gap-6 whitespace-nowrap min-[1200px]:flex">
           <div className="flex flex-col gap-[3px]">
             <Label>Stack</Label>
             <b className="font-display text-sm font-bold [font-variation-settings:'wdth'_108]">Next.js · MERN</b>
@@ -364,7 +380,7 @@ export function Hero({ settings, storefront }: HeroProps) {
             )}
           </span>
           <span className="flex flex-col leading-tight">
-            <small className="type-label flex items-center gap-1.5 text-[10px] text-muted">
+            <small className="type-label flex items-center gap-1.5 whitespace-nowrap text-[10px] text-muted">
               <StatusLight size="sm" on={false} pulse={false} />
               {settings.availability}
             </small>

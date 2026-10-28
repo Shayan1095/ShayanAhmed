@@ -81,15 +81,23 @@ export function Cartridge({ title, kind, status, summary, fact, shot, href, clas
           {shot}
           <Screen
             ref={screen}
-            bootOn="manual"
+            // With a screenshot the screen is a hover reveal; without one it is the label screen itself.
+            bootOn={shot ? "manual" : "view"}
             className={cn(
-              "absolute inset-0 flex items-end rounded-lg px-3.5 py-3 font-mono text-[11.5px] tracking-[0.02em]",
-              "opacity-0 transition-opacity duration-200 group-hover/cart:opacity-100 [@media(hover:none)]:opacity-100",
-              // On touch, the fact sits in a strip at the bottom instead of covering the shot.
-              "[@media(hover:none)]:top-auto [@media(hover:none)]:rounded-t-none",
+              "absolute inset-0 flex flex-col justify-between rounded-lg px-3.5 py-3 font-mono text-[11.5px] tracking-[0.02em]",
+              shot &&
+                "opacity-0 transition-opacity duration-200 group-hover/cart:opacity-100 [@media(hover:none)]:top-auto [@media(hover:none)]:rounded-t-none [@media(hover:none)]:opacity-100",
             )}
           >
-            <span className="relative z-[3]">
+            {!shot && (
+              <span aria-hidden="true" className="relative z-[3] flex items-center justify-end">
+                <span className="flex gap-1">
+                  <i className="block size-1.5 rounded-full bg-ink-3" />
+                  <i className="block size-1.5 rounded-full bg-ink-3" />
+                </span>
+              </span>
+            )}
+            <span className="relative z-[3] mt-auto">
               <span aria-hidden="true" className="mr-2 text-copper">
                 ›
               </span>
