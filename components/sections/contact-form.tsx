@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { sendInquiry } from "@/app/actions/contact";
-import { contactSchema, firstIssue, type ContactField, type ContactState } from "@/lib/contact-schema";
+import { checkContact, type ContactField, type ContactState } from "@/lib/contact-rules";
 import { Screen, Screws, StatusLight, TypeText, type ScreenHandle } from "@/components/system";
 import { cn } from "@/lib/utils";
 
@@ -49,13 +49,11 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
   }, [state]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    const data = Object.fromEntries(new FormData(e.currentTarget));
-    const parsed = contactSchema.safeParse(data);
-    if (!parsed.success && !parsed.error.issues.some((i) => i.path[0] === "website")) {
+    const issue = checkContact(Object.fromEntries(new FormData(e.currentTarget)));
+    if (issue) {
       e.preventDefault();
-      const issue = firstIssue(parsed.error);
       setClientError(issue);
-      if (issue.field) e.currentTarget.querySelector<HTMLElement>(`[name="${issue.field}"]`)?.focus();
+      e.currentTarget.querySelector<HTMLElement>(`[name="${issue.field}"]`)?.focus();
       return;
     }
     setClientError(null);
