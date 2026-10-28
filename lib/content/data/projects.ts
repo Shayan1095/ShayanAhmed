@@ -36,7 +36,7 @@ export const projects: Project[] = [
       { title: "8 operations agents", text: "" },
       { title: "Aria store assistant", text: "" },
     ],
-    stack: ["Next.js", "Node.js", "MongoDB"],
+    stack: [], // confirm with Shayan before filling
     gallery: [],
     uiFragments: [
       { tag: "Order risk guard", text: "Order #1042 flagged: duplicate address" },
@@ -79,7 +79,7 @@ export const projects: Project[] = [
       { title: "Email templates", text: "" },
       { title: "Follow-up sequences", text: "" },
     ],
-    stack: ["Next.js", "Node.js", "MongoDB"],
+    stack: [], // confirm with Shayan before filling
     gallery: [],
     uiFragments: [
       { tag: "Inbound lead", text: "New lead captured from the contact page" },

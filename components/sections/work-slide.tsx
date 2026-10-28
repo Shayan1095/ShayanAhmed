@@ -2,11 +2,9 @@
 
 import { useRef, useState } from "react";
 import type { Project } from "@/lib/content/types";
-import { AgentsDashboard, Monitor, MonitorImage, MonitorStandby } from "@/components/site/monitor";
+import { hasOwnerView, ProjectMonitor, type MonitorView } from "@/components/site/project-monitor";
 import { Button, InsetToggle, StatusBadge, Tag, UiFragment, type ScreenHandle } from "@/components/system";
 import { cn } from "@/lib/utils";
-
-type View = "customer" | "owner";
 
 /** Fragment spots around the monitor, mirrored on alternate slides. data-speed drives parallax. */
 const spots = [
@@ -24,26 +22,12 @@ const spots = [
 
 export function WorkSlide({ project, index }: { project: Project; index: number }) {
   const screen = useRef<ScreenHandle>(null);
-  const [view, setView] = useState<View>("customer");
-  const customer = project.customerView ?? project.cover;
-  const hasOwner = Boolean(project.ownerView || project.agents?.length);
-  const label =
-    view === "owner" && project.monitorLabel
-      ? project.monitorLabel.replace(/·.*$/, "· admin / agents")
-      : project.monitorLabel;
+  const [view, setView] = useState<MonitorView>("customer");
+  const hasOwner = hasOwnerView(project);
 
-  const changeView = (v: View) => {
+  const changeView = (v: MonitorView) => {
     setView(v);
     screen.current?.boot();
-  };
-
-  const views: Record<View, React.ReactNode> = {
-    customer: customer ? <MonitorImage image={customer} /> : <MonitorStandby project={project} />,
-    owner: project.ownerView ? (
-      <MonitorImage image={project.ownerView} />
-    ) : project.agents ? (
-      <AgentsDashboard agents={project.agents} />
-    ) : null,
   };
 
   return (
@@ -53,22 +37,7 @@ export function WorkSlide({ project, index }: { project: Project; index: number 
       className="grid grid-cols-1 items-center gap-7 min-[900px]:flex-[0_0_min(1120px,88vw)] min-[900px]:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]"
     >
       <div className="relative">
-        <Monitor label={label} screenRef={screen}>
-          {(Object.keys(views) as View[]).map((v) =>
-            views[v] ? (
-              <div
-                key={v}
-                aria-hidden={view !== v}
-                className={cn(
-                  "absolute inset-0 transition-[opacity,transform] duration-[450ms] ease-out-expo",
-                  view !== v && "pointer-events-none scale-[1.03] opacity-0",
-                )}
-              >
-                {views[v]}
-              </div>
-            ) : null,
-          )}
-        </Monitor>
+        <ProjectMonitor project={project} view={view} screenRef={screen} />
         {project.uiFragments.map((f, i) => {
           const spot = spots[index % 2][i];
           if (!spot) return null;

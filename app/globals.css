@@ -335,6 +335,16 @@ body::after {
   }
 }
 
+/* View Transition: a project's monitor morphs from the homepage into its case study. */
+::view-transition-group(.morph) {
+  animation-duration: 600ms;
+  animation-timing-function: var(--ease-out-expo);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+}
+
 /* SplitText line masks need a little room for descenders. */
 .split-line {
   padding-bottom: 0.06em;
