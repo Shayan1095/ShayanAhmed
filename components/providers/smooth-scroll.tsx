@@ -2,6 +2,7 @@
 
 import Lenis from "lenis";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from "react";
+import { isLowPowerDevice } from "@/lib/device-power";
 import { gsap, refreshScrollTriggers, ScrollTrigger } from "@/lib/gsap";
 import { useReducedMotion } from "@/hooks/use-media-query";
 
@@ -34,7 +35,11 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
   }, []);
 
   useEffect(() => {
-    if (reduce) return;
+    // Low-power devices (no GPU acceleration, weak CPU) get native scrolling and
+    // simpler surfaces: smooth-scroll interpolation costs a frame they don't have.
+    const low = isLowPowerDevice();
+    document.documentElement.dataset.power = low ? "low" : "full";
+    if (reduce || low) return;
 
     // anchors: plain <a href="#id"> links scroll smoothly, and still jump without JS.
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true, anchors: true });

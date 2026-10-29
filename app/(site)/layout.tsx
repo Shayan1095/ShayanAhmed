@@ -1,5 +1,6 @@
 import { SiteProviders } from "@/components/providers/site-providers";
 import { Footer } from "@/components/site/footer";
+import { MobileCta } from "@/components/site/mobile-cta";
 import { Navbar } from "@/components/site/navbar";
 import { getSiteSettings } from "@/lib/content";
 
@@ -14,6 +15,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <Navbar availability={settings.availability} />
       {children}
       <Footer />
+      <MobileCta availability={settings.availability} />
     </SiteProviders>
   );
 }

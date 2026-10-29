@@ -73,7 +73,7 @@ export function WorkSlide({ project, index }: { project: Project; index: number 
         </div>
         <h3
           id={`work-${project.slug}`}
-          className="font-display text-[clamp(30px,3vw,38px)] font-extrabold uppercase leading-[0.95] tracking-[-0.03em] [font-variation-settings:'wdth'_118]"
+          className="font-display text-[clamp(30px,3vw,38px)] font-extrabold leading-[0.95] tracking-[-0.03em] [font-variation-settings:'wdth'_104]"
         >
           {project.title}
         </h3>

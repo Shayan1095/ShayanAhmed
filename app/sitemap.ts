@@ -6,6 +6,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const projects = (await getProjects()).filter((p) => p.hasCaseStudy);
   return [
     { url: site.url, changeFrequency: "monthly", priority: 1 },
+    { url: `${site.url}/work`, changeFrequency: "monthly", priority: 0.9 },
     ...projects.map((p) => ({
       url: `${site.url}/work/${p.slug}`,
       changeFrequency: "monthly" as const,

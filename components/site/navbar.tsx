@@ -84,7 +84,8 @@ export function Navbar({ availability }: { availability: string }) {
         className={cn(
           "fixed inset-x-0 top-[env(safe-area-inset-top)] z-70 transition-[transform,padding] duration-500 ease-out-expo",
           compact ? "py-2" : "py-3.5",
-          hidden && !menuOpen && "-translate-y-[130%]",
+          // Comes back whenever something inside it has keyboard focus.
+          hidden && !menuOpen && "-translate-y-[130%] focus-within:translate-y-0",
         )}
       >
         <div className="wrap">

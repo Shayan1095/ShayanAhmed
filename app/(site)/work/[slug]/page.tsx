@@ -126,7 +126,7 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
                           className={a.needsYou ? "size-2 rounded-full bg-walnut" : "size-2 rounded-full bg-paper-edge"}
                         />
                       </div>
-                      <h3 className="font-display text-lg font-extrabold uppercase leading-tight [font-variation-settings:'wdth'_112]">
+                      <h3 className="font-display text-lg font-extrabold leading-tight [font-variation-settings:'wdth'_104]">
                         {a.name}
                       </h3>
                       <p className="mt-auto font-mono text-[11px] uppercase tracking-[0.08em] text-muted">
@@ -184,7 +184,7 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
               <Label>Next project</Label>
               <SplitReveal
                 as="p"
-                className="mt-4 font-display text-[clamp(48px,9vw,140px)] font-extrabold uppercase leading-[0.86] tracking-[-0.045em] transition-colors [font-variation-settings:'wdth'_116] group-hover:text-walnut"
+                className="mt-4 font-display text-[clamp(48px,9vw,140px)] font-extrabold leading-[0.95] tracking-[-0.035em] transition-colors [font-variation-settings:'wdth'_104] group-hover:text-walnut"
               >
                 {next.title} →
               </SplitReveal>
@@ -198,7 +198,7 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
         <div className="wrap flex flex-col items-start gap-8 min-[900px]:flex-row min-[900px]:items-end min-[900px]:justify-between">
           <div>
             <Label>Your project</Label>
-            <p className="mt-4 max-w-[14em] font-display text-[clamp(34px,4.6vw,64px)] font-extrabold uppercase leading-[0.92] tracking-[-0.035em] [font-variation-settings:'wdth'_116]">
+            <p className="mt-4 max-w-[14em] font-display text-[clamp(34px,4.6vw,64px)] font-extrabold leading-[0.92] tracking-[-0.035em] [font-variation-settings:'wdth'_104]">
               Want this for <em className="font-bold italic text-copper [font-variation-settings:'wdth'_94]">your business?</em>
             </p>
           </div>

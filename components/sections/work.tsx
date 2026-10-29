@@ -9,7 +9,7 @@ import { motionGrammar } from "@/lib/motion";
 import { WorkSlide } from "./work-slide";
 
 /**
- * 02 Selected work (cream). Desktop: the band pins and the rail slides
+ * 01 Selected work (cream), straight after the hero: proof first. Desktop: the band pins and the rail slides
  * sideways, fragments drift at their own speeds. Mobile / reduced motion: stacked.
  */
 export function Work({ projects }: { projects: Project[] }) {
@@ -67,7 +67,7 @@ export function Work({ projects }: { projects: Project[] }) {
   if (total === 0) return null;
 
   return (
-    <Band ref={root} id="work" aria-label="Selected work">
+    <Band ref={root} id="work" aria-label="Selected work" className="border-t border-paper-edge/70">
       <div
         ref={pin}
         className="flex flex-col justify-center overflow-clip py-20 min-[900px]:min-h-svh min-[900px]:pb-10 min-[900px]:pt-24"
@@ -75,7 +75,7 @@ export function Work({ projects }: { projects: Project[] }) {
         <div className="wrap">
           <div className="mb-9 flex flex-wrap items-end justify-between gap-6 [@media(min-width:900px)_and_(max-height:820px)]:mb-6">
             <div>
-              <Label className="block">02 · Selected work</Label>
+              <Label className="block">01 · Selected work</Label>
               <SplitReveal className="type-section mt-[18px]">
                 Case <em>studies</em>
               </SplitReveal>

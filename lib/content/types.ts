@@ -78,7 +78,16 @@ export type Faq = {
   published: boolean;
 };
 
-export type HeroChannel = "site" | "orders" | "leads";
+/** One decision in the hero demo: an agent prepares it, the visitor makes the call. */
+export type DemoDecision = {
+  /** Agent tag, e.g. "Risk guard". */
+  agent: string;
+  /** What happened, e.g. "Order #1042 flagged: duplicate address". */
+  title: string;
+  /** Why it needs the owner. */
+  detail: string;
+  actions: { label: string; result: string; primary?: boolean }[];
+};
 
 export type SiteSettings = {
   /** Shown beside the status light, e.g. "Booking for December". */
@@ -87,8 +96,14 @@ export type SiteSettings = {
   linkedin?: string;
   /** About section spec sheet. Only true values. */
   specSheet: { label: string; value: string }[];
-  /** Lines the hero screen and live caption cycle through. channel is an extension (SITE / ORDERS / LEADS tabs). */
-  heroCaptionEvents: { tag: string; text: string; channel: HeroChannel }[];
+  /** extension: the hero's operations demo (labelled as a demo of the Brands Attire build). */
+  heroDemo: {
+    /** Which build the demo is modelled on, shown on the screen. */
+    source: string;
+    decisions: DemoDecision[];
+    /** Routine work agents finish on their own while the visitor decides. */
+    routine: { agent: string; text: string }[];
+  };
   /** extension: contact form budget options. Hidden while empty. */
   budgetRanges: string[];
   /** extension: contact form project types. */

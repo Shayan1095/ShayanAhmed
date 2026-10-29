@@ -19,20 +19,46 @@ export const siteSettings: SiteSettings = {
     { label: "Languages", value: "English, Urdu" },
     { label: "Experience", value: "AI team at a software company" },
   ],
-  // Illustrative events from the Brands Attire and SKY Tech builds, shown on the hero slab.
-  heroCaptionEvents: [
-    { channel: "orders", tag: "Order", text: "#1042 flagged, owner notified" },
-    { channel: "site", tag: "Site", text: "New enquiry from the contact form" },
-    { channel: "orders", tag: "Remind", text: "Cart reminder sent with a code" },
-    { channel: "leads", tag: "Lead", text: "Follow-up sent to 12 leads" },
-    { channel: "orders", tag: "Order", text: "#1051 dispatched in one click" },
-    { channel: "site", tag: "Site", text: "Checkout completed: #1058" },
-    { channel: "orders", tag: "Stock", text: "3 items low, restock drafted" },
-    { channel: "leads", tag: "Lead", text: "Welcome email sent to prospect" },
-    { channel: "orders", tag: "Return", text: "Return triaged for approval" },
-    { channel: "leads", tag: "Lead", text: "Query answered from template" },
-    { channel: "orders", tag: "Brief", text: "Daily briefing ready for owner" },
-  ],
+  // The hero demo is modelled on the Brands Attire operations layer and labelled as a demo on screen.
+  heroDemo: {
+    source: "Brands Attire operations",
+    decisions: [
+      {
+        agent: "Risk guard",
+        title: "Order #1042 flagged: duplicate address",
+        detail: "Same address as a cancelled order last week.",
+        actions: [
+          { label: "Approve", result: "Approved. Courier booked, customer notified.", primary: true },
+          { label: "Hold", result: "Held. Customer asked to confirm the address." },
+        ],
+      },
+      {
+        agent: "Restock",
+        title: "3 items are running low",
+        detail: "Draft order to the supplier is ready.",
+        actions: [
+          { label: "Send order", result: "Sent. Supplier has the purchase order.", primary: true },
+          { label: "Not yet", result: "Saved as a draft for tomorrow's briefing." },
+        ],
+      },
+      {
+        agent: "Returns",
+        title: "Return request: size exchange",
+        detail: "Within the 14-day window, item unworn.",
+        actions: [
+          { label: "Approve", result: "Approved. Exchange label emailed.", primary: true },
+          { label: "Review", result: "Moved to your review list." },
+        ],
+      },
+    ],
+    routine: [
+      { agent: "Reminders", text: "Cart reminder sent with a code" },
+      { agent: "Catalogue", text: "Catalogue check: all clear" },
+      { agent: "Checkout", text: "Order #1058 paid and packed" },
+      { agent: "Briefing", text: "Daily briefing ready for 9:00" },
+      { agent: "Feedback", text: "4 new reviews summarised" },
+    ],
+  },
   budgetRanges: [],
   projectTypes: [
     "Website or landing page",

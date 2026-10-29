@@ -43,7 +43,7 @@ export function CaseHero({ project, index, total }: { project: Project; index: n
               as="h1"
               id="case-title"
               start="top bottom"
-              className="font-display text-[clamp(44px,6.4vw,96px)] font-extrabold uppercase leading-[0.88] tracking-[-0.04em] [font-variation-settings:'wdth'_118]"
+              className="font-display text-[clamp(44px,6.4vw,96px)] font-extrabold leading-[0.95] tracking-[-0.03em] [font-variation-settings:'wdth'_104]"
             >
               {project.title}
             </SplitReveal>

@@ -1,57 +1,41 @@
 "use client";
 
 import { motion, useMotionValue, useSpring } from "motion/react";
-import dynamic from "next/dynamic";
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { ImageRef, SiteSettings } from "@/lib/content/types";
-import { useSmoothScroll } from "@/components/providers/smooth-scroll";
-import { Button, Keycap, Label, StatusLight, type ScreenHandle } from "@/components/system";
+import { Button, Label, type ScreenHandle } from "@/components/system";
 import { useFinePointer, useReducedMotion } from "@/hooks/use-media-query";
-import { gsap, MQ, refreshScrollTriggers, useGSAP } from "@/lib/gsap";
-import { motionGrammar } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { HeroSlab } from "./hero-slab";
-import { CARD_H, CARD_LINK, CARD_W, createHeroState, hasWebGL, type HeroState } from "./three/shared";
-import { useHeroConsole } from "./use-hero-console";
-
-// The 3D chunk loads only on capable desktops, after the page is interactive.
-const HeroScene = dynamic(() => import("./three/hero-scene"), { ssr: false });
-
-const layerCards = [
-  { label: "Layer 1 · Glass", title: "Website", text: "Storefront, pages and checkout your customers use." },
-  { label: "Layer 2 · Board", title: "System", text: "Dashboards, orders, leads and records your team runs on." },
-  { label: "Layer 3 · Core", title: "Automation", text: "Agents flag orders and prepare restocks. You approve." },
-];
+import { useOpsDemo } from "./use-ops-demo";
 
 type HeroProps = {
   settings: SiteSettings;
   /** Real Brands Attire storefront screenshot, when available. */
   storefront?: ImageRef;
+  /** Case study the secondary call to action opens. */
+  caseStudyHref?: string;
 };
 
 const lines = ["Websites with", "the systems", "built in"] as const;
-const BASE_TILT = { x: 5, y: -14 };
+const trust = ["Clients in Pakistan and abroad", "Calls in your time zone", "Reply within 24h"];
+const TILT = { x: 3, y: -7 };
 
 /**
- * Hero (DESIGN.md §8). Magazine-cover layout: full-width headline behind the
- * display slab. The HTML slab is the base (phones, reduced motion, no WebGL,
- * keyboard and screen readers); on capable desktops the 3D slab crossfades
- * over it and the hero pins for the teardown and dive.
+ * Hero (revised): magazine-cover headline plus an interactive proof. The slab
+ * is a working demo of what Shayan builds: agents prepare decisions, the
+ * visitor approves them. No scroll-jacking; the headline paints immediately.
  */
-export function Hero({ settings, storefront }: HeroProps) {
+export function Hero({ settings, storefront, caseStudyHref }: HeroProps) {
   const root = useRef<HTMLElement>(null);
-  const strip = useRef<ScreenHandle>(null);
-  const led = useRef<HTMLSpanElement>(null);
+  const screen = useRef<ScreenHandle>(null);
   const reduce = useReducedMotion();
   const fine = useFinePointer();
-  const { scrollTo } = useSmoothScroll();
 
-  // Console runs after the screen boots, and only while the hero is on screen.
+  // The demo runs after the screen boots and only while the hero is on screen.
   const [booted, setBooted] = useState(false);
   const [inView, setInView] = useState(true);
-  const live = useHeroConsole(settings.heroCaptionEvents, booted && inView, reduce);
-  const latest = live.lines[live.lines.length - 1];
+  const { state, decision, decide } = useOpsDemo(settings.heroDemo, booted && inView);
 
   useEffect(() => {
     const el = root.current;
@@ -61,145 +45,49 @@ export function Hero({ settings, storefront }: HeroProps) {
     return () => io.disconnect();
   }, []);
 
-  // 3D mode: desktop, motion allowed, WebGL available. Decided after mount.
-  const [three, setThree] = useState(false);
-  const [sceneReady, setSceneReady] = useState(false);
-  // Mutable bridge between React/GSAP and the 3D render loop.
-  const heroState = useRef<HeroState>(createHeroState());
+  // Screen boot after the CSS entrance has placed the slab.
   useEffect(() => {
-    heroState.current.live = { lines: live.lines, channels: live.channels, mode: live.mode, clock: live.clock };
-    heroState.current.onToggle = live.toggle;
-    heroState.current.invalidate();
-  }, [live.lines, live.channels, live.mode, live.clock, live.toggle]);
+    const id = window.setTimeout(
+      () => {
+        screen.current?.boot();
+        setBooted(true);
+      },
+      reduce ? 0 : 750,
+    );
+    return () => window.clearTimeout(id);
+  }, [reduce]);
 
-  // Pointer tilt of the HTML slab (desktop): Motion owns its rotation. Off once the 3D slab is up.
-  const rx = useSpring(useMotionValue(BASE_TILT.x), { stiffness: 60, damping: 18 });
-  const ry = useSpring(useMotionValue(BASE_TILT.y), { stiffness: 60, damping: 18 });
+  // Slight turn toward the cursor (desktop). Motion owns the slab's rotation.
+  const rx = useSpring(useMotionValue(TILT.x), { stiffness: 50, damping: 18 });
+  const ry = useSpring(useMotionValue(TILT.y), { stiffness: 50, damping: 18 });
   useEffect(() => {
-    if (!fine || reduce || sceneReady) return;
+    if (!fine || reduce) return;
     const onMove = (e: PointerEvent) => {
-      const px = e.clientX / window.innerWidth - 0.5;
-      const py = e.clientY / window.innerHeight - 0.5;
-      rx.set(BASE_TILT.x - py * 6);
-      ry.set(BASE_TILT.y + px * 10);
+      rx.set(TILT.x - (e.clientY / window.innerHeight - 0.5) * 4);
+      ry.set(TILT.y + (e.clientX / window.innerWidth - 0.5) * 7);
     };
     window.addEventListener("pointermove", onMove, { passive: true });
     return () => window.removeEventListener("pointermove", onMove);
-  }, [fine, reduce, sceneReady, rx, ry]);
-
-  // Entrance (~1.4s). GSAP owns the anchor, lines, foot and the 3D boot values; never the tilt layer.
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-      mm.add(MQ.reduce, () => setBooted(true));
-      mm.add(MQ.motion, () => {
-        const q = gsap.utils.selector(root);
-        const boot = heroState.current.boot;
-        Object.assign(boot, { rise: 0, led: 0, screen: 0.03 });
-        const tl = gsap.timeline();
-        tl.from(q("[data-hero-line]"), { yPercent: 115, duration: 1.05, stagger: 0.08, ease: "expo.out" }, 0.15)
-          .from(q("[data-hero-kicker]"), { y: 16, duration: 0.8, ease: "expo.out" }, 0.1)
-          .from(q("[data-hero-anchor]"), { y: 70, opacity: 0, duration: 1.6, ease: "expo.out" }, 0.3)
-          .to(boot, { rise: 1, duration: 1.6, ease: "expo.out" }, 0.3)
-          // status light blinks twice
-          .fromTo(led.current, { opacity: 0.05 }, { opacity: 1, duration: 0.05 }, 0.5)
-          .to(led.current, { opacity: 0.05, duration: 0.07 }, 0.58)
-          .to(led.current, { opacity: 1, duration: 0.05 }, 0.68)
-          .to(boot, { led: 1, duration: 0.05 }, 0.5)
-          .to(boot, { led: 0.04, duration: 0.07 }, 0.58)
-          .to(boot, { led: 1, duration: 0.05 }, 0.68)
-          // screen boots with the shared flicker
-          .add(() => strip.current?.boot(), 0.8)
-          .to(boot, { screen: 0.6, duration: 0.04 }, 0.8)
-          .to(boot, { screen: 0.06, duration: 0.05 }, 0.86)
-          .to(boot, { screen: 0.85, duration: 0.04 }, 0.93)
-          .to(boot, { screen: 0.25, duration: 0.04 }, 0.99)
-          .to(boot, { screen: 1, duration: 0.35, ease: "power2.out" }, 1.04)
-          .add(() => setBooted(true), 1.05)
-          .from(q("[data-rise-in]"), { y: 26, duration: 0.85, stagger: 0.07, ease: "expo.out" }, 0.9);
-        return () => Object.assign(boot, { rise: 1, led: 1, screen: 1 });
-      });
-      mm.add(MQ.desktop, () => {
-        if (hasWebGL()) setThree(true);
-        return () => {
-          setThree(false);
-          setSceneReady(false);
-        };
-      });
-    },
-    { scope: root },
-  );
-
-  // Scroll. 3D: the hero pins for 1.6 screens: headline splits off, slab tears down
-  // into three labelled layers, rejoins and the camera dives into the live strip.
-  // 2D desktop: headline lines split off, bottom row sinks.
-  useGSAP(
-    () => {
-      const q = gsap.utils.selector(root);
-      const dirs = [-1, 1, -1];
-      gsap.matchMedia().add(MQ.desktop, () => {
-        if (!three) {
-          const st = { trigger: root.current, start: "top top", end: "bottom top", scrub: 0.8 };
-          q("[data-hero-row]").forEach((row, i) => gsap.to(row, { xPercent: dirs[i] * 45, ease: "none", scrollTrigger: st }));
-          gsap.to(q("[data-hero-foot]"), { y: 60, opacity: 0, ease: "none", scrollTrigger: { ...st, end: "40% top" } });
-          gsap.to(q("[data-hero-anchor]"), { yPercent: -12, ease: "none", scrollTrigger: st });
-          requestAnimationFrame(refreshScrollTriggers);
-          return;
-        }
-        heroState.current.p = 0;
-        const tl = gsap.timeline({
-          defaults: { ease: "none" },
-          scrollTrigger: {
-            trigger: root.current,
-            start: "top top",
-            end: `+=${motionGrammar.maxPin * 100}%`,
-            pin: true,
-            scrub: motionGrammar.scrub,
-            // Measured first: everything below depends on the space this pin adds.
-            refreshPriority: 1,
-          },
-        });
-        tl.to(heroState.current, { p: 1, duration: 1, onUpdate: () => heroState.current.invalidate() }, 0)
-          .to(q("[data-hero-kicker]"), { opacity: 0, duration: 0.08 }, 0)
-          .to(q("[data-hero-caption]"), { opacity: 0, duration: 0.12 }, 0)
-          .to(q("[data-hero-foot]"), { y: 60, opacity: 0, duration: 0.22 }, 0);
-        q("[data-hero-row]").forEach((row, i) => tl.to(row, { xPercent: dirs[i] * 115, duration: 0.24, ease: "power1.in" }, 0));
-        q("[data-hero-card]").forEach((card, i) =>
-          tl.fromTo(card, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.08 }, 0.38 + i * 0.045).to(card, { opacity: 0, duration: 0.07 }, 0.6),
-        );
-        tl.fromTo(q("[data-hero-tdcap]"), { opacity: 0 }, { opacity: 1, duration: 0.06 }, 0.5)
-          .to(q("[data-hero-tdcap]"), { opacity: 0, duration: 0.05 }, 0.62)
-          .fromTo(q("[data-hero-dive]"), { opacity: 0 }, { opacity: 1, duration: 0.1 }, 0.9);
-        // The pin adds 1.6 screens of scroll above every other section: re-measure them all.
-        requestAnimationFrame(refreshScrollTriggers);
-      });
-    },
-    { scope: root, dependencies: [three], revertOnUpdate: true },
-  );
-
-  const portrait = settings.portrait;
+  }, [fine, reduce, rx, ry]);
 
   return (
     <section
       ref={root}
       id="hero"
-      data-hero-3d={three || undefined}
       aria-labelledby="hero-title"
-      className="group/hero relative flex flex-col overflow-clip bg-[radial-gradient(110%_80%_at_68%_52%,var(--color-paper-hi)_0%,var(--color-paper)_55%,#ece1cd_100%)] pb-14 min-[900px]:block min-[900px]:h-svh min-[900px]:min-h-[680px] min-[900px]:pb-0"
+      className="hero-surface relative overflow-clip pb-16 pt-[calc(env(safe-area-inset-top)+104px)] min-[900px]:pb-20 min-[900px]:pt-[calc(env(safe-area-inset-top)+112px)]"
     >
-      {/* Masthead */}
-      <div className="relative z-[1] order-1 px-[max(16px,env(safe-area-inset-left))] pt-[calc(env(safe-area-inset-top)+96px)] min-[900px]:pointer-events-none min-[900px]:absolute min-[900px]:inset-x-0 min-[900px]:top-0 min-[900px]:pl-[max(48px,env(safe-area-inset-left))] min-[900px]:pt-[calc(env(safe-area-inset-top)+108px)]">
-        <div data-hero-kicker className="mb-[18px] ml-1 flex items-center gap-2.5">
-          <Label>Full-stack developer · Pakistan</Label>
-        </div>
+      <div className="wrap [--hl:clamp(38px,10.4vw,64px)] min-[900px]:[--hl:min(8vw,13vh,132px)]">
+        <Label className="hero-in mb-5 block [animation-delay:.05s]">Full-stack developer · Pakistan</Label>
+
         <h1
           id="hero-title"
           aria-label="Websites with the systems built in."
-          className="whitespace-nowrap font-display text-[clamp(30px,10vw,64px)] font-extrabold uppercase leading-[0.86] tracking-[-0.045em] [font-variation-settings:'wdth'_108] min-[900px]:text-[min(9.4vw,15vh)]"
+          className="whitespace-nowrap font-display text-[length:var(--hl)] font-extrabold uppercase leading-[0.86] tracking-[-0.045em] [font-variation-settings:'wdth'_108]"
         >
           {lines.map((l, i) => (
-            <span key={l} aria-hidden="true" data-hero-row className="block overflow-hidden pb-[0.04em]">
-              <span data-hero-line className="inline-block">
+            <span key={l} aria-hidden="true" className="block overflow-hidden pb-[0.04em]">
+              <span className="hero-line inline-block" style={{ animationDelay: `${0.06 + i * 0.07}s` }}>
                 {i === 2 ? (
                   <>
                     <em className="font-[750] italic text-walnut [font-variation-settings:'wdth'_92]">{l}</em>
@@ -212,181 +100,72 @@ export function Hero({ settings, storefront }: HeroProps) {
             </span>
           ))}
         </h1>
-      </div>
 
-      {/* Slab + live caption */}
-      <div
-        data-hero-anchor
-        className="@container relative z-[2] order-3 mx-auto mt-10 w-[min(92vw,560px)] px-0 min-[900px]:absolute min-[900px]:left-[71%] min-[900px]:top-[53%] min-[900px]:mt-0 min-[900px]:w-[min(47vw,82vh,780px)] min-[900px]:-translate-x-1/2 min-[900px]:-translate-y-1/2 [@media(min-width:900px)_and_(max-height:820px)]:top-[50%] [@media(min-width:900px)_and_(max-height:820px)]:w-[min(47vw,74vh,780px)]"
-      >
-        {/* HTML slab. Hidden once the 3D slab is up, but shown again for keyboard focus. */}
-        <div
-          data-html-slab
-          className={cn(
-            "transition-opacity duration-500",
-            sceneReady && "pointer-events-none opacity-0 focus-within:pointer-events-auto focus-within:opacity-100",
-          )}
-        >
-          <motion.div style={{ rotateX: rx, rotateY: ry, transformPerspective: 1400 }} className="max-[899px]:transform-none!">
-            <HeroSlab {...live} onToggle={live.toggle} storefront={storefront} stripRef={strip} ledRef={led} />
-          </motion.div>
-          {/* contact shadow */}
-          <div
-            aria-hidden="true"
-            className="mx-auto -mt-2 h-8 w-[86%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(17_17_17/.28),transparent)] blur-md"
-          />
-        </div>
-        <p
-          data-hero-caption
-          aria-live="polite"
-          className="raised-sm mt-4 flex items-center gap-2.5 rounded-control bg-paper-hi px-3.5 py-2.5 text-[13.5px] leading-snug min-[900px]:absolute min-[900px]:bottom-[16%] min-[900px]:right-[calc(100%+12px)] min-[900px]:mt-0 min-[900px]:w-[300px]"
-        >
-          <span aria-hidden="true" className="text-copper">
-            ●
-          </span>
-          <span>
-            <span className="type-label block text-[10px] text-walnut">Just now · {latest?.tag}</span>
-            {latest?.text}
-          </span>
-        </p>
-      </div>
-
-      {three && (
-        <>
-          {/* 3D slab, crossfading over the HTML one. Hidden while the HTML slab has keyboard focus. */}
-          <div
-            className={cn(
-              "absolute inset-0 z-[2] transition-opacity duration-700 group-has-[[data-html-slab]:focus-within]/hero:opacity-0",
-              sceneReady ? "opacity-100" : "opacity-0",
-            )}
-          >
-            <HeroScene stateRef={heroState} storefront={storefront} active={inView} onReady={() => setSceneReady(true)} />
-          </div>
-
-          {/* Teardown label cards: positioned by the scene, faded by the scroll timeline. */}
-          {layerCards.map((c, i) => (
-            <div
-              key={c.title}
-              ref={(el) => {
-                heroState.current.cards[i] = el;
-              }}
-              aria-hidden="true"
-              // A zero-size point placed at the layer's bottom edge; the card hangs below it.
-              className="pointer-events-none absolute left-0 top-0 z-[4] size-0 will-change-transform"
-            >
-              <div
-                data-hero-card
-                style={{ width: CARD_W, height: CARD_H, top: CARD_LINK, left: -CARD_W / 2 }}
-                className="raised absolute rounded-[14px] px-4 pb-[15px] pt-3.5 opacity-0"
-              >
-                {/* connector up to the layer, with a copper contact dot */}
-                <span style={{ height: CARD_LINK }} className="absolute bottom-full left-1/2 w-px bg-ink/35" />
-                <span
-                  style={{ top: -CARD_LINK - 3 }}
-                  className="absolute left-1/2 -ml-[3px] size-[7px] rounded-full bg-copper shadow-glow"
-                />
-                <Label>{c.label}</Label>
-                <b className="my-[7px] block font-display text-2xl font-extrabold uppercase leading-none [font-variation-settings:'wdth'_115]">
-                  {c.title}
-                </b>
-                <p className="text-[13.5px] leading-normal text-muted">{c.text}</p>
-              </div>
+        {/* Below the headline: copy on the left, the demo on the right rising beside "BUILT IN." */}
+        <div className="mt-8 grid grid-cols-1 gap-10 min-[1000px]:mt-0 min-[1000px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] min-[1000px]:items-start min-[1000px]:gap-14">
+          <div className="flex flex-col gap-7 min-[1000px]:pt-9">
+            <p className="hero-in max-w-[30em] text-[17px] leading-[1.6] text-muted [animation-delay:.3s] min-[900px]:text-lg">
+              I&apos;m <strong className="font-semibold text-ink">Shayan Ahmed</strong>. I build the storefront your
+              customers use and the back office that runs it, with agents that take the routine work off your plate
+              while you approve every decision.
+            </p>
+            <div className="hero-in flex flex-wrap gap-3 [animation-delay:.38s] max-[520px]:[&>*]:flex-1">
+              <Button href="#contact" arrow size="lg" className="w-full">
+                Start a project
+              </Button>
+              {caseStudyHref && (
+                <Button href={caseStudyHref} variant="paper" size="lg" className="w-full">
+                  See a case study
+                </Button>
+              )}
             </div>
-          ))}
-          <div
-            data-hero-tdcap
-            aria-hidden="true"
-            // Top centre: the cards hang below the slab, the navbar is hidden while scrolling down.
-            className="pointer-events-none absolute left-1/2 top-[calc(env(safe-area-inset-top)+40px)] z-[4] -translate-x-1/2 whitespace-nowrap text-center opacity-0"
-          >
-            <Label>Every build ships with</Label>
-            <strong className="mt-1.5 block font-display text-[clamp(22px,2.2vw,30px)] font-extrabold uppercase leading-none tracking-[-0.02em] [font-variation-settings:'wdth'_112]">
-              all three layers, <em className="font-bold italic text-walnut [font-variation-settings:'wdth'_94]">designed together.</em>
-            </strong>
+            <p
+              aria-live="polite"
+              className="hero-in hidden items-center gap-3 font-mono text-xs uppercase tracking-[0.1em] text-walnut [animation-delay:.46s] min-[1000px]:flex"
+            >
+              <span aria-hidden="true" className="inline-block h-px w-10 bg-walnut/60" />
+              {state.touched ? "Agents do the routine. You make the calls." : "Try it: make the call on the right."}
+            </p>
+            <ul className="hero-in hidden flex-wrap gap-x-6 gap-y-2 text-sm text-muted [animation-delay:.52s] min-[1000px]:flex">
+              {trust.map((t) => (
+                <li key={t} className="flex items-center gap-2">
+                  <span aria-hidden="true" className="size-1 rounded-full bg-walnut" />
+                  {t}
+                </li>
+              ))}
+            </ul>
           </div>
-          {/* The dive lands in the Services band, which is ink. */}
-          <div data-hero-dive aria-hidden="true" className="pointer-events-none absolute inset-0 z-[6] bg-ink opacity-0" />
-        </>
-      )}
 
-      {/* Phone: the three layers as a short stacked reveal (the teardown is desktop 3D). */}
-      <ol className="wrap order-4 mt-8 flex flex-col gap-2 min-[900px]:hidden" aria-label="Every build ships with three layers">
-        {[
-          ["Website", "What customers see"],
-          ["System", "What your team runs on"],
-          ["Automation", "What runs without you"],
-        ].map(([t, d]) => (
-          <li key={t} data-rise-in className="raised flex items-baseline gap-3 rounded-control px-3.5 py-3">
-            <b className="min-w-[110px] font-display text-base font-extrabold uppercase [font-variation-settings:'wdth'_112]">{t}</b>
-            <span className="text-[13px] text-muted">{d}</span>
-          </li>
-        ))}
-      </ol>
-
-      {/* Bottom row */}
-      <div
-        data-hero-foot
-        className="relative z-[3] order-2 flex flex-col gap-7 px-[max(16px,env(safe-area-inset-left))] pt-7 min-[900px]:pointer-events-none min-[900px]:absolute min-[900px]:inset-x-0 min-[900px]:bottom-[calc(env(safe-area-inset-bottom)+28px)] min-[900px]:flex-row min-[900px]:items-end min-[900px]:justify-between min-[900px]:p-0 min-[900px]:px-[max(48px,env(safe-area-inset-left))] [&>*]:pointer-events-auto"
-      >
-        <div className="max-w-[410px]">
-          <p data-rise-in className="text-[16.5px] leading-[1.55] text-muted max-[899px]:hidden">
-            I&apos;m <strong className="font-semibold text-ink">Shayan Ahmed</strong>. I build the website your
-            customers see and the system your team runs on, with agents that do the repetitive work while you
-            approve every action.
-          </p>
-          <div data-rise-in className="flex flex-wrap gap-2.5 min-[900px]:mt-[18px] [&>*]:max-[899px]:flex-1">
-            <Button href="#contact" arrow className="w-full">
-              Start a project
-            </Button>
-            <Button href="#work" variant="paper" className="w-full">
-              See the work
-            </Button>
+          <div className="hero-slab-in relative min-[1000px]:-mt-[calc(var(--hl)*0.98)] min-[1000px]:justify-self-end">
+            <motion.div
+              style={{ rotateX: rx, rotateY: ry, transformPerspective: 1600 }}
+              className={cn("w-full min-[1000px]:w-[min(44vw,560px)]", !fine && "transform-none!")}
+            >
+              <HeroSlab
+                state={state}
+                decision={decision}
+                onDecide={decide}
+                source={settings.heroDemo.source}
+                storefront={storefront}
+                screenRef={screen}
+              />
+            </motion.div>
+            <div
+              aria-hidden="true"
+              className="mx-auto -mt-3 h-7 w-[84%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(17_17_17/.22),transparent)] blur-md"
+            />
           </div>
+
+          {/* Trust facts on small screens sit under the demo. */}
+          <ul className="flex flex-col gap-2 text-sm text-muted min-[1000px]:hidden">
+            {trust.map((t) => (
+              <li key={t} className="flex items-center gap-2">
+                <span aria-hidden="true" className="size-1 rounded-full bg-walnut" />
+                {t}
+              </li>
+            ))}
+          </ul>
         </div>
-
-        <div data-rise-in className="hidden items-end gap-6 whitespace-nowrap min-[1200px]:flex">
-          <div className="flex flex-col gap-[3px]">
-            <Label>Stack</Label>
-            <b className="font-display text-sm font-bold [font-variation-settings:'wdth'_108]">Next.js · MERN</b>
-          </div>
-          <div className="flex flex-col gap-[3px]">
-            <Label>Clients</Label>
-            <b className="font-display text-sm font-bold [font-variation-settings:'wdth'_108]">Pakistan and abroad</b>
-          </div>
-          <button
-            type="button"
-            onClick={() => scrollTo("#services")}
-            className="group flex cursor-pointer flex-col gap-[3px] text-left"
-          >
-            <Label>{three ? "Scroll to take it apart" : "Next: what I build"}</Label>
-            <b className="flex items-center gap-1.5 font-display text-sm font-bold transition-colors [font-variation-settings:'wdth'_108] group-hover:text-walnut">
-              Skip the story ↓
-            </b>
-          </button>
-        </div>
-
-        <a
-          data-rise-in
-          href="#contact"
-          className="raised hidden items-center gap-3 rounded-[40px] py-[7px] pl-[7px] pr-[18px] min-[900px]:flex"
-        >
-          <span className="inset-track relative grid size-[42px] place-items-center overflow-hidden rounded-full">
-            {portrait ? (
-              <Image src={portrait.src} alt="" fill sizes="42px" className="object-cover" />
-            ) : (
-              <Keycap aria-hidden="true" className="h-[42px] min-w-[42px] rounded-full text-[12px]">
-                SA
-              </Keycap>
-            )}
-          </span>
-          <span className="flex flex-col leading-tight">
-            <small className="type-label flex items-center gap-1.5 whitespace-nowrap text-[10px] text-muted">
-              <StatusLight size="sm" on={false} pulse={false} />
-              {settings.availability}
-            </small>
-            <strong className="text-sm font-semibold">Book a call</strong>
-          </span>
-        </a>
       </div>
     </section>
   );

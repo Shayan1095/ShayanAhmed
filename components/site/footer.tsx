@@ -23,7 +23,7 @@ export async function Footer() {
         <div className="grid grid-cols-1 items-center gap-10 min-[900px]:grid-cols-[minmax(0,1fr)_auto]">
           <div>
             <Label>End of transmission</Label>
-            <p className="mt-4 max-w-[13em] font-display text-[clamp(28px,3.4vw,44px)] font-extrabold uppercase leading-[0.95] tracking-[-0.03em] [font-variation-settings:'wdth'_116]">
+            <p className="mt-4 max-w-[13em] font-display text-[clamp(28px,3.4vw,44px)] font-extrabold leading-[0.95] tracking-[-0.03em] [font-variation-settings:'wdth'_104]">
               Have a business that should run itself?
             </p>
             <Button href="/#contact" arrow className="mt-6">

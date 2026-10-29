@@ -197,6 +197,8 @@ Bands alternate to mark chapters: **cream → ink → cream → cream → ink �
 
 ### Hero (cream) — Layout 2, "magazine cover"
 
+> **Revised 2026-10-29 (supersedes the 3D teardown below).** The pinned 3D slab, teardown and dive were removed: they hid the work behind 1.6 screens of scroll and ran poorly on machines without GPU acceleration. The hero is now an *interactive proof*: the full headline (painted at once, CSS entrance), a value line, "Start a project" + "See a case study", a demo prompt and three trust facts on the left; on the right the HTML display slab rising beside "BUILT IN.", whose ink panel is a working demo of the Brands Attire operations layer (agents prepare decisions such as a flagged order, the visitor taps Approve / Hold, routine work ticks along). Demo content lives in `SiteSettings.heroDemo`. No scroll-linked motion. The homepage order is now Hero → Work → Services → Archive (3 + link to `/work`) → Process → About → Testimonials → FAQ → Contact, with call-to-action strips after Work and Process and a sticky "Start a project" bar on phones. The sections below describe the original 3D version for reference.
+
 **Composition:** giant uppercase headline across the full width ("WEBSITES WITH / THE SYSTEMS / *BUILT IN*.") behind the 3D **display slab** (the hero object) placed right, overlapping only the ends of lines 1–2. Bottom row: short intro + two buttons (left), spec bar (Stack · Clients in Pakistan and abroad · Scroll to take it apart), portrait chip with availability (right).
 
 **Live caption:** beside the device, real HTML text that mirrors the device screen: `● Just now: Order #1042 flagged, owner notified`. Updates with each new screen line. `aria-live="polite"`.

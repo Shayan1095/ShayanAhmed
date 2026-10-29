@@ -21,7 +21,7 @@ export function Contact({ settings }: { settings: SiteSettings }) {
       <div className="wrap grid grid-cols-1 items-start gap-14 min-[980px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <div>
           <Label>08 · Contact</Label>
-          <SplitReveal className="mb-6 mt-4 font-display text-[clamp(44px,6.4vw,92px)] font-extrabold uppercase leading-[0.88] tracking-[-0.04em] [font-variation-settings:'wdth'_120] [&_em]:font-bold [&_em]:italic [&_em]:text-copper [&_em]:[font-variation-settings:'wdth'_94]">
+          <SplitReveal className="mb-6 mt-4 font-display text-[clamp(40px,5vw,72px)] font-extrabold leading-[0.95] tracking-[-0.03em] [font-variation-settings:'wdth'_104] [&_em]:font-bold [&_em]:italic [&_em]:text-copper [&_em]:[font-variation-settings:'wdth'_94]">
             Let&apos;s build <em>your system.</em>
           </SplitReveal>
           <Rise as="p" className="max-w-[28em] text-[17px] text-muted-ink">

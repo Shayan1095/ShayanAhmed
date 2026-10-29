@@ -1,9 +1,7 @@
 "use client";
 
-import { motion, useMotionValue, useSpring } from "motion/react";
 import Link from "next/link";
 import { useRef } from "react";
-import { useFinePointer, useReducedMotion } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { Label } from "./label";
 import { Screen, type ScreenHandle } from "./screen";
@@ -15,60 +13,27 @@ type CartridgeProps = {
   kind: string;
   status: ProjectStatus;
   summary: string;
-  /** One fact shown on the mini screen when the cartridge is hovered. */
+  /** One fact on the cartridge's mini label screen. */
   fact: string;
-  /** Screenshot or diagram. Without one, the slot stays a plain inset. */
+  /** Screenshot or diagram. Without one, the label screen fills the slot. */
   shot?: React.ReactNode;
   href?: string;
   className?: string;
 };
 
-// Tilt springs from React Bits Tilted Card (MIT, reactbits.dev).
-const tiltSpring = { damping: 30, stiffness: 100, mass: 2 };
-const AMP_X = 7;
-const AMP_Y = 9;
-const LIFT = -6;
-
 /**
- * Archive project card: grip strip, label area, status badge. On desktop it
- * tilts toward the cursor, lifts, and its mini label screen boots with one fact.
- * Motion owns the body's transform; reveals and layout animation go on a wrapper.
+ * Archive project card: grip strip, label area, status badge. Lifts slightly on
+ * hover; with a screenshot, its mini label screen boots with one fact on hover.
  */
 export function Cartridge({ title, kind, status, summary, fact, shot, href, className }: CartridgeProps) {
-  const fine = useFinePointer();
-  const reduce = useReducedMotion();
-  const tilt = fine && !reduce;
   const screen = useRef<ScreenHandle>(null);
 
-  const rotateX = useSpring(useMotionValue(0), tiltSpring);
-  const rotateY = useSpring(useMotionValue(0), tiltSpring);
-  const y = useSpring(useMotionValue(0), tiltSpring);
-
-  const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!tilt) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    rotateX.set(-py * AMP_X);
-    rotateY.set(px * AMP_Y);
-  };
-  const onEnter = () => {
-    if (tilt) y.set(LIFT);
-    screen.current?.boot();
-  };
-  const onLeave = () => {
-    rotateX.set(0);
-    rotateY.set(0);
-    y.set(0);
-  };
-
   const body = (
-    <motion.div
-      style={{ rotateX, rotateY, y }}
+    <div
       className={cn(
         "group/cart relative flex h-full flex-col rounded-[16px_16px_22px_22px] px-[18px] pb-5",
         "bg-[linear-gradient(180deg,var(--color-paper-hi),var(--color-paper)_50%,var(--color-paper-lo))] shadow-raised",
-        "transition-shadow duration-300 hover:shadow-[var(--shadow-raised),0_40px_50px_-30px_rgb(17_17_17/.35)] [transform-style:preserve-3d]",
+        "transition-[transform,box-shadow] duration-300 ease-out-expo hover:-translate-y-1 hover:shadow-[var(--shadow-raised),0_22px_30px_-22px_rgb(17_17_17/.35)]",
       )}
     >
       {/* grip strip */}
@@ -109,7 +74,7 @@ export function Cartridge({ title, kind, status, summary, fact, shot, href, clas
           <Label>{kind}</Label>
           <StatusBadge status={status} />
         </div>
-        <h3 className="font-display text-xl font-extrabold uppercase leading-[1.1] tracking-[-0.01em] [font-variation-settings:'wdth'_110]">
+        <h3 className="font-display text-xl font-extrabold leading-[1.1] tracking-[-0.01em] [font-variation-settings:'wdth'_104]">
           {href ? (
             <Link href={href} className="after:absolute after:inset-0 after:content-['']">
               {title}
@@ -120,16 +85,11 @@ export function Cartridge({ title, kind, status, summary, fact, shot, href, clas
         </h3>
         <p className="text-sm text-muted">{summary}</p>
       </div>
-    </motion.div>
+    </div>
   );
 
   return (
-    <div
-      className={cn("h-full [perspective:900px]", className)}
-      onPointerMove={onMove}
-      onPointerEnter={onEnter}
-      onPointerLeave={onLeave}
-    >
+    <div className={cn("h-full", className)} onPointerEnter={() => shot && screen.current?.boot()}>
       {body}
     </div>
   );

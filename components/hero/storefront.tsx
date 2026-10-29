@@ -35,10 +35,10 @@ export function Storefront({ image }: { image?: ImageRef }) {
         <span className="rounded-[0.7cqw] bg-ink px-[1.8cqw] py-[0.8cqw] text-[1.3cqw] font-semibold text-paper">Cart · 2</span>
       </div>
 
-      <div className="relative flex h-[39%] overflow-hidden rounded-[1.4cqw] bg-ink-2">
-        <div className="flex flex-1 flex-col justify-center gap-[1.2cqw] pl-[3.5cqw]">
+      <div className="relative flex h-[46%] shrink-0 overflow-hidden rounded-[1.4cqw] bg-ink-2">
+        <div className="flex flex-1 flex-col justify-center gap-[0.9cqw] pl-[3.5cqw]">
           <span className="font-mono text-[1.2cqw] uppercase tracking-[0.12em] text-copper">New season</span>
-          <span className="font-display text-[3.9cqw] font-extrabold uppercase leading-[1.05] text-paper [font-variation-settings:'wdth'_112]">
+          <span className="font-display text-[3.2cqw] font-extrabold uppercase leading-[1.05] text-paper [font-variation-settings:'wdth'_112]">
             Linen, made
             <br />
             for heat.
@@ -53,7 +53,7 @@ export function Storefront({ image }: { image?: ImageRef }) {
       <div className="grid grid-cols-4 gap-[1.8cqw]">
         {products.map((p) => (
           <div key={p.name} className="flex flex-col gap-[0.4cqw]">
-            <div className="grid aspect-[365/170] place-items-center rounded-[1cqw] bg-[#ede3d2]">
+            <div className="grid aspect-[365/130] place-items-center rounded-[1cqw] bg-[#ede3d2]">
               <span className="h-[80%] w-[27%] rounded-[1.3cqw]" style={{ background: p.tone }} />
             </div>
             <span className="text-[1.35cqw] font-semibold">{p.name}</span>

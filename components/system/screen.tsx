@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { gsap, MQ, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { isLowPowerDevice } from "@/lib/device-power";
 import { bootScreen } from "@/lib/screen-boot";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +33,8 @@ export function Screen({ ref, bootOn = "view", bootDelay = 0, className, childre
   const [bootCount, setBootCount] = useState(0);
 
   const run = () => {
-    if (!el.current || window.matchMedia(MQ.reduce).matches) return;
+    // No flicker with reduced motion or on low-power devices (a filter animation repaints every frame).
+    if (!el.current || window.matchMedia(MQ.reduce).matches || isLowPowerDevice()) return;
     bootScreen(el.current, () => setBootCount((c) => c + 1));
   };
 
