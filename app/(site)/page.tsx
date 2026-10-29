@@ -7,6 +7,7 @@ import { Process } from "@/components/sections/process";
 import { Services } from "@/components/sections/services";
 import { Testimonials } from "@/components/sections/testimonials";
 import { Work } from "@/components/sections/work";
+import { BandTransitions } from "@/components/fx/band-transitions";
 import { CtaStrip } from "@/components/site/cta-strip";
 import { homeJsonLd, JsonLd } from "@/components/site/json-ld";
 import { Band } from "@/components/system";
@@ -49,17 +50,15 @@ export default async function HomePage() {
       </Band>
       <Services />
       <Archive projects={archive} limit={3} seeAllHref="/work" />
-      <Process />
-      <Band tone="ink" aria-label="Plan your build" className="pb-20 min-[900px]:pb-[120px]">
-        <div className="wrap">
-          <CtaStrip tone="ink" title="Ready to map out your build?" note="It starts with a discovery call, and you get a written summary of goals." />
-        </div>
-      </Band>
+      <Process>
+        <CtaStrip tone="ink" title="Ready to map out your build?" note="It starts with a discovery call, and you get a written summary of goals." />
+      </Process>
       <About settings={settings} />
       <Testimonials items={testimonials} />
       <FaqSection items={faqs} />
       <Contact settings={settings} />
       <JsonLd data={homeJsonLd(settings, featured)} />
+      <BandTransitions />
     </main>
   );
 }

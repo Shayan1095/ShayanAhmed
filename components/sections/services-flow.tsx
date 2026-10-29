@@ -1,4 +1,5 @@
-import { Rise, Screen, StatusLight } from "@/components/system";
+import { ScrollFx } from "@/components/fx/scroll-fx";
+import { Screen, StatusLight } from "@/components/system";
 import { cn } from "@/lib/utils";
 
 const steps = [
@@ -15,14 +16,16 @@ const steps = [
 export function ServicesFlow() {
   return (
     <div className="mb-[72px]">
-      <ol className="relative grid grid-cols-1 gap-4 min-[900px]:grid-cols-4 min-[900px]:gap-[22px]">
-        {/* the route through the four steps */}
-        <li
-          aria-hidden="true"
-          className="pointer-events-none absolute bottom-6 left-[27px] top-6 w-px bg-[linear-gradient(180deg,rgb(201_133_63/.15),rgb(201_133_63/.7),rgb(201_133_63/.15))] min-[900px]:inset-x-[12.5%] min-[900px]:bottom-auto min-[900px]:top-[27px] min-[900px]:h-px min-[900px]:w-auto min-[900px]:bg-[linear-gradient(90deg,rgb(201_133_63/.15),rgb(201_133_63/.7),rgb(201_133_63/.15))]"
-        />
+      {/* Signature: the route draws itself across the steps as you scroll; the steps rise along it. */}
+      <ScrollFx as="ol" effects={["draw", "rise"]} className="relative grid grid-cols-1 gap-4 min-[900px]:grid-cols-4 min-[900px]:gap-[22px]">
+        <li aria-hidden="true" className="pointer-events-none absolute bottom-6 left-[27px] top-6 w-px bg-ink-3 min-[900px]:hidden">
+          <span data-fx="line" data-fx-axis="y" className="absolute inset-0 block bg-[linear-gradient(180deg,rgb(201_133_63/.2),var(--color-copper),rgb(201_133_63/.2))]" />
+        </li>
+        <li aria-hidden="true" className="pointer-events-none absolute inset-x-[12.5%] top-[27px] hidden h-px bg-ink-3 min-[900px]:block">
+          <span data-fx="line" className="absolute inset-0 block bg-[linear-gradient(90deg,rgb(201_133_63/.2),var(--color-copper),rgb(201_133_63/.2))]" />
+        </li>
         {steps.map((s, i) => (
-          <Rise as="li" key={s.title} delay={i * 0.06} className="relative z-[1] flex gap-4 min-[900px]:flex-col min-[900px]:gap-4">
+          <li key={s.title} data-fx="item" className="relative z-[1] flex gap-4 min-[900px]:flex-col min-[900px]:gap-4">
             <div
               className={cn(
                 "grid size-14 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(180deg,#2a2724,var(--color-ink-2))] font-mono text-sm text-muted-ink shadow-ink-raised",
@@ -40,9 +43,9 @@ export function ServicesFlow() {
                 <p className="text-sm text-muted-ink">{s.text}</p>
               </div>
             </Screen>
-          </Rise>
+          </li>
         ))}
-      </ol>
+      </ScrollFx>
       <p className="mt-7 text-[14.5px] text-muted-ink">
         A real flow from the Brands Attire build. Every system I deliver follows this shape: agents prepare, you decide.
       </p>

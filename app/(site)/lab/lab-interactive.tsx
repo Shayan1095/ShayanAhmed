@@ -63,7 +63,7 @@ export function LabInteractive() {
           <Panel className="flex flex-col gap-5 p-7">
             <div className="flex items-center justify-between">
               <Label>Screen · boots on enter</Label>
-              <Button variant="paper" magnetic={false} onClick={() => screen.current?.boot()}>
+              <Button variant="paper" onClick={() => screen.current?.boot()}>
                 Reboot
               </Button>
             </div>

@@ -1,8 +1,16 @@
 import type { SiteSettings } from "@/lib/content/types";
 import { Clock } from "@/components/site/clock";
-import { Band, Label, Rise, SplitReveal } from "@/components/system";
+import { Band, Button, Label, Rise, SplitReveal } from "@/components/system";
+import { ScrollFx } from "@/components/fx/scroll-fx";
 import { ContactForm } from "./contact-form";
 import { CopyButton } from "./copy-button";
+
+const promises = [
+  "A price per milestone, approved before work starts",
+  "A live link to your build, updated weekly",
+  "Calls in your time zone",
+  "A reply within one working day",
+];
 
 /** 08 Contact (ink). The primary call to action. */
 export function Contact({ settings }: { settings: SiteSettings }) {
@@ -28,6 +36,31 @@ export function Contact({ settings }: { settings: SiteSettings }) {
             Tell me what you&apos;re building and what&apos;s slowing you down. I reply within one working day with next
             steps.
           </Rise>
+          {(settings.bookingUrl || settings.startingPrice) && (
+            <Rise className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
+              {settings.bookingUrl && (
+                <Button href={settings.bookingUrl} variant="paper" arrow target="_blank" rel="noopener">
+                  Book a call
+                </Button>
+              )}
+              {settings.startingPrice && (
+                <p className="text-[15px] text-muted-ink">
+                  Projects usually start from <strong className="font-semibold text-paper">{settings.startingPrice}</strong>
+                </p>
+              )}
+            </Rise>
+          )}
+          {/* What working together looks like, from the Process and FAQ. */}
+          <ScrollFx as="ul" effects={["rise"]} className="mt-8 grid grid-cols-1 gap-3 min-[560px]:grid-cols-2">
+            {promises.map((p) => (
+              <li key={p} data-fx="item" className="flex items-start gap-3 text-[14.5px] leading-snug text-[#d9cfc0]">
+                <span aria-hidden="true" className="mt-0.5 text-copper">
+                  ✓
+                </span>
+                {p}
+              </li>
+            ))}
+          </ScrollFx>
           <Rise>
           <dl className="mt-[34px] flex flex-col gap-3">
             {rows.map((r) => (
@@ -54,9 +87,12 @@ export function Contact({ settings }: { settings: SiteSettings }) {
           </dl>
           </Rise>
         </div>
-        <Rise>
-          <ContactForm projectTypes={settings.projectTypes} budgetRanges={settings.budgetRanges} />
-        </Rise>
+        {/* Signature: the control panel tilts up into place as you arrive. */}
+        <ScrollFx effects={["tilt"]}>
+          <div data-fx="tilt">
+            <ContactForm projectTypes={settings.projectTypes} budgetRanges={settings.budgetRanges} />
+          </div>
+        </ScrollFx>
       </div>
     </Band>
   );

@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
 import type { Project, ProjectCategory } from "@/lib/content/types";
+import { ScrollFx } from "@/components/fx/scroll-fx";
 import { Band, Cartridge, InsetToggle, Rise, SectionHeader } from "@/components/system";
 import { ScrollTrigger } from "@/lib/gsap";
 import { easeOutExpo } from "@/lib/motion";
@@ -23,6 +24,9 @@ const matches: Record<Filter, (c: ProjectCategory) => boolean> = {
   web: (c) => c === "web-tool" || c === "website",
   auto: (c) => c === "automation",
 };
+
+/** Column drift speeds for the preview grid: middle column travels furthest. */
+const COLUMN_SPEED = [0.18, 0.5, 0.3];
 
 type ArchiveProps = {
   projects: Project[];
@@ -62,6 +66,8 @@ export function Archive({ projects, limit, seeAllHref, index = "03", className }
           aside={filterable ? <InsetToggle label="Filter projects" options={available} value={filter} onChange={setFilter} /> : undefined}
           className="min-[900px]:mb-[40px]"
         />
+        {/* Signature: columns drift at different speeds as the grid passes (preview only; the filtered grid reflows instead). */}
+        <ScrollFx effects={filterable ? [] : ["parallax"]}>
         <motion.ul layout={filterable} className="grid grid-cols-1 gap-[22px] min-[640px]:grid-cols-2 min-[980px]:grid-cols-3">
           <AnimatePresence mode="popLayout" initial={false} onExitComplete={() => ScrollTrigger.refresh()}>
             {shown.map((p, i) => (
@@ -73,6 +79,7 @@ export function Archive({ projects, limit, seeAllHref, index = "03", className }
                 exit={{ opacity: 0, scale: 0.94 }}
                 transition={{ duration: 0.6, ease: easeOutExpo }}
               >
+                <div data-fx-speed={filterable ? undefined : COLUMN_SPEED[i % 3]} className="h-full">
                 <Rise delay={(i % 3) * 0.06} className="h-full">
                   <Cartridge
                     title={p.title}
@@ -96,10 +103,12 @@ export function Archive({ projects, limit, seeAllHref, index = "03", className }
                     }
                   />
                 </Rise>
+                </div>
               </motion.li>
             ))}
           </AnimatePresence>
         </motion.ul>
+        </ScrollFx>
         {seeAllHref && more > 0 && (
           <div className="mt-10 flex justify-center">
             <Link

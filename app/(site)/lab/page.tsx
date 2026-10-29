@@ -51,7 +51,7 @@ export default function LabPage() {
                 </Button>
               </div>
               <div className="flex flex-wrap gap-3">
-                <Button variant="ink" size="lg" magnetic={false}>
+                <Button variant="ink" size="lg">
                   Send message
                 </Button>
                 <Button variant="paper" disabled>

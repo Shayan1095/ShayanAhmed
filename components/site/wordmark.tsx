@@ -7,6 +7,8 @@
  */
 import { useEffect, useRef } from "react";
 import { useFinePointer, useReducedMotion } from "@/hooks/use-media-query";
+import { isLowPowerDevice } from "@/lib/device-power";
+import { gsap, MQ, useGSAP } from "@/lib/gsap";
 import { cn } from "@/lib/utils";
 
 const MIN_WDTH = 80;
@@ -51,6 +53,28 @@ export function Wordmark({ text, className }: { text: string; className?: string
       onLeave();
     };
   }, [fine, reduce]);
+
+  // Scroll-linked finale: letters rise one after another as the page ends.
+  useGSAP(
+    () => {
+      const el = root.current;
+      if (!el || isLowPowerDevice()) return;
+      gsap.matchMedia().add(MQ.motion, () => {
+        gsap.fromTo(
+          el.querySelectorAll("[data-letter]"),
+          { yPercent: 70, opacity: 0.15 },
+          {
+            yPercent: 0,
+            opacity: 1,
+            ease: "power2.out",
+            stagger: 0.06,
+            scrollTrigger: { trigger: el, start: "top bottom", end: "bottom 92%", scrub: 0.8 },
+          },
+        );
+      });
+    },
+    { scope: root },
+  );
 
   return (
     // Sized to the container (cqi), so the full name always fits its width.

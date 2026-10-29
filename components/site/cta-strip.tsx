@@ -1,4 +1,5 @@
-import { Button, Rise } from "@/components/system";
+import { ScrollFx } from "@/components/fx/scroll-fx";
+import { Button } from "@/components/system";
 import { cn } from "@/lib/utils";
 
 type CtaStripProps = {
@@ -14,7 +15,9 @@ type CtaStripProps = {
 export function CtaStrip({ title, note = "Reply within 24h · Milestones you approve", tone = "paper", className }: CtaStripProps) {
   const ink = tone === "ink";
   return (
-    <Rise
+    <ScrollFx effects={["tilt"]}>
+    <div
+      data-fx="tilt"
       className={cn(
         "flex flex-col gap-5 rounded-panel px-6 py-6 min-[760px]:flex-row min-[760px]:items-center min-[760px]:justify-between min-[760px]:px-8",
         ink ? "ink-raised tone-ink text-paper" : "raised",
@@ -30,6 +33,7 @@ export function CtaStrip({ title, note = "Reply within 24h · Milestones you app
       <Button href="/#contact" variant={ink ? "paper" : "ink"} arrow className="self-start min-[760px]:self-auto">
         Start a project
       </Button>
-    </Rise>
+    </div>
+    </ScrollFx>
   );
 }

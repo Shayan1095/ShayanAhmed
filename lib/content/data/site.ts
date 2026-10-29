@@ -59,6 +59,9 @@ export const siteSettings: SiteSettings = {
       { agent: "Feedback", text: "4 new reviews summarised" },
     ],
   },
+  // Set these to show the "Book a call" button and the starting price on the contact section.
+  bookingUrl: undefined,
+  startingPrice: undefined,
   budgetRanges: [],
   projectTypes: [
     "Website or landing page",

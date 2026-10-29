@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Keycap, Magnet, StatusLight } from "@/components/system";
+import { Keycap, StatusLight } from "@/components/system";
 import { useSmoothScroll } from "@/components/providers/smooth-scroll";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { easeOutExpo } from "@/lib/motion";
@@ -130,7 +130,7 @@ export function Navbar({ availability }: { availability: string }) {
                 <StatusLight label={availability} className="text-[13px] font-semibold" />
                 <Clock className="font-mono text-[10px] tracking-[0.1em] text-muted" />
               </div>
-              <Magnet className="hidden min-[900px]:inline-flex">
+              <div className="hidden min-[900px]:inline-flex">
                 <a
                   href={sectionHref("contact", onHome)}
                   className="group/cta relative inline-flex min-h-[46px] flex-col items-center justify-center overflow-hidden rounded-control bg-[linear-gradient(180deg,#2a2826,var(--color-ink))] px-5 text-[15px] font-semibold text-paper shadow-[inset_0_1px_0_rgb(255_255_255/.14),0_2px_0_#000,0_12px_24px_-10px_rgb(17_17_17/.6)] transition-transform duration-100 active:translate-y-0.5"
@@ -145,7 +145,7 @@ export function Navbar({ availability }: { availability: string }) {
                     Reply within 24h
                   </span>
                 </a>
-              </Magnet>
+              </div>
               <button
                 type="button"
                 aria-label="Open menu"

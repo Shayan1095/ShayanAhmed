@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Magnet } from "./magnet";
 
 type Variant = "ink" | "paper";
 type Size = "md" | "lg";
@@ -8,8 +7,6 @@ type Size = "md" | "lg";
 type CommonProps = {
   variant?: Variant;
   size?: Size;
-  /** Magnetic pull on desktop (React Bits Magnet). */
-  magnetic?: boolean;
   /** Adds a → that nudges right on hover. */
   arrow?: boolean;
   className?: string;
@@ -51,7 +48,7 @@ function isExternal(href: string) {
  * Labels are verbs: "Start a project", "Read the case study".
  */
 export function Button(props: ButtonProps) {
-  const { variant = "ink", size = "md", magnetic = true, arrow, className, children, ...rest } = props;
+  const { variant = "ink", size = "md", arrow, className, children, ...rest } = props;
   const classes = cn(base, variants[variant], sizes[size], className);
   const content = (
     <>
@@ -90,5 +87,5 @@ export function Button(props: ButtonProps) {
     );
   }
 
-  return magnetic ? <Magnet>{el}</Magnet> : el;
+  return el;
 }

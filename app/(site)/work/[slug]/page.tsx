@@ -3,6 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CaseHero } from "@/components/case-study/case-hero";
+import { BandTransitions } from "@/components/fx/band-transitions";
+import { ScrollFx } from "@/components/fx/scroll-fx";
+import { Monitor } from "@/components/site/monitor";
 import { SystemDiagram } from "@/components/case-study/system-diagram";
 import { Testimonials } from "@/components/sections/testimonials";
 import { Band, Button, Label, Panel, Rise, SectionHeader, SplitReveal, UiFragment } from "@/components/system";
@@ -83,6 +86,28 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
 
       <SystemDiagram project={project} />
 
+      {project.video && (
+        <Band aria-label="Walkthrough" className="section-pad">
+          <div className="wrap">
+            <SectionHeader label="Walkthrough" title={<>See it <em>run</em></>} intro={project.video.caption} />
+            <ScrollFx effects={["tilt"]}>
+              <div data-fx="tilt">
+                <Monitor label={`${project.title.toLowerCase()} · walkthrough`}>
+                  <video
+                    className="absolute inset-0 size-full object-cover"
+                    src={project.video.src}
+                    poster={project.video.poster}
+                    controls
+                    preload="none"
+                    playsInline
+                  />
+                </Monitor>
+              </div>
+            </ScrollFx>
+          </div>
+        </Band>
+      )}
+
       {(project.uiFragments.length > 0 || agents.length > 0 || features.length > 0) && (
         <Band aria-label="Inside the system" className="section-pad">
           <div className="wrap">
@@ -107,17 +132,19 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
             />
 
             {project.uiFragments.length > 0 && (
-              <Rise className="mb-10 flex flex-wrap gap-4">
+              <ScrollFx effects={["parallax"]} className="mb-12 flex flex-wrap gap-4">
                 {project.uiFragments.map((f, i) => (
-                  <UiFragment key={f.text} tag={f.tag} text={f.text} actions={f.actions} live={i === 0} className="w-[280px]" />
+                  <div key={f.text} data-fx-speed={[0.15, 0.45, 0.28][i % 3]}>
+                    <UiFragment tag={f.tag} text={f.text} actions={f.actions} live={i === 0} className="w-[280px]" />
+                  </div>
                 ))}
-              </Rise>
+              </ScrollFx>
             )}
 
             {agents.length > 0 && (
-              <ul className="grid grid-cols-1 gap-4 min-[640px]:grid-cols-2 min-[1000px]:grid-cols-4">
+              <ScrollFx as="ul" effects={["rise"]} className="grid grid-cols-1 gap-4 min-[640px]:grid-cols-2 min-[1000px]:grid-cols-4">
                 {agents.map((a, i) => (
-                  <Rise as="li" key={a.name} delay={(i % 4) * 0.05}>
+                  <li key={a.name} data-fx="item">
                     <Panel className="flex h-full flex-col gap-3 p-5">
                       <div className="flex items-center justify-between">
                         <Label>Agent {String(i + 1).padStart(2, "0")}</Label>
@@ -134,9 +161,9 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
                         {a.status}
                       </p>
                     </Panel>
-                  </Rise>
+                  </li>
                 ))}
-              </ul>
+              </ScrollFx>
             )}
 
             {features.length > 0 && (
@@ -151,6 +178,29 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
                 ))}
               </ul>
             )}
+          </div>
+        </Band>
+      )}
+
+      {project.decisions && project.decisions.length > 0 && (
+        <Band aria-label="Key decisions" className="section-pad border-t border-paper-edge">
+          <div className="wrap">
+            <SectionHeader label="Key decisions" title={<>Why it&apos;s <em>built this way</em></>} />
+            <ScrollFx as="ol" effects={["rise"]} className="grid grid-cols-1 gap-5 min-[900px]:grid-cols-2">
+              {project.decisions.map((d, i) => (
+                <li key={d.title} data-fx="item">
+                  <Panel className="flex h-full gap-5 p-7">
+                    <span className="font-display text-[32px] font-extrabold leading-none text-walnut [font-variation-settings:'wdth'_110]">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <div>
+                      <h3 className="type-card text-[22px]">{d.title}</h3>
+                      <p className="mt-3 text-[15.5px] text-muted">{d.text}</p>
+                    </div>
+                  </Panel>
+                </li>
+              ))}
+            </ScrollFx>
           </div>
         </Band>
       )}
@@ -208,6 +258,7 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
         </div>
       </Band>
 
+      <BandTransitions />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}

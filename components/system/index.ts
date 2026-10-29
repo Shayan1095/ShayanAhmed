@@ -6,7 +6,6 @@ export { Drawer } from "./drawer";
 export { InsetToggle, type ToggleOption } from "./inset-toggle";
 export { Keycap } from "./keycap";
 export { Label } from "./label";
-export { Magnet } from "./magnet";
 export { Panel, Screws } from "./panel";
 export { Rise, SplitReveal } from "./reveal";
 export { Screen, TypeText, useScreenBoot, type ScreenHandle } from "./screen";

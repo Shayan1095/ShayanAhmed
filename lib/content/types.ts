@@ -33,6 +33,16 @@ export type Project = {
   kind: string;
   summary: string;
   problem?: string;
+  /** extension: case study summary facts, shown only when filled in. */
+  client?: string;
+  role?: string;
+  timeline?: string;
+  /** One-line result, e.g. "Order checks cut from 2 hours a day to 10 minutes". */
+  outcome?: string;
+  /** extension: screen-recorded walkthrough (mp4/webm in public/work/<slug>/). */
+  video?: { src: string; poster?: string; caption?: string };
+  /** extension: key decisions and why they were made. */
+  decisions?: { title: string; text: string }[];
   layers: { website: string[]; system: string[]; automation: string[] };
   features: { title: string; text: string }[];
   stack: string[];
@@ -104,6 +114,10 @@ export type SiteSettings = {
     /** Routine work agents finish on their own while the visitor decides. */
     routine: { agent: string; text: string }[];
   };
+  /** extension: booking page (Calendly, Cal.com). Shows a "Book a call" button when set. */
+  bookingUrl?: string;
+  /** extension: e.g. "$1,500". Shows "Projects usually start from …" when set. */
+  startingPrice?: string;
   /** extension: contact form budget options. Hidden while empty. */
   budgetRanges: string[];
   /** extension: contact form project types. */

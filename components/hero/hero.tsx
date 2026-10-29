@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import type { ImageRef, SiteSettings } from "@/lib/content/types";
 import { Button, Label, type ScreenHandle } from "@/components/system";
 import { useFinePointer, useReducedMotion } from "@/hooks/use-media-query";
+import { isLowPowerDevice } from "@/lib/device-power";
+import { gsap, MQ, useGSAP } from "@/lib/gsap";
 import { cn } from "@/lib/utils";
 import { HeroSlab } from "./hero-slab";
 import { useOpsDemo } from "./use-ops-demo";
@@ -70,6 +72,24 @@ export function Hero({ settings, storefront, caseStudyHref }: HeroProps) {
     return () => window.removeEventListener("pointermove", onMove);
   }, [fine, reduce, rx, ry]);
 
+  // Scroll-linked exit (desktop): headline lines drift apart, the demo floats up.
+  useGSAP(
+    () => {
+      if (isLowPowerDevice()) return;
+      gsap.matchMedia().add(MQ.desktop, () => {
+        const q = gsap.utils.selector(root);
+        const st = { trigger: root.current, start: "top top", end: "bottom top", scrub: 0.8 };
+        const dirs = [-1, 1, -1];
+        q("[data-hero-row]").forEach((row, i) =>
+          gsap.to(row, { xPercent: dirs[i] * 9, opacity: 0.35, ease: "none", scrollTrigger: st }),
+        );
+        gsap.to(q("[data-hero-float]"), { yPercent: -14, ease: "none", scrollTrigger: st });
+        gsap.to(q("[data-hero-copy]"), { y: -50, opacity: 0.5, ease: "none", scrollTrigger: st });
+      });
+    },
+    { scope: root },
+  );
+
   return (
     <section
       ref={root}
@@ -86,7 +106,7 @@ export function Hero({ settings, storefront, caseStudyHref }: HeroProps) {
           className="whitespace-nowrap font-display text-[length:var(--hl)] font-extrabold uppercase leading-[0.86] tracking-[-0.045em] [font-variation-settings:'wdth'_108]"
         >
           {lines.map((l, i) => (
-            <span key={l} aria-hidden="true" className="block overflow-hidden pb-[0.04em]">
+            <span key={l} aria-hidden="true" data-hero-row className="block overflow-hidden pb-[0.04em]">
               <span className="hero-line inline-block" style={{ animationDelay: `${0.06 + i * 0.07}s` }}>
                 {i === 2 ? (
                   <>
@@ -103,7 +123,7 @@ export function Hero({ settings, storefront, caseStudyHref }: HeroProps) {
 
         {/* Below the headline: copy on the left, the demo on the right rising beside "BUILT IN." */}
         <div className="mt-8 grid grid-cols-1 gap-10 min-[1000px]:mt-0 min-[1000px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] min-[1000px]:items-start min-[1000px]:gap-14">
-          <div className="flex flex-col gap-7 min-[1000px]:pt-9">
+          <div data-hero-copy className="flex flex-col gap-7 min-[1000px]:pt-9">
             <p className="hero-in max-w-[30em] text-[17px] leading-[1.6] text-muted [animation-delay:.3s] min-[900px]:text-lg">
               I&apos;m <strong className="font-semibold text-ink">Shayan Ahmed</strong>. I build the storefront your
               customers use and the back office that runs it, with agents that take the routine work off your plate
@@ -137,6 +157,7 @@ export function Hero({ settings, storefront, caseStudyHref }: HeroProps) {
           </div>
 
           <div className="hero-slab-in relative min-[1000px]:-mt-[calc(var(--hl)*0.98)] min-[1000px]:justify-self-end">
+            <div data-hero-float>
             <motion.div
               style={{ rotateX: rx, rotateY: ry, transformPerspective: 1600 }}
               className={cn("w-full min-[1000px]:w-[min(44vw,560px)]", !fine && "transform-none!")}
@@ -150,6 +171,7 @@ export function Hero({ settings, storefront, caseStudyHref }: HeroProps) {
                 screenRef={screen}
               />
             </motion.div>
+            </div>
             <div
               aria-hidden="true"
               className="mx-auto -mt-3 h-7 w-[84%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(17_17_17/.22),transparent)] blur-md"

@@ -1,15 +1,22 @@
 import Image from "next/image";
 import type { SiteSettings } from "@/lib/content/types";
-import { Band, Button, Label, Rise, SplitReveal } from "@/components/system";
+import { ScrollFx } from "@/components/fx/scroll-fx";
+import { Band, Button, Label, SplitReveal } from "@/components/system";
 import { SpecSheet } from "./spec-sheet";
 
-/** 05 About (cream). Portrait in a raised frame, spec sheet, short story. */
+/**
+ * 05 About (cream). Portrait in a raised frame, spec sheet, short story.
+ * Signature: the frame drifts and straightens with scroll; the story rises in.
+ */
 export function About({ settings }: { settings: SiteSettings }) {
   const portrait = settings.portrait;
   return (
     <Band id="about" aria-label="About" className="section-pad">
-      <div className="wrap grid grid-cols-1 items-center gap-12 min-[980px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] min-[980px]:gap-[72px]">
-        <Rise>
+      <ScrollFx
+        effects={["parallax", "rise"]}
+        className="wrap grid grid-cols-1 items-center gap-12 min-[980px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] min-[980px]:gap-[72px]"
+      >
+        <div data-fx-speed="0.45" data-fx-rotate="-5">
           <figure className="relative mx-auto aspect-[4/5] w-full max-w-[420px] -rotate-2 rounded-3xl bg-[linear-gradient(160deg,var(--color-paper-hi),var(--color-paper-lo))] p-4 shadow-raised">
             <span
               aria-hidden="true"
@@ -35,24 +42,26 @@ export function About({ settings }: { settings: SiteSettings }) {
               )}
             </div>
           </figure>
-        </Rise>
+        </div>
         <div>
           <Label>05 · About</Label>
           <SplitReveal className="mb-[22px] mt-4 font-display text-[clamp(34px,4.4vw,60px)] font-extrabold uppercase leading-[0.94] tracking-[-0.035em] [font-variation-settings:'wdth'_116] [&_em]:font-bold [&_em]:italic [&_em]:text-walnut [&_em]:[font-variation-settings:'wdth'_95]">
             I build the part of the website <em>that does the work.</em>
           </SplitReveal>
-          <Rise as="p" className="max-w-[34em] text-[17px] leading-[1.7] text-muted">
+          <p data-fx="item" className="max-w-[34em] text-[17px] leading-[1.7] text-muted">
             I&apos;m Shayan Ahmed, a full-stack developer working with clients in Pakistan and abroad. I focus on what
             most sites leave out: the systems that save an owner hours every week.
-          </Rise>
-          <Rise className="mb-[30px] mt-7">
+          </p>
+          <div data-fx="item" className="mb-[30px] mt-7">
             <SpecSheet rows={settings.specSheet} />
-          </Rise>
-          <Button href="#contact" variant="paper" arrow>
-            Work with me
-          </Button>
+          </div>
+          <div data-fx="item">
+            <Button href="#contact" variant="paper" arrow>
+              Work with me
+            </Button>
+          </div>
         </div>
-      </div>
+      </ScrollFx>
     </Band>
   );
 }

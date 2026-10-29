@@ -1,5 +1,6 @@
 import type { Project } from "@/lib/content/types";
-import { Band, Label, Panel, Rise, SectionHeader } from "@/components/system";
+import { ScrollFx } from "@/components/fx/scroll-fx";
+import { Band, Label, Panel, SectionHeader } from "@/components/system";
 
 const layerMeta = [
   { key: "website", n: 1, part: "Glass", title: "Website", line: "What customers see" },
@@ -31,14 +32,17 @@ export function SystemDiagram({ project }: { project: Project }) {
               : `${layers.map((l) => l.title).join(" and ")}, designed together.`
           }
         />
-        <ol className="relative flex flex-col gap-5">
+        {/* Signature: the wire draws down the stack as each layer rises into place. */}
+        <ScrollFx as="ol" effects={["draw", "rise"]} className="relative flex flex-col gap-5">
           {/* wire running through the layers */}
           <span
             aria-hidden="true"
+            data-fx="line"
+            data-fx-axis="y"
             className="absolute bottom-8 left-[27px] top-8 w-px bg-[linear-gradient(180deg,transparent,var(--color-copper)_12%,var(--color-copper)_88%,transparent)] opacity-60 min-[900px]:left-[35px]"
           />
-          {layers.map((l, i) => (
-            <Rise as="li" key={l.key} delay={i * 0.08} className="relative">
+          {layers.map((l) => (
+            <li key={l.key} data-fx="item" className="relative">
               <Panel tone="ink" className="grid grid-cols-1 gap-5 py-6 pl-16 pr-6 min-[900px]:grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)] min-[900px]:items-center min-[900px]:gap-10 min-[900px]:py-8 min-[900px]:pl-20 min-[900px]:pr-8">
                 <span
                   aria-hidden="true"
@@ -69,9 +73,9 @@ export function SystemDiagram({ project }: { project: Project }) {
                   ))}
                 </ul>
               </Panel>
-            </Rise>
+            </li>
           ))}
-        </ol>
+        </ScrollFx>
       </div>
     </Band>
   );

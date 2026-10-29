@@ -1,4 +1,5 @@
-import { Band, Label, Panel, Rise, Screen, SectionHeader } from "@/components/system";
+import { ScrollFx } from "@/components/fx/scroll-fx";
+import { Band, Label, Panel, Screen, SectionHeader } from "@/components/system";
 import { ServicesFlow } from "./services-flow";
 
 const layers = [
@@ -43,9 +44,10 @@ export function Services() {
 
         <ServicesFlow />
 
-        <ul className="grid grid-cols-1 gap-[22px] min-[980px]:grid-cols-3">
-          {layers.map((l, i) => (
-            <Rise as="li" key={l.title} delay={i * 0.08}>
+        {/* Signature: the three layer modules fan in from their sides as you scroll. */}
+        <ScrollFx as="ul" effects={["fan"]} className="grid grid-cols-1 gap-[22px] min-[980px]:grid-cols-3">
+          {layers.map((l) => (
+            <li key={l.title} data-fx="item">
               <Panel tone="ink" as="article" className="group/layer flex h-full flex-col gap-4 px-7 py-[30px]">
                 <div className="flex items-center justify-between">
                   <Label>
@@ -74,9 +76,9 @@ export function Services() {
                   </ul>
                 </Screen>
               </Panel>
-            </Rise>
+            </li>
           ))}
-        </ul>
+        </ScrollFx>
       </div>
     </Band>
   );

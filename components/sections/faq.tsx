@@ -1,4 +1,5 @@
 import type { Faq } from "@/lib/content/types";
+import { ScrollFx } from "@/components/fx/scroll-fx";
 import { Band, Drawer, SectionHeader } from "@/components/system";
 
 /** 07 FAQ (cream). First drawer open. Also emits FAQPage structured data. */
@@ -28,13 +29,15 @@ export function FaqSection({ items }: { items: Faq[] }) {
           }
           className="min-[900px]:mb-[34px]"
         />
-        <div className="flex max-w-[940px] flex-col gap-3.5">
+        <ScrollFx effects={["rise"]} className="flex max-w-[940px] flex-col gap-3.5">
           {items.map((f, i) => (
-            <Drawer key={f.id} question={f.question} defaultOpen={i === 0}>
-              <p>{f.answer}</p>
-            </Drawer>
+            <div key={f.id} data-fx="item">
+              <Drawer question={f.question} defaultOpen={i === 0}>
+                <p>{f.answer}</p>
+              </Drawer>
+            </div>
           ))}
-        </div>
+        </ScrollFx>
       </div>
       <script
         type="application/ld+json"

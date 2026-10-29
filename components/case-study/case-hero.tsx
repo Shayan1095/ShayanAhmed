@@ -12,9 +12,14 @@ export function CaseHero({ project, index, total }: { project: Project; index: n
   const [view, setView] = useState<MonitorView>("customer");
   const hasOwner = hasOwnerView(project);
 
+  // At-a-glance facts: only the ones that are filled in.
   const meta = [
+    project.client && { label: "Client", value: project.client },
     { label: "Type", value: project.kind },
+    project.role && { label: "Role", value: project.role },
+    project.timeline && { label: "Timeline", value: project.timeline },
     project.stack.length > 0 && { label: "Stack", value: project.stack.join(" · ") },
+    project.outcome && { label: "Outcome", value: project.outcome },
   ].filter(Boolean) as { label: string; value: string }[];
 
   return (
