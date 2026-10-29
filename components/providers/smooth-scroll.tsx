@@ -35,14 +35,14 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
   }, []);
 
   useEffect(() => {
-    // Low-power devices (no GPU acceleration, weak CPU) get native scrolling and
-    // simpler surfaces: smooth-scroll interpolation costs a frame they don't have.
-    const low = isLowPowerDevice();
-    document.documentElement.dataset.power = low ? "low" : "full";
-    if (reduce || low) return;
+    // Power tier: "lite" on devices without GPU acceleration (cheaper surfaces,
+    // see [data-power="low"] in globals.css); motion and smooth scroll stay on.
+    document.documentElement.dataset.power = isLowPowerDevice() ? "low" : "full";
+    if (reduce) return;
 
-    // anchors: plain <a href="#id"> links scroll smoothly, and still jump without JS.
-    const lenis = new Lenis({ duration: 1.15, smoothWheel: true, anchors: true });
+    // Inertia scrolling: the page glides slightly behind the wheel for a weighted,
+    // premium feel. anchors: plain <a href="#id"> links scroll smoothly too.
+    const lenis = new Lenis({ lerp: 0.075, wheelMultiplier: 0.95, smoothWheel: true, anchors: true });
     lenisRef.current = lenis;
     lenis.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);

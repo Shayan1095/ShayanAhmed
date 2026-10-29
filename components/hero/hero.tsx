@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import type { ImageRef, SiteSettings } from "@/lib/content/types";
 import { Button, Label, type ScreenHandle } from "@/components/system";
 import { useFinePointer, useReducedMotion } from "@/hooks/use-media-query";
-import { isLowPowerDevice } from "@/lib/device-power";
 import { gsap, MQ, useGSAP } from "@/lib/gsap";
 import { cn } from "@/lib/utils";
 import { HeroSlab } from "./hero-slab";
@@ -75,7 +74,6 @@ export function Hero({ settings, storefront, caseStudyHref }: HeroProps) {
   // Scroll-linked exit (desktop): headline lines drift apart, the demo floats up.
   useGSAP(
     () => {
-      if (isLowPowerDevice()) return;
       gsap.matchMedia().add(MQ.desktop, () => {
         const q = gsap.utils.selector(root);
         const st = { trigger: root.current, start: "top top", end: "bottom top", scrub: 0.8 };

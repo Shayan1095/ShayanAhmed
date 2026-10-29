@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import { isLowPowerDevice } from "@/lib/device-power";
 import { gsap, MQ, SplitText, useGSAP } from "@/lib/gsap";
 import { motionGrammar } from "@/lib/motion";
 
@@ -24,8 +23,7 @@ export function SplitReveal({ as = "h2", start = motionGrammar.heading.start, ch
   useGSAP(
     () => {
       const el = ref.current;
-      // Low-power devices show content in place (repainting moving blocks costs too much there).
-      if (!el || isLowPowerDevice()) return;
+      if (!el) return;
       gsap.matchMedia().add(MQ.motion, () => {
         SplitText.create(el, {
           type: "lines",
@@ -71,8 +69,7 @@ export function Rise({ as = "div", start = motionGrammar.block.start, delay = 0,
   useGSAP(
     () => {
       const el = ref.current;
-      // Low-power devices show content in place (repainting moving blocks costs too much there).
-      if (!el || isLowPowerDevice()) return;
+      if (!el) return;
       gsap.matchMedia().add(MQ.motion, () => {
         gsap.from(el, {
           y,

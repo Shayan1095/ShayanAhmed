@@ -7,7 +7,6 @@
  */
 import { useEffect, useRef } from "react";
 import { useFinePointer, useReducedMotion } from "@/hooks/use-media-query";
-import { isLowPowerDevice } from "@/lib/device-power";
 import { gsap, MQ, useGSAP } from "@/lib/gsap";
 import { cn } from "@/lib/utils";
 
@@ -58,7 +57,7 @@ export function Wordmark({ text, className }: { text: string; className?: string
   useGSAP(
     () => {
       const el = root.current;
-      if (!el || isLowPowerDevice()) return;
+      if (!el) return;
       gsap.matchMedia().add(MQ.motion, () => {
         gsap.fromTo(
           el.querySelectorAll("[data-letter]"),

@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import { isLowPowerDevice } from "@/lib/device-power";
 import { gsap, MQ, useGSAP } from "@/lib/gsap";
 import { motionGrammar } from "@/lib/motion";
 
@@ -17,8 +16,8 @@ import { motionGrammar } from "@/lib/motion";
  *  tilt      [data-fx="tilt"]     straightens from a slight rotateX and rises
  *  progress  [data-fx-step]       steps gain data-on as scroll passes them
  *
- * Transform and opacity only. Off with reduced motion and on low-power devices,
- * where content simply sits in place.
+ * Transform and opacity only, so they stay smooth even without GPU
+ * acceleration. Off with reduced motion, where content simply sits in place.
  */
 export type FxName = "rise" | "fan" | "draw" | "parallax" | "tilt" | "progress";
 
@@ -34,7 +33,7 @@ export function ScrollFx({ effects, as = "div", children, ...props }: ScrollFxPr
   useGSAP(
     () => {
       const el = root.current;
-      if (!el || isLowPowerDevice()) return;
+      if (!el) return;
       gsap.matchMedia().add(MQ.motion, () => {
         const q = gsap.utils.selector(el);
         const scrub = motionGrammar.scrub;

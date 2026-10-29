@@ -44,7 +44,14 @@ export function Drawer({ question, children, defaultOpen = false, headingLevel: 
             aria-hidden="true"
             className="inset-track relative hidden h-3.5 w-[54px] shrink-0 rounded-[7px] sm:block"
           >
-            <span className="absolute inset-x-2.5 top-1 h-1.5 rounded-[3px] bg-[linear-gradient(180deg,var(--color-paper-hi),var(--color-paper-edge))] shadow-[0_1px_2px_rgb(17_17_17/.25)]" />
+            {/* the handle slides along its track as the drawer is pulled open */}
+            <motion.span
+              initial={false}
+              animate={{ x: open ? 12 : -8, scaleX: open ? 0.7 : 1 }}
+              transition={{ type: "spring", stiffness: 380, damping: 28 }}
+              className="absolute inset-x-2.5 top-1 h-1.5 rounded-[3px] bg-[linear-gradient(180deg,var(--color-paper-hi),var(--color-paper-edge))] shadow-[0_1px_2px_rgb(17_17_17/.25)] data-[open=true]:bg-copper"
+              data-open={open}
+            />
           </span>
           <span className="flex-1">{question}</span>
           <motion.span

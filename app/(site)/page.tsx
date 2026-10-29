@@ -8,6 +8,7 @@ import { Services } from "@/components/sections/services";
 import { Testimonials } from "@/components/sections/testimonials";
 import { Work } from "@/components/sections/work";
 import { BandTransitions } from "@/components/fx/band-transitions";
+import { VelocityMarquee } from "@/components/fx/velocity-marquee";
 import { CtaStrip } from "@/components/site/cta-strip";
 import { homeJsonLd, JsonLd } from "@/components/site/json-ld";
 import { Band } from "@/components/system";
@@ -42,6 +43,7 @@ export default async function HomePage() {
         storefront={brandsAttire?.customerView ?? brandsAttire?.cover}
         caseStudyHref={flagship ? `/work/${flagship.slug}` : undefined}
       />
+      <VelocityMarquee items={["Websites", "Systems", "Automation", "Storefronts", "Admin panels", "Operations agents"]} />
       <Work projects={featured} />
       <Band aria-label="Talk about your project" className="pb-20 min-[900px]:pb-24">
         <div className="wrap">
@@ -53,6 +55,7 @@ export default async function HomePage() {
       <Process>
         <CtaStrip tone="ink" title="Ready to map out your build?" note="It starts with a discovery call, and you get a written summary of goals." />
       </Process>
+      <VelocityMarquee items={["Milestones you approve", "A live link every week", "A clean handover"]} />
       <About settings={settings} />
       <Testimonials items={testimonials} />
       <FaqSection items={faqs} />
