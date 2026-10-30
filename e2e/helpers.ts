@@ -2,8 +2,11 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page } from "@playwright/test";
 
 /** WCAG A/AA check. Run on settled pages (reduced motion), so animations don't skew contrast. */
-export async function expectNoA11yViolations(page: Page) {
-  const { violations } = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+export async function expectNoA11yViolations(page: Page, include?: string) {
+  let builder = new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]);
+  // Scope to a layer (e.g. an open panel) so covered content beneath it isn't measured.
+  if (include) builder = builder.include(include);
+  const { violations } = await builder.analyze();
   expect(violations.map((v) => `${v.id}: ${v.nodes[0]?.target.join(" ")}`)).toEqual([]);
 }
 

@@ -4,7 +4,8 @@ import { Footer } from "@/components/site/footer";
 import { Navbar } from "@/components/site/navbar";
 import { NoSignal } from "@/components/site/no-signal";
 import { Button, Label } from "@/components/system";
-import { getSiteSettings } from "@/lib/content";
+import { getFeaturedProjects, getSiteSettings } from "@/lib/content";
+import { toNavProjects } from "@/components/site/nav-links";
 
 export const metadata: Metadata = {
   title: "Page not found",
@@ -13,10 +14,17 @@ export const metadata: Metadata = {
 
 /** Custom 404: same hardware language, a monitor with no signal, two ways back. */
 export default async function NotFound() {
-  const settings = await getSiteSettings();
+  const [settings, featured] = await Promise.all([getSiteSettings(), getFeaturedProjects()]);
   return (
     <SiteProviders>
-      <Navbar availability={settings.availability} onHome={false} place="Lost signal" email={settings.email} linkedin={settings.linkedin} />
+      <Navbar
+        availability={settings.availability}
+        onHome={false}
+        place="Lost signal"
+        email={settings.email}
+        linkedin={settings.linkedin}
+        projects={toNavProjects(featured)}
+      />
       <main id="main" className="pb-24 pt-[calc(env(safe-area-inset-top)+120px)]">
         <div className="wrap grid grid-cols-1 items-center gap-12 min-[980px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] min-[980px]:gap-16">
           <div>

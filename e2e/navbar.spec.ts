@@ -58,6 +58,53 @@ test.describe("navbar (desktop)", () => {
     await expect(readout(page)).toHaveText("Case study");
   });
 
+  test("the bar turns to glass once you scroll, and back at the top", async ({ page }) => {
+    await page.goto("/");
+    await settle(page);
+    const bar = page.locator("header").first().locator("> div > div").first();
+    const solid = /(^|\s)raised(\s|$)/;
+    await expect(bar).toHaveClass(solid);
+    await page.evaluate(() => window.scrollTo(0, 400));
+    await expect(bar).toHaveClass(/nav-glass/);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(bar).toHaveClass(solid);
+  });
+
+  test("Work opens a preview of the featured case studies (mouse and keyboard)", async ({ page }) => {
+    await page.goto("/");
+    const nav = page.getByRole("navigation", { name: "Main" });
+    const work = nav.getByRole("link", { name: "Work", exact: true });
+    const panel = page.getByRole("region", { name: "Featured work" });
+
+    await settle(page);
+    const box = (await work.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await expect(panel).toBeVisible();
+    await expect(work).toHaveAttribute("aria-expanded", "true");
+    await expect(panel.getByRole("link", { name: /Brands Attire/ })).toHaveAttribute("href", "/work/brands-attire");
+    await expect(panel.getByRole("link", { name: "All work" })).toBeVisible();
+
+    // Pointer leaves: it closes after a short pause.
+    await page.mouse.move(10, 600);
+    await expect(panel).toBeHidden();
+
+    // Accessibility of the open panel (scoped: content beneath it is covered).
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await expect(panel).toBeVisible();
+    await expectNoA11yViolations(page, "#work-preview");
+    await page.mouse.move(10, 600);
+    await expect(panel).toBeHidden();
+
+    // Keyboard: focusing Work opens it, Tab goes into the panel, Escape closes and returns to Work.
+    await work.focus();
+    await expect(panel).toBeVisible();
+    await page.keyboard.press("Tab");
+    expect(await panel.evaluate((el) => el.contains(document.activeElement))).toBe(true);
+    await page.keyboard.press("Escape");
+    await expect(panel).toBeHidden();
+    await expect(work).toBeFocused();
+  });
+
   test("Start a project has no hover caption", async ({ page }) => {
     await page.goto("/");
     const cta = page.locator("header").first().getByRole("link", { name: "Start a project" });
@@ -96,6 +143,18 @@ test.describe("navbar (phone)", () => {
     await page.keyboard.press("Escape");
     await expect(menu).toBeHidden();
     await expect(open).toBeFocused();
+  });
+
+  test("menu shows the latest project", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    await page.getByRole("button", { name: "Open menu" }).click();
+    const menu = page.getByRole("dialog", { name: "Menu" });
+    const card = menu.getByRole("link", { name: /Latest project/ });
+    await expect(card).toBeVisible();
+    await expect(card).toHaveAttribute("href", "/work/brands-attire");
+    // Letter-by-letter links still read as whole words.
+    await expect(menu.getByRole("link", { name: "Services", exact: true })).toBeVisible();
   });
 
   test("menu links reach their sections", async ({ page }) => {

@@ -10,7 +10,7 @@ import { gsap, MQ, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { easeOutExpo, motionGrammar } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { Clock } from "./clock";
-import { chapters, navLinks, sectionHref, type ChapterId, type NavId } from "./nav-links";
+import { chapters, navLinks, sectionHref, type ChapterId, type NavId, type NavProject } from "./nav-links";
 
 type NavbarProps = {
   availability: string;
@@ -21,6 +21,8 @@ type NavbarProps = {
   place?: string;
   email?: string;
   linkedin?: string;
+  /** Featured projects for the Work preview and the phone menu's latest-project card. */
+  projects?: NavProject[];
 };
 
 /** Reads the route (inside the layout's Suspense boundary) and renders the navbar for it. */
@@ -41,8 +43,10 @@ const SCRAMBLE_CHARS = "0123456789·ABCDEFGHIJKLMNOPRSTUVWXYZ";
  *    you point at or focus (a spring slide, never magnetic).
  *  - A readout under the name says where you are ("Process"),
  *    scrambling to each new chapter (GSAP ScrambleText).
+ *  - Once you scroll, the bar slims into frosted glass (solid on low-power devices).
+ *  - Hovering or focusing Work opens a preview of the featured case studies.
  */
-export function Navbar({ availability, onHome, onWork = false, place, email, linkedin }: NavbarProps) {
+export function Navbar({ availability, onHome, onWork = false, place, email, linkedin, projects = [] }: NavbarProps) {
   const progress = useRef<HTMLSpanElement>(null);
   const readout = useRef<HTMLSpanElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
@@ -52,6 +56,22 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
   const [hover, setHover] = useState<NavId | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
+
+  // Work preview: opens on hover or focus; closing waits a beat so the pointer can travel into it.
+  const [preview, setPreview] = useState(false);
+  const closeTimer = useRef(0);
+  const skipFocusOpen = useRef(false);
+  const openPreview = useCallback(() => {
+    window.clearTimeout(closeTimer.current);
+    setPreview(true);
+  }, []);
+  const closePreviewSoon = useCallback(() => {
+    window.clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => setPreview(false), 160);
+  }, []);
+  useEffect(() => () => window.clearTimeout(closeTimer.current), []);
+  // The bar hiding on scroll also hides the preview.
+  const previewOpen = preview && !hidden;
 
   const navIds = navLinks.map((l) => l.id) as readonly string[];
   const active: NavId | null = onWork ? "work" : chapter && navIds.includes(chapter) ? (chapter as NavId) : null;
@@ -147,7 +167,12 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
         )}
       >
         <div className="wrap">
-          <div className="raised relative flex items-center justify-between gap-4 overflow-hidden rounded-card py-2 pl-3 pr-2">
+          <div
+            className={cn(
+              "relative mx-auto flex items-center justify-between gap-4 rounded-card pl-3 pr-2 transition-[max-width,padding,background-color,box-shadow,border-color] duration-500 ease-out-expo",
+              compact ? "nav-glass max-w-[1120px] py-1.5" : "raised max-w-[1600px] py-2",
+            )}
+          >
             <Link href="/" className="flex items-center gap-3">
               <Keycap aria-hidden="true">SA</Keycap>
               <span className="flex flex-col leading-tight">
@@ -169,8 +194,29 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
                   const lit = keyOn === l.id;
                   const current = active === l.id;
                   const href = l.id === "work" && onWork ? "/work" : sectionHref(l.id, onHome);
+                  const isWork = l.id === "work" && projects.length > 0;
                   return (
-                    <li key={l.id} className="relative">
+                    <li
+                      key={l.id}
+                      className="relative"
+                      {...(isWork && {
+                        onMouseEnter: openPreview,
+                        onMouseLeave: closePreviewSoon,
+                        onFocus: () => {
+                          // Focus returning to Work after Escape must not reopen the preview.
+                          if (skipFocusOpen.current) skipFocusOpen.current = false;
+                          else openPreview();
+                        },
+                        onBlur: (e: React.FocusEvent) => !e.currentTarget.contains(e.relatedTarget as Node) && setPreview(false),
+                        onKeyDown: (e: React.KeyboardEvent) => {
+                          if (e.key === "Escape" && previewOpen) {
+                            setPreview(false);
+                            skipFocusOpen.current = true;
+                            (e.currentTarget.querySelector("a") as HTMLElement | null)?.focus();
+                          }
+                        },
+                      })}
+                    >
                       {lit && (
                         <motion.span
                           layoutId="nav-key"
@@ -182,6 +228,7 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
                       <a
                         href={href}
                         aria-current={current ? (onWork ? "page" : "location") : undefined}
+                        {...(isWork && { "aria-expanded": previewOpen, "aria-controls": "work-preview" })}
                         onMouseEnter={() => setHover(l.id)}
                         onFocus={() => setHover(l.id)}
                         onBlur={() => setHover(null)}
@@ -192,6 +239,7 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
                       >
                         {l.label}
                       </a>
+                      {isWork && <WorkPreview open={previewOpen} projects={projects} />}
                     </li>
                   );
                 })}
@@ -235,11 +283,10 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
               </button>
             </div>
 
-            <span
-              ref={progress}
-              aria-hidden="true"
-              className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-copper shadow-glow"
-            />
+            {/* Progress line, clipped to the bar's rounded corners. */}
+            <span aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden rounded-card">
+              <span ref={progress} className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-copper shadow-glow" />
+            </span>
           </div>
         </div>
       </header>
@@ -253,9 +300,111 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
         availability={availability}
         email={email}
         linkedin={linkedin}
+        latest={projects[0]}
         returnFocus={menuButton}
       />
     </>
+  );
+}
+
+/**
+ * Menu link text that rises in letter by letter, each letter from behind its
+ * own mask. The real word is read once by screen readers (the letters are
+ * hidden from them); reduced motion shows the word at once (site-wide Motion setting).
+ */
+function LetterReveal({ text, delay = 0 }: { text: string; delay?: number }) {
+  return (
+    <span className="inline-flex">
+      <span className="sr-only">{text}</span>
+      {Array.from(text).map((ch, i) => (
+        <span key={i} aria-hidden="true" className="inline-block overflow-hidden pb-[0.06em] align-bottom">
+          <motion.span
+            className="inline-block"
+            initial={{ y: "105%" }}
+            animate={{ y: "0%" }}
+            transition={{ delay: delay + i * 0.028, duration: 0.65, ease: easeOutExpo }}
+          >
+            {ch === " " ? " " : ch}
+          </motion.span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/** A project's screenshot, or its monitor label on an ink screen until screenshots are added. */
+function ProjectThumb({ project, className }: { project: NavProject; className?: string }) {
+  return (
+    <span className={cn("relative block overflow-hidden rounded-lg bg-ink", className)}>
+      {project.image ? (
+        // eslint-disable-next-line @next/next/no-img-element -- small preview; next/image adds nothing here
+        <img
+          src={project.image.src}
+          alt=""
+          width={project.image.width}
+          height={project.image.height}
+          loading="lazy"
+          className="absolute inset-0 size-full object-cover object-top transition-transform duration-700 ease-out-expo group-hover/card:scale-[1.04]"
+        />
+      ) : (
+        <span className="absolute inset-0 grid place-items-center px-3 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-muted-ink">
+          {project.monitorLabel ?? project.title}
+        </span>
+      )}
+    </span>
+  );
+}
+
+/** Featured case studies under the Work link: one move from the navbar to your proof. */
+function WorkPreview({ open, projects }: { open: boolean; projects: NavProject[] }) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          id="work-preview"
+          role="region"
+          aria-label="Featured work"
+          initial={{ opacity: 0, y: -6, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -4, scale: 0.98, transition: { duration: 0.18 } }}
+          transition={{ duration: 0.45, ease: easeOutExpo }}
+          // The top padding bridges the gap, so the pointer can travel from the link into the panel.
+          className="absolute left-[-6px] top-full z-10 w-[min(600px,calc(100vw-48px))] origin-top-left pt-3"
+        >
+          <div className="nav-glass rounded-card p-2.5">
+            <ul className="grid grid-cols-2 gap-2.5">
+              {projects.map((p, i) => (
+                <motion.li
+                  key={p.slug}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.06 + i * 0.05, duration: 0.45, ease: easeOutExpo }}
+                >
+                  <Link href={p.href} className="group/card flex h-full flex-col gap-2.5 rounded-[12px] p-2 transition-colors hover:bg-paper-edge/25 focus-visible:bg-paper-edge/25">
+                    <ProjectThumb project={p} className="aspect-[16/10] w-full" />
+                    <span className="px-0.5">
+                      <span className="block font-display text-[15px] font-extrabold leading-tight [font-variation-settings:'wdth'_104]">
+                        {p.title}
+                      </span>
+                      <span className="mt-0.5 line-clamp-2 block text-[12.5px] leading-snug text-muted">{p.line}</span>
+                    </span>
+                  </Link>
+                </motion.li>
+              ))}
+            </ul>
+            <Link
+              href="/work"
+              className="group/all mt-1 flex items-center justify-between rounded-[10px] px-3 py-2 text-[13px] font-semibold text-ink hover:bg-paper-edge/25"
+            >
+              All work
+              <span aria-hidden="true" className="transition-transform duration-300 ease-out-expo group-hover/all:translate-x-1">
+                →
+              </span>
+            </Link>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -272,6 +421,7 @@ function MobileMenu({
   availability,
   email,
   linkedin,
+  latest,
   returnFocus,
 }: {
   open: boolean;
@@ -282,6 +432,7 @@ function MobileMenu({
   availability: string;
   email?: string;
   linkedin?: string;
+  latest?: NavProject;
   returnFocus: React.RefObject<HTMLButtonElement | null>;
 }) {
   const { stop, start } = useSmoothScroll();
@@ -382,12 +533,7 @@ function MobileMenu({
                 const current = active === l.id;
                 const href = l.id === "work" && onWork ? "/work" : sectionHref(l.id, onHome);
                 return (
-                  <motion.li
-                    key={l.id}
-                    initial={{ y: 40, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.12 + i * 0.05, duration: 0.6, ease: easeOutExpo }}
-                  >
+                  <li key={l.id}>
                     <a
                       href={href}
                       onClick={onClose}
@@ -400,17 +546,40 @@ function MobileMenu({
                           current && "text-copper",
                         )}
                       >
-                        {l.label}
+                        <LetterReveal text={l.label} delay={0.14 + i * 0.07} />
                       </span>
                       {current && (
                         <span aria-hidden="true" className="ml-auto size-2 self-center rounded-full bg-copper shadow-glow" />
                       )}
                     </a>
-                  </motion.li>
+                  </li>
                 );
               })}
             </ul>
           </nav>
+          {latest && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.6, ease: easeOutExpo }}
+            >
+            <Link
+              href={latest.href}
+              onClick={onClose}
+              className="group/card flex items-center gap-3.5 rounded-card bg-ink-2 p-2.5 pr-4 shadow-ink-raised"
+            >
+              <ProjectThumb project={latest} className="aspect-[16/10] w-24 shrink-0" />
+              <span className="min-w-0">
+                <span className="block font-mono text-[10px] uppercase tracking-[0.12em] text-muted-ink">Latest project</span>
+                <span className="block truncate font-display text-[17px] font-extrabold [font-variation-settings:'wdth'_104]">{latest.title}</span>
+                <span className="block truncate text-[13px] text-muted-ink">{latest.line}</span>
+              </span>
+              <span aria-hidden="true" className="ml-auto text-copper transition-transform duration-300 ease-out-expo group-hover/card:translate-x-1">
+                →
+              </span>
+            </Link>
+            </motion.div>
+          )}
           <div className="mt-auto flex flex-col gap-3.5 font-mono text-xs tracking-[0.08em] text-muted-ink">
             {contacts.length > 0 && (
               <ul className="flex flex-col gap-2 border-t border-ink-3 pt-4">
