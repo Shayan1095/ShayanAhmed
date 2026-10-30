@@ -1,7 +1,7 @@
 "use client";
 
 import type { DemoDecision, ImageRef } from "@/lib/content/types";
-import { Screen, TypeText, type ScreenHandle } from "@/components/system";
+import { RollingNumber, Screen, Typewriter, TypeText, type ScreenHandle } from "@/components/system";
 import { cn } from "@/lib/utils";
 import { Storefront } from "./storefront";
 import type { OpsDemoState } from "./use-ops-demo";
@@ -57,7 +57,7 @@ export function HeroSlab({ state, decision, onDecide, source, storefront, screen
                 Live demo · {source}
               </span>
               <span aria-hidden="true" className="hidden tabular-nums min-[420px]:inline">
-                Agents {state.handled} · You {state.decided}
+                Agents <RollingNumber value={state.handled} /> · You <RollingNumber value={state.decided} />
               </span>
             </div>
 
@@ -124,7 +124,7 @@ export function HeroSlab({ state, decision, onDecide, source, storefront, screen
                 <li key={l.id} className="flex animate-[log-in_.5s_var(--ease-out-expo)] items-center gap-2 truncate">
                   <span className="text-copper/80">✓</span>
                   <span className="uppercase tracking-[0.08em] text-muted-ink/80">{l.agent}</span>
-                  <span className="truncate text-paper/75">{l.text}</span>
+                  <Typewriter text={l.text} trigger={1} speed={16} className="truncate text-paper/75" />
                 </li>
               ))}
             </ul>

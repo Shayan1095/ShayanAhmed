@@ -1,13 +1,12 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Project, ProjectCategory } from "@/lib/content/types";
 import { ScrollFx } from "@/components/fx/scroll-fx";
 import { Band, Cartridge, InsetToggle, Rise, SectionHeader } from "@/components/system";
-import { ScrollTrigger } from "@/lib/gsap";
-import { easeOutExpo } from "@/lib/motion";
+import { Flip, gsap, MQ, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { motionGrammar } from "@/lib/motion";
 
 const filters = [
   { value: "all", label: "All" },
@@ -40,13 +39,44 @@ type ArchiveProps = {
 
 /**
  * Archive of builds. On the homepage a short, calm preview; on /work the full
- * list with a filter whose grid reflows with Motion layout animation.
+ * list with a filter. Filtering uses GSAP Flip: every card stays in the page,
+ * the ones that remain glide to their new places, the rest shrink away.
  */
 export function Archive({ projects, limit, seeAllHref, index = "03", className }: ArchiveProps) {
   const filterable = !limit;
   const [filter, setFilter] = useState<Filter>("all");
+  const grid = useRef<HTMLUListElement>(null);
+  const flipState = useRef<ReturnType<typeof Flip.getState> | null>(null);
   const available = filters.filter((f) => f.value === "all" || projects.some((p) => matches[f.value](p.category)));
-  const shown = (filterable ? projects.filter((p) => matches[filter](p.category)) : projects).slice(0, limit);
+  const list = limit ? projects.slice(0, limit) : projects;
+  const shown = filterable ? projects.filter((p) => matches[filter](p.category)) : list;
+
+  const changeFilter = (next: Filter) => {
+    // Record where every card is now, then let React apply the filter.
+    if (grid.current && !window.matchMedia(MQ.reduce).matches) {
+      flipState.current = Flip.getState(grid.current.querySelectorAll("[data-flip]"));
+    }
+    setFilter(next);
+  };
+
+  // After the filter renders, animate from the recorded positions.
+  useGSAP(
+    () => {
+      const state = flipState.current;
+      if (!state) return;
+      flipState.current = null;
+      Flip.from(state, {
+        duration: 0.75,
+        ease: motionGrammar.easeToggle,
+        absolute: true,
+        stagger: 0.03,
+        onEnter: (els) => gsap.fromTo(els, { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.6, ease: motionGrammar.ease, delay: 0.15 }),
+        onLeave: (els) => gsap.to(els, { opacity: 0, scale: 0.9, duration: 0.35, ease: "power1.in" }),
+        onComplete: () => ScrollTrigger.refresh(),
+      });
+    },
+    { dependencies: [filter], scope: grid },
+  );
 
   if (projects.length === 0) return null;
   const more = limit ? projects.length - shown.length : 0;
@@ -63,21 +93,17 @@ export function Archive({ projects, limit, seeAllHref, index = "03", className }
             </>
           }
           intro={filterable ? undefined : "Systems, tools and automations built for clients and as products."}
-          aside={filterable ? <InsetToggle label="Filter projects" options={available} value={filter} onChange={setFilter} /> : undefined}
+          aside={filterable ? <InsetToggle label="Filter projects" options={available} value={filter} onChange={changeFilter} /> : undefined}
           className="min-[900px]:mb-[40px]"
         />
         {/* Signature: columns drift at different speeds as the grid passes (preview only; the filtered grid reflows instead). */}
         <ScrollFx effects={filterable ? [] : ["parallax"]}>
-        <motion.ul layout={filterable} className="grid grid-cols-1 gap-[22px] min-[640px]:grid-cols-2 min-[980px]:grid-cols-3">
-          <AnimatePresence mode="popLayout" initial={false} onExitComplete={() => ScrollTrigger.refresh()}>
-            {shown.map((p, i) => (
-              <motion.li
+        <ul ref={grid} className="grid grid-cols-1 gap-[22px] min-[640px]:grid-cols-2 min-[980px]:grid-cols-3">
+            {list.map((p, i) => (
+              <li
                 key={p.slug}
-                layout={filterable}
-                initial={{ opacity: 0, scale: 0.94, y: 24 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.94 }}
-                transition={{ duration: 0.6, ease: easeOutExpo }}
+                data-flip={p.slug}
+                hidden={!shown.includes(p)}
               >
                 <div data-fx-speed={filterable ? undefined : COLUMN_SPEED[i % 3]} className="h-full">
                 <Rise delay={(i % 3) * 0.06} className="h-full">
@@ -104,10 +130,9 @@ export function Archive({ projects, limit, seeAllHref, index = "03", className }
                   />
                 </Rise>
                 </div>
-              </motion.li>
+              </li>
             ))}
-          </AnimatePresence>
-        </motion.ul>
+        </ul>
         </ScrollFx>
         {seeAllHref && more > 0 && (
           <div className="mt-10 flex justify-center">

@@ -26,7 +26,7 @@ export function ProcessTrack({ children }: { children: React.ReactNode }) {
       mm.add(MQ.desktop, () => {
         light(0);
         const tl = gsap.timeline({
-          defaults: { ease: "power2.out" },
+          defaults: { ease: motionGrammar.ease },
           scrollTrigger: {
             trigger: el,
             // Heading and panel pin together; centred when they fit, else near the top.
@@ -66,7 +66,7 @@ export function ProcessTrack({ children }: { children: React.ReactNode }) {
             {
               y: 0,
               opacity: 1,
-              ease: "power2.out",
+              ease: motionGrammar.ease,
               scrollTrigger: {
                 trigger: s,
                 start: "top 92%",

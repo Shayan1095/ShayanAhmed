@@ -1,10 +1,10 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { Project } from "@/lib/content/types";
 import { useSmoothScroll } from "@/components/providers/smooth-scroll";
-import { Band, Label, SplitReveal } from "@/components/system";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { Band, Label, RollingNumber, SplitReveal, Typewriter } from "@/components/system";
+import { gsap, Observer, useGSAP } from "@/lib/gsap";
 import { motionGrammar } from "@/lib/motion";
 import { WorkSlide } from "./work-slide";
 
@@ -16,7 +16,8 @@ export function Work({ projects }: { projects: Project[] }) {
   const root = useRef<HTMLElement>(null);
   const pin = useRef<HTMLDivElement>(null);
   const rail = useRef<HTMLDivElement>(null);
-  const counter = useRef<HTMLElement>(null);
+  // Which slide is in view; the counter rolls between numbers (RollingNumber).
+  const [current, setCurrent] = useState(1);
   const total = projects.length;
   const { scrollTo } = useSmoothScroll();
 
@@ -38,7 +39,7 @@ export function Work({ projects }: { projects: Project[] }) {
             invalidateOnRefresh: true,
             onUpdate: (self) => {
               const n = Math.min(total, Math.floor(self.progress * total) + 1);
-              if (counter.current) counter.current.textContent = String(n).padStart(2, "0");
+              setCurrent((c) => (c === n ? c : n));
             },
           },
         });
@@ -58,7 +59,48 @@ export function Work({ projects }: { projects: Project[] }) {
           if (Math.abs(window.scrollY - y) > 4) scrollTo(y, { immediate: true });
         };
         railEl.addEventListener("focusin", onFocus);
-        return () => railEl.removeEventListener("focusin", onFocus);
+
+        // Drag the rail (GSAP Observer). Dragging moves the page in step with the rail;
+        // letting go throws it on with momentum, which Lenis eases out.
+        const st = tl.scrollTrigger!;
+        const pxPerScroll = () => distance() / Math.max(1, st.end - st.start);
+        const clampY = (y: number) => gsap.utils.clamp(st.start, st.end, y);
+        let dragged = false;
+        const drag = Observer.create({
+          target: railEl,
+          type: "pointer",
+          dragMinimum: 6,
+          onDragStart: () => {
+            dragged = true;
+            railEl.classList.add("cursor-grabbing");
+          },
+          onDrag: (self) => scrollTo(clampY(window.scrollY - self.deltaX / pxPerScroll()), { immediate: true }),
+          onDragEnd: (self) => {
+            railEl.classList.remove("cursor-grabbing");
+            const fling = (-self.velocityX / pxPerScroll()) * 0.35;
+            scrollTo(clampY(window.scrollY + fling));
+            // Let the click that ends a drag through only if it wasn't a drag.
+            window.setTimeout(() => (dragged = false), 0);
+          },
+        });
+        const blockClickAfterDrag = (e: MouseEvent) => {
+          if (dragged) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        };
+        railEl.addEventListener("click", blockClickAfterDrag, true);
+        const noNativeDrag = (e: DragEvent) => e.preventDefault();
+        railEl.addEventListener("dragstart", noNativeDrag);
+        railEl.classList.add("cursor-grab", "select-none");
+
+        return () => {
+          railEl.removeEventListener("focusin", onFocus);
+          railEl.removeEventListener("click", blockClickAfterDrag, true);
+          railEl.removeEventListener("dragstart", noNativeDrag);
+          railEl.classList.remove("cursor-grab", "select-none", "cursor-grabbing");
+          drag.kill();
+        };
       });
     },
     { scope: root, dependencies: [total, scrollTo] },
@@ -75,17 +117,18 @@ export function Work({ projects }: { projects: Project[] }) {
         <div className="wrap">
           <div className="mb-9 flex flex-wrap items-end justify-between gap-6 [@media(min-width:900px)_and_(max-height:820px)]:mb-6">
             <div>
-              <Label className="block">01 · Selected work</Label>
+              <Label className="block">
+                <Typewriter text="01 · Selected work" speed={38} />
+              </Label>
               <SplitReveal className="type-section mt-[18px]">
                 Case <em>studies</em>
               </SplitReveal>
             </div>
             <div className="flex items-center gap-3.5" aria-hidden="true">
               <b
-                ref={counter}
                 className="font-display text-[40px] font-extrabold leading-none tabular-nums [font-variation-settings:'wdth'_120]"
               >
-                01
+                <RollingNumber value={String(current).padStart(2, "0")} />
               </b>
               <Label>/ {String(total).padStart(2, "0")} shipped</Label>
             </div>

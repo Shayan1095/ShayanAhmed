@@ -417,3 +417,10 @@ html[data-power="low"] .ink-screen {
     scroll-behavior: auto !important;
   }
 }
+
+/* Typewriter caret after typing finishes. */
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}

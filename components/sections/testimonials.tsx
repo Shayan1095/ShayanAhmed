@@ -1,5 +1,5 @@
 import type { Testimonial } from "@/lib/content/types";
-import { Band, Label, Rise } from "@/components/system";
+import { Band, Label, Rise, Typewriter } from "@/components/system";
 import { cn } from "@/lib/utils";
 
 /**
@@ -28,7 +28,9 @@ export function Testimonials({ items }: { items: Testimonial[] }) {
                 <span className="absolute right-[26px] top-6 rotate-6 rounded-md border-[1.5px] border-walnut px-[9px] py-[5px] font-mono text-[10px] uppercase tracking-[0.16em] text-walnut">
                   Approved
                 </span>
-                <Label>06 · Client words</Label>
+                <Label>
+            <Typewriter text="06 · Client words" speed={38} />
+          </Label>
                 <blockquote className="mx-auto mb-[22px] mt-[18px] max-w-[24em] font-display text-[clamp(24px,3vw,38px)] font-semibold italic leading-[1.25] tracking-[-0.01em] [font-variation-settings:'wdth'_92]">
                   &ldquo;{t.quote}&rdquo;
                 </blockquote>

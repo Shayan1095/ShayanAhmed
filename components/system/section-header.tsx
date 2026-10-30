@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Label } from "./label";
 import { Rise, SplitReveal } from "./reveal";
+import { Typewriter } from "./typewriter";
 
 type SectionHeaderProps = {
   /** Chapter number, e.g. "01". */
@@ -27,7 +28,9 @@ export function SectionHeader({ index, label, title, intro, as = "h2", aside, cl
       )}
     >
       <div>
-        <Label className="mb-[18px] block">{index ? `${index} · ${label}` : label}</Label>
+        <Label className="mb-[18px] block">
+          <Typewriter text={index ? `${index} · ${label}` : label} speed={38} />
+        </Label>
         <SplitReveal as={as} className="type-section">
           {title}
         </SplitReveal>

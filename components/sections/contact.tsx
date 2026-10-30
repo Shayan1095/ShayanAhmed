@@ -1,6 +1,6 @@
 import type { SiteSettings } from "@/lib/content/types";
 import { Clock } from "@/components/site/clock";
-import { Band, Button, Label, Rise, SplitReveal } from "@/components/system";
+import { Band, Button, Label, Rise, SplitReveal, Typewriter } from "@/components/system";
 import { ScrollFx } from "@/components/fx/scroll-fx";
 import { ContactForm } from "./contact-form";
 import { CopyButton } from "./copy-button";
@@ -28,7 +28,9 @@ export function Contact({ settings }: { settings: SiteSettings }) {
     <Band tone="ink" id="contact" aria-label="Contact" className="section-pad">
       <div className="wrap grid grid-cols-1 items-start gap-14 min-[980px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <div>
-          <Label>08 · Contact</Label>
+          <Label>
+            <Typewriter text="08 · Contact" speed={38} />
+          </Label>
           <SplitReveal className="mb-6 mt-4 font-display text-[clamp(40px,5vw,72px)] font-extrabold leading-[0.95] tracking-[-0.03em] [font-variation-settings:'wdth'_104] [&_em]:font-bold [&_em]:italic [&_em]:text-copper [&_em]:[font-variation-settings:'wdth'_94]">
             Let&apos;s build <em>your system.</em>
           </SplitReveal>

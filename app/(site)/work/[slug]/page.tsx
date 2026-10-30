@@ -8,7 +8,7 @@ import { ScrollFx } from "@/components/fx/scroll-fx";
 import { Monitor } from "@/components/site/monitor";
 import { SystemDiagram } from "@/components/case-study/system-diagram";
 import { Testimonials } from "@/components/sections/testimonials";
-import { Band, Button, Label, Panel, Rise, SectionHeader, SplitReveal, UiFragment } from "@/components/system";
+import { Band, Button, Label, Panel, Rise, RollingNumber, SectionHeader, SplitReveal, UiFragment } from "@/components/system";
 import { getProjects, getTestimonials } from "@/lib/content";
 import { site } from "@/lib/site";
 
@@ -216,7 +216,7 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
                     <Label>{r.label}</Label>
                   </dt>
                   <dd className="mt-3 font-display text-[clamp(40px,5vw,64px)] font-extrabold leading-none text-copper [font-variation-settings:'wdth'_118]">
-                    {r.value}
+                    <RollingNumber value={r.value} />
                   </dd>
                 </Panel>
               ))}

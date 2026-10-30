@@ -9,6 +9,10 @@ const steps = [
   { layer: "Automation", title: "Dispatched", text: "Courier booked, customer notified." },
 ] as const;
 
+/** Signal routes between the steps: gentle arcs, like a trace on a board. */
+const ROUTE_H = "M0,8 Q50,0 100,8 T200,8 T300,8";
+const ROUTE_V = "M8,0 Q0,16.7 8,33.3 T8,66.6 T8,100";
+
 /**
  * A real workflow from the Brands Attire build, laid out as a calm sequence.
  * The one human step ("You approve") carries the only lit light.
@@ -17,12 +21,19 @@ export function ServicesFlow() {
   return (
     <div className="mb-[72px]">
       {/* Signature: the route draws itself across the steps as you scroll; the steps rise along it. */}
-      <ScrollFx as="ol" effects={["draw", "rise"]} className="relative grid grid-cols-1 gap-4 min-[900px]:grid-cols-4 min-[900px]:gap-[22px]">
-        <li aria-hidden="true" className="pointer-events-none absolute bottom-6 left-[27px] top-6 w-px bg-ink-3 min-[900px]:hidden">
-          <span data-fx="line" data-fx-axis="y" className="absolute inset-0 block bg-[linear-gradient(180deg,rgb(201_133_63/.2),var(--color-copper),rgb(201_133_63/.2))]" />
+      <ScrollFx as="ol" effects={["stroke", "rise"]} className="relative grid grid-cols-1 gap-4 min-[900px]:grid-cols-4 min-[900px]:gap-[22px]">
+        {/* The route: a faint track, and a copper signal that draws along it (DrawSVG). */}
+        <li aria-hidden="true" className="pointer-events-none absolute bottom-6 left-[19px] top-6 w-4 min-[900px]:hidden">
+          <svg viewBox="0 0 16 100" preserveAspectRatio="none" className="size-full overflow-visible">
+            <path d={ROUTE_V} fill="none" stroke="var(--color-ink-3)" strokeWidth="1" />
+            <path data-fx="stroke" d={ROUTE_V} fill="none" stroke="var(--color-copper)" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
         </li>
-        <li aria-hidden="true" className="pointer-events-none absolute inset-x-[12.5%] top-[27px] hidden h-px bg-ink-3 min-[900px]:block">
-          <span data-fx="line" className="absolute inset-0 block bg-[linear-gradient(90deg,rgb(201_133_63/.2),var(--color-copper),rgb(201_133_63/.2))]" />
+        <li aria-hidden="true" className="pointer-events-none absolute inset-x-[12.5%] top-[19px] hidden h-4 min-[900px]:block">
+          <svg viewBox="0 0 300 16" preserveAspectRatio="none" className="size-full overflow-visible">
+            <path d={ROUTE_H} fill="none" stroke="var(--color-ink-3)" strokeWidth="1" />
+            <path data-fx="stroke" d={ROUTE_H} fill="none" stroke="var(--color-copper)" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
         </li>
         {steps.map((s, i) => (
           <li key={s.title} data-fx="item" className="relative z-[1] flex gap-4 min-[900px]:flex-col min-[900px]:gap-4">

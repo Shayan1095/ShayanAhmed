@@ -8,6 +8,7 @@
 import { useEffect, useRef } from "react";
 import { useFinePointer, useReducedMotion } from "@/hooks/use-media-query";
 import { gsap, MQ, useGSAP } from "@/lib/gsap";
+import { motionGrammar } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 const MIN_WDTH = 80;
@@ -65,7 +66,7 @@ export function Wordmark({ text, className }: { text: string; className?: string
           {
             yPercent: 0,
             opacity: 1,
-            ease: "power2.out",
+            ease: motionGrammar.ease,
             stagger: 0.06,
             scrollTrigger: { trigger: el, start: "top bottom", end: "bottom 92%", scrub: 0.8 },
           },

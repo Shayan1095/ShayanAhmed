@@ -9,6 +9,8 @@ export { Label } from "./label";
 export { Panel, Screws } from "./panel";
 export { Rise, SplitReveal } from "./reveal";
 export { Screen, TypeText, useScreenBoot, type ScreenHandle } from "./screen";
+export { RollingNumber } from "./rolling-number";
+export { Typewriter, type TypewriterProps } from "./typewriter";
 export { SectionHeader } from "./section-header";
 export { StatusBadge, Tag, type ProjectStatus } from "./status-badge";
 export { StatusLight } from "./status-light";

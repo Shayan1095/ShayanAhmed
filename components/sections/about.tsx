@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { SiteSettings } from "@/lib/content/types";
 import { ScrollFx } from "@/components/fx/scroll-fx";
-import { Band, Button, Label, SplitReveal } from "@/components/system";
+import { Band, Button, Label, SplitReveal, Typewriter } from "@/components/system";
 import { SpecSheet } from "./spec-sheet";
 
 /**
@@ -44,7 +44,9 @@ export function About({ settings }: { settings: SiteSettings }) {
           </figure>
         </div>
         <div>
-          <Label>05 · About</Label>
+          <Label>
+            <Typewriter text="05 · About" speed={38} />
+          </Label>
           <SplitReveal className="mb-[22px] mt-4 font-display text-[clamp(34px,4.4vw,60px)] font-extrabold uppercase leading-[0.94] tracking-[-0.035em] [font-variation-settings:'wdth'_116] [&_em]:font-bold [&_em]:italic [&_em]:text-walnut [&_em]:[font-variation-settings:'wdth'_95]">
             I build the part of the website <em>that does the work.</em>
           </SplitReveal>
