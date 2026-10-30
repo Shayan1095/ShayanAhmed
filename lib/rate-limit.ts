@@ -19,7 +19,12 @@ export async function rateLimit(
   limit: number,
   windowMs: number,
 ): Promise<{ ok: boolean; retryAfterMin: number }> {
-  if (!(await connectDb())) return { ok: true, retryAfterMin: 0 };
+  // No database (unset or down): allow the request rather than locking everyone out.
+  const db = await connectDb().catch((err) => {
+    console.error("[rate-limit] database unreachable, allowing request:", (err as Error).message);
+    return null;
+  });
+  if (!db) return { ok: true, retryAfterMin: 0 };
   const now = new Date();
   const row = await RateLimitModel.findOneAndUpdate(
     { key, expiresAt: { $gt: now } },
@@ -41,5 +46,5 @@ export async function rateLimit(
 
 /** Clears a limit early, e.g. after a successful sign-in. */
 export async function resetRateLimit(key: string) {
-  if (await connectDb()) await RateLimitModel.deleteOne({ key });
+  if (await connectDb().catch(() => null)) await RateLimitModel.deleteOne({ key });
 }

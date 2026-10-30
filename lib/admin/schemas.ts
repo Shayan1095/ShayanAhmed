@@ -16,8 +16,8 @@ const lines = z.array(z.string().trim().min(1).max(160)).max(40);
 export const imageRefSchema = z.object({
   src: z.string().trim().min(1, "Add an image URL").max(600),
   alt: text(200),
-  width: z.number().int().min(1).max(10000),
-  height: z.number().int().min(1).max(10000),
+  width: z.number("Add the width").int().min(1, "Add the width").max(10000),
+  height: z.number("Add the height").int().min(1, "Add the height").max(10000),
 });
 const optImage = imageRefSchema.nullish().transform((v) => v ?? undefined);
 
@@ -26,7 +26,8 @@ export const projectSchema = z.object({
     .string()
     .trim()
     .toLowerCase()
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "use lowercase letters, numbers and dashes")
+    .min(1, "Add a URL slug")
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers and dashes only")
     .max(80),
   title: text(120).min(1, "Add a title"),
   category: z.enum(["website", "system", "automation", "web-tool"]),
@@ -41,21 +42,27 @@ export const projectSchema = z.object({
   outcome: opt(200),
   fact: text(120),
   monitorLabel: opt(80),
-  liveUrl: opt(300).pipe(z.url().optional()),
+  liveUrl: opt(300).pipe(z.url("Enter a full URL, starting with https://").optional()),
   demoNote: opt(200),
   stack: lines,
   layers: z.object({ website: lines, system: lines, automation: lines }),
-  features: z.array(z.object({ title: text(80).min(1), text: text(400) })).max(20),
-  decisions: z.array(z.object({ title: text(120).min(1), text: text(600) })).max(12),
+  features: z.array(z.object({ title: text(80).min(1, "Name the feature, or remove the row"), text: text(400) })).max(20),
+  decisions: z.array(z.object({ title: text(120).min(1, "Name the decision, or remove the row"), text: text(600) })).max(12),
   uiFragments: z
-    .array(z.object({ tag: text(60).min(1), text: text(160).min(1), actions: z.array(text(30)).max(3).optional() }))
+    .array(
+      z.object({
+        tag: text(60).min(1, "Add the source"),
+        text: text(160).min(1, "Add the message"),
+        actions: z.array(text(30)).max(3).optional(),
+      }),
+    )
     .max(6),
   agents: z
-    .array(z.object({ name: text(60).min(1), status: text(60), needsYou: z.boolean().optional() }))
+    .array(z.object({ name: text(60).min(1, "Name the agent"), status: text(60), needsYou: z.boolean().optional() }))
     .max(12),
-  results: z.array(z.object({ label: text(80).min(1), value: text(40).min(1) })).max(8),
+  results: z.array(z.object({ label: text(80).min(1, "Add a label"), value: text(40).min(1, "Add the figure") })).max(8),
   video: z
-    .object({ src: text(600).min(1), poster: opt(600), caption: opt(200) })
+    .object({ src: text(600).min(1, "Add the video URL"), poster: opt(600), caption: opt(200) })
     .nullish()
     .transform((v) => v ?? undefined),
   cover: optImage,
@@ -87,13 +94,13 @@ export const faqSchema = z.object({
 
 export const settingsSchema = z.object({
   availability: text(60).min(1, "Add an availability line"),
-  email: opt(120).pipe(z.email().optional()),
-  linkedin: opt(300).pipe(z.url().optional()),
-  bookingUrl: opt(300).pipe(z.url().optional()),
+  email: opt(120).pipe(z.email("Enter a valid email address").optional()),
+  linkedin: opt(300).pipe(z.url("Enter a full URL, starting with https://").optional()),
+  bookingUrl: opt(300).pipe(z.url("Enter a full URL, starting with https://").optional()),
   startingPrice: opt(30),
   budgetRanges: lines,
   projectTypes: lines,
-  specSheet: z.array(z.object({ label: text(40).min(1), value: text(120).min(1) })).max(12),
+  specSheet: z.array(z.object({ label: text(40).min(1, "Add a label"), value: text(120).min(1, "Add a value") })).max(12),
   portrait: optImage,
 });
 export type SettingsInput = z.input<typeof settingsSchema>;

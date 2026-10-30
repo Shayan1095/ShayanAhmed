@@ -13,16 +13,32 @@ import { uploadFile } from "./upload";
 
 /* Small, consistent field set for the admin. Every field has a visible label and optional hint. */
 
+/** Inline validation message, linked to its control with aria-describedby. */
+export function FieldError({ id, error }: { id: string; error?: string }) {
+  if (!error) return null;
+  return (
+    <p id={id} className="text-[12.5px] font-medium leading-snug text-destructive">
+      {error}
+    </p>
+  );
+}
+
+/** aria props for a control that may have an error. */
+export const errorProps = (id: string, error?: string) =>
+  error ? { "aria-invalid": true as const, "aria-describedby": `${id}-error` } : {};
+
 function Shell({
   id,
   label,
   hint,
+  error,
   children,
   className,
 }: {
   id: string;
   label: string;
   hint?: string;
+  error?: string;
   children: React.ReactNode;
   className?: string;
 }) {
@@ -32,7 +48,8 @@ function Shell({
         {label}
       </label>
       {children}
-      {hint && <p className="text-[12.5px] leading-snug text-muted">{hint}</p>}
+      <FieldError id={`${id}-error`} error={error} />
+      {hint && !error && <p className="text-[12.5px] leading-snug text-muted">{hint}</p>}
     </div>
   );
 }
@@ -40,6 +57,7 @@ function Shell({
 export function TextField({
   label,
   hint,
+  error,
   value,
   onChange,
   className,
@@ -47,13 +65,21 @@ export function TextField({
 }: Omit<React.ComponentProps<"input">, "value" | "onChange"> & {
   label: string;
   hint?: string;
+  error?: string;
   value: string | null | undefined;
   onChange: (v: string) => void;
 }) {
   const id = useId();
   return (
-    <Shell id={id} label={label} hint={hint} className={className}>
-      <Input id={id} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className="h-9 bg-paper" {...props} />
+    <Shell id={id} label={label} hint={hint} error={error} className={className}>
+      <Input
+        id={id}
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-9 bg-paper"
+        {...errorProps(id, error)}
+        {...props}
+      />
     </Shell>
   );
 }
@@ -61,6 +87,7 @@ export function TextField({
 export function TextAreaField({
   label,
   hint,
+  error,
   value,
   onChange,
   rows = 3,
@@ -69,18 +96,20 @@ export function TextAreaField({
 }: Omit<React.ComponentProps<"textarea">, "value" | "onChange"> & {
   label: string;
   hint?: string;
+  error?: string;
   value: string | null | undefined;
   onChange: (v: string) => void;
 }) {
   const id = useId();
   return (
-    <Shell id={id} label={label} hint={hint} className={className}>
+    <Shell id={id} label={label} hint={hint} error={error} className={className}>
       <Textarea
         id={id}
         rows={rows}
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value)}
         className="bg-paper"
+        {...errorProps(id, error)}
         {...props}
       />
     </Shell>
@@ -91,13 +120,17 @@ export function TextAreaField({
 export function LinesField({
   label,
   hint,
+  error,
   value,
   onChange,
+  onBlur,
   rows = 4,
   className,
 }: {
   label: string;
   hint?: string;
+  error?: string;
+  onBlur?: () => void;
   value: string[];
   onChange: (v: string[]) => void;
   rows?: number;
@@ -106,11 +139,13 @@ export function LinesField({
   const id = useId();
   const [draft, setDraft] = useState(value.join("\n"));
   return (
-    <Shell id={id} label={label} hint={hint ?? "One per line."} className={className}>
+    <Shell id={id} label={label} hint={hint ?? "One per line."} error={error} className={className}>
       <Textarea
         id={id}
         rows={rows}
         value={draft}
+        onBlur={onBlur}
+        {...errorProps(id, error)}
         onChange={(e) => {
           setDraft(e.target.value);
           onChange(
@@ -171,7 +206,10 @@ export function RowsField<T extends Record<string, unknown>>({
   columns,
   empty,
   max = 20,
+  rowErrors,
 }: {
+  /** Per-row field errors, in React Hook Form's shape: rowErrors[i][key].message. */
+  rowErrors?: unknown;
   label: string;
   hint?: string;
   rows: T[];
@@ -201,6 +239,7 @@ export function RowsField<T extends Record<string, unknown>>({
               {columns.map((c) => {
                 const fid = `${groupId}-${i}-${c.key}`;
                 const v = row[c.key];
+                const cellError = (rowErrors as Record<number, Record<string, { message?: string }> | undefined> | undefined)?.[i]?.[c.key]?.message;
                 return (
                   <div key={c.key} className={cn("flex flex-col gap-1", c.kind === "textarea" && "sm:col-span-full")}>
                     <label htmlFor={fid} className="text-[11.5px] font-medium text-muted">
@@ -220,6 +259,7 @@ export function RowsField<T extends Record<string, unknown>>({
                         placeholder={c.placeholder}
                         onChange={(e) => update(i, { [c.key]: e.target.value } as Partial<T>)}
                         className="bg-paper-hi"
+                        {...errorProps(fid, cellError)}
                       />
                     ) : (
                       <Input
@@ -228,8 +268,10 @@ export function RowsField<T extends Record<string, unknown>>({
                         placeholder={c.placeholder}
                         onChange={(e) => update(i, { [c.key]: e.target.value } as Partial<T>)}
                         className="h-8 bg-paper-hi"
+                        {...errorProps(fid, cellError)}
                       />
                     )}
+                    <FieldError id={`${fid}-error`} error={cellError} />
                   </div>
                 );
               })}

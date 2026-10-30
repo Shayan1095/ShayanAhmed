@@ -1,11 +1,21 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { useSyncExternalStore } from "react";
 import { Screen, TypeText } from "@/components/system";
+
+// The address the visitor typed. usePathname() reports the internal "/_not-found"
+// route here, so read the browser's location instead (empty during prerender).
+const noop = () => () => {};
+const usePath = () =>
+  useSyncExternalStore(
+    noop,
+    () => window.location.pathname,
+    () => "",
+  );
 
 /** The 404 screen: a monitor that lost its signal, printing the missing path. */
 export function NoSignal() {
-  const path = usePathname();
+  const path = usePath() || "this address";
   return (
     <div className="relative rounded-[22px] bg-[linear-gradient(155deg,#fdf9f1_0%,var(--color-paper)_38%,#d9ccb4_100%)] p-3 shadow-raised">
       <span aria-hidden="true" className="absolute -top-px right-[7%] h-[3px] w-[5%] rounded-b-sm bg-ink-3" />
