@@ -37,17 +37,21 @@ test.describe("navbar (desktop)", () => {
     await scrollToSection(page, "services");
     const services = page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Services" });
     await expect(services).toHaveAttribute("aria-current", "location");
+    // The section you're in glows; the others don't.
+    await expect(services).toHaveClass(/nav-glow/);
+    const process = page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Process" });
+    await expect(process).not.toHaveClass(/nav-glow/);
     await expect(readout(page)).toHaveText("Services", { timeout: 5000 });
   });
 
-  test("the bar hides on scroll down and returns on scroll up", async ({ page }) => {
+  test("the bar stays visible while scrolling down", async ({ page }) => {
     await page.goto("/");
     await settle(page);
     const header = page.locator("header").first();
-    await page.evaluate(() => window.scrollTo(0, 1500));
-    await expect(header).toHaveClass(/-translate-y-\[130%\]/);
-    await page.evaluate(() => window.scrollTo(0, 1100));
-    await expect(header).not.toHaveClass(/-translate-y-\[130%\]/);
+    await page.evaluate(() => window.scrollTo(0, 2500));
+    await page.waitForTimeout(600);
+    await expect(header).toBeInViewport();
+    await expect(header.getByRole("link", { name: "Start a project" })).toBeInViewport();
   });
 
   test("on case studies, Work stays lit and opens the work page", async ({ page }) => {

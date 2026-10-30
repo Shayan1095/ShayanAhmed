@@ -37,10 +37,10 @@ const DEFAULT_PLACE = "Full-stack developer";
 const SCRAMBLE_CHARS = "0123456789·ABCDEFGHIJKLMNOPRSTUVWXYZ";
 
 /**
- * Navbar (DESIGN.md §7). Hides on scroll down and returns on scroll up,
- * compacts after the top, copper progress line.
- *  - The raised key marks the section in view and glides to whichever link
- *    you point at or focus (a spring slide, never magnetic).
+ * Navbar (DESIGN.md §7). Always visible; compacts after the top, copper progress line.
+ *  - Links sit directly on the bar. The section in view glows copper, with a
+ *    dot that springs from link to link; hovering draws a hairline underline.
+ *  - The bar stays put while you scroll (it never hides).
  *  - A readout under the name says where you are ("Process"),
  *    scrambling to each new chapter (GSAP ScrambleText).
  *  - Once you scroll, the bar slims into frosted glass (solid on low-power devices).
@@ -50,10 +50,8 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
   const progress = useRef<HTMLSpanElement>(null);
   const readout = useRef<HTMLSpanElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
-  const [hidden, setHidden] = useState(false);
   const [compact, setCompact] = useState(false);
   const [chapter, setChapter] = useState<ChapterId | null>(null);
-  const [hover, setHover] = useState<NavId | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 
@@ -70,20 +68,16 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
     closeTimer.current = window.setTimeout(() => setPreview(false), 160);
   }, []);
   useEffect(() => () => window.clearTimeout(closeTimer.current), []);
-  // The bar hiding on scroll also hides the preview.
-  const previewOpen = preview && !hidden;
+  const previewOpen = preview;
 
   const navIds = navLinks.map((l) => l.id) as readonly string[];
   const active: NavId | null = onWork ? "work" : chapter && navIds.includes(chapter) ? (chapter as NavId) : null;
-  const keyOn = hover ?? active;
 
   // Scroll-driven state. GSAP owns scroll; the bar itself moves with CSS transitions.
   useGSAP(
     () => {
       const setProgress = gsap.quickSetter(progress.current, "scaleX");
-      let lastY = window.scrollY;
       let compactNow = false;
-      let hiddenNow = false;
 
       // Runs every scroll frame: only touch React state when a value actually flips.
       ScrollTrigger.create({
@@ -94,11 +88,6 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
           setProgress(self.progress);
           const c = y > 60;
           if (c !== compactNow) setCompact((compactNow = c));
-          if (Math.abs(y - lastY) > 4) {
-            const h = y > lastY && y > 240;
-            if (h !== hiddenNow) setHidden((hiddenNow = h));
-            lastY = y;
-          }
         },
       });
 
@@ -162,8 +151,6 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
         className={cn(
           "fixed inset-x-0 top-[env(safe-area-inset-top)] z-70 transition-[transform,padding] duration-500 ease-out-expo",
           compact ? "py-2" : "py-3.5",
-          // Comes back whenever something inside it has keyboard focus.
-          hidden && !menuOpen && "-translate-y-[130%] focus-within:translate-y-0",
         )}
       >
         <div className="wrap">
@@ -188,10 +175,9 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
               </span>
             </Link>
 
-            <nav aria-label="Main" className="hidden min-[900px]:block" onMouseLeave={() => setHover(null)}>
-              <ul className="inset-track relative flex gap-0.5 rounded-control p-1">
+            <nav aria-label="Main" className="hidden min-[900px]:block">
+              <ul className="relative flex items-center gap-1">
                 {navLinks.map((l) => {
-                  const lit = keyOn === l.id;
                   const current = active === l.id;
                   const href = l.id === "work" && onWork ? "/work" : sectionHref(l.id, onHome);
                   const isWork = l.id === "work" && projects.length > 0;
@@ -217,27 +203,32 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
                         },
                       })}
                     >
-                      {lit && (
-                        <motion.span
-                          layoutId="nav-key"
-                          aria-hidden="true"
-                          className="raised-sm absolute inset-0 rounded-[9px]"
-                          transition={{ type: "spring", stiffness: 420, damping: 36, mass: 0.8 }}
-                        />
-                      )}
                       <a
                         href={href}
                         aria-current={current ? (onWork ? "page" : "location") : undefined}
                         {...(isWork && { "aria-expanded": previewOpen, "aria-controls": "work-preview" })}
-                        onMouseEnter={() => setHover(l.id)}
-                        onFocus={() => setHover(l.id)}
-                        onBlur={() => setHover(null)}
                         className={cn(
-                          "relative block rounded-[9px] px-4 py-[9px] text-sm font-medium transition-colors duration-300",
-                          lit || current ? "text-ink" : "text-muted hover:text-ink",
+                          "group/link relative block px-3.5 py-2.5 text-sm font-medium transition-[color,text-shadow] duration-500 ease-out-expo",
+                          current ? "nav-glow" : "text-muted hover:text-ink focus-visible:text-ink",
                         )}
                       >
                         {l.label}
+                        {/* Hover: a hairline draws in from the left. */}
+                        {!current && (
+                          <span
+                            aria-hidden="true"
+                            className="absolute inset-x-3.5 bottom-1.5 h-px origin-left scale-x-0 bg-ink/40 transition-transform duration-500 ease-out-expo group-hover/link:scale-x-100 group-focus-visible/link:scale-x-100"
+                          />
+                        )}
+                        {/* Where you are: a copper dot that springs from link to link. */}
+                        {current && (
+                          <motion.span
+                            layoutId="nav-dot"
+                            aria-hidden="true"
+                            className="absolute bottom-0 left-1/2 size-[5px] -translate-x-1/2 rounded-full bg-copper shadow-glow"
+                            transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                          />
+                        )}
                       </a>
                       {isWork && <WorkPreview open={previewOpen} projects={projects} />}
                     </li>

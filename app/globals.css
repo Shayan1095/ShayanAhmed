@@ -263,6 +263,14 @@ body {
   box-shadow: var(--shadow-raised);
 }
 
+/* Navbar: the section you're in glows copper (dark copper text keeps AA contrast on paper). */
+@utility nav-glow {
+  color: #8a521a;
+  text-shadow:
+    0 0 10px rgb(201 133 63 / 0.55),
+    0 0 22px rgb(201 133 63 / 0.3);
+}
+
 /* Navbar once scrolled: frosted paper glass. Solid on low-power devices (see below). */
 @utility nav-glass {
   background-color: rgb(251 246 236 / 0.72);
