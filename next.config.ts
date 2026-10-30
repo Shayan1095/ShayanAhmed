@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  // Images uploaded from the admin panel.
+  images: { remotePatterns: [{ protocol: "https", hostname: "res.cloudinary.com" }] },
   // Font files read by the generated social images and icons.
   outputFileTracingIncludes: {
     "/**/*": ["./node_modules/@fontsource/{anybody,martian-mono,hanken-grotesk}/files/*-latin-*.woff"],

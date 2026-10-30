@@ -1,7 +1,8 @@
 import { SiteProviders } from "@/components/providers/site-providers";
 import { Footer } from "@/components/site/footer";
-import { MobileCta } from "@/components/site/mobile-cta";
-import { Navbar } from "@/components/site/navbar";
+import { MobileCta, RouteMobileCta } from "@/components/site/mobile-cta";
+import { Navbar, RouteNavbar } from "@/components/site/navbar";
+import { Suspense } from "react";
 import { getSiteSettings } from "@/lib/content";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
@@ -12,10 +13,15 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <noscript>
         <style>{`[data-drawer-body]{height:auto!important;opacity:1!important}`}</style>
       </noscript>
-      <Navbar availability={settings.availability} />
+      {/* The route streams in for pages rendered on demand; the fallback is the same bar for inner pages. */}
+      <Suspense fallback={<Navbar availability={settings.availability} onHome={false} />}>
+        <RouteNavbar availability={settings.availability} />
+      </Suspense>
       {children}
       <Footer />
-      <MobileCta availability={settings.availability} />
+      <Suspense fallback={<MobileCta availability={settings.availability} onHome={false} />}>
+        <RouteMobileCta availability={settings.availability} />
+      </Suspense>
     </SiteProviders>
   );
 }

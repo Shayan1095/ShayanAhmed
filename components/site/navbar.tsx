@@ -12,12 +12,16 @@ import { cn } from "@/lib/utils";
 import { Clock } from "./clock";
 import { navLinks, sectionHref, type NavId } from "./nav-links";
 
+/** Reads the route (inside the layout's Suspense boundary) and renders the navbar for it. */
+export function RouteNavbar({ availability }: { availability: string }) {
+  return <Navbar availability={availability} onHome={usePathname() === "/"} />;
+}
+
 /**
  * Navbar (DESIGN.md §7). Hides on scroll down and returns on scroll up,
  * compacts after the top, copper progress line, scroll-spy key in an inset track.
  */
-export function Navbar({ availability }: { availability: string }) {
-  const onHome = usePathname() === "/";
+export function Navbar({ availability, onHome }: { availability: string; onHome: boolean }) {
   const header = useRef<HTMLElement>(null);
   const progress = useRef<HTMLSpanElement>(null);
   const [hidden, setHidden] = useState(false);

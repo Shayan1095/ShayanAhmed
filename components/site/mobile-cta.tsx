@@ -9,8 +9,11 @@ import { cn } from "@/lib/utils";
  * Sticky "Start a project" bar on phones. Appears once the hero is out of view
  * and steps aside while the contact form or footer is on screen.
  */
-export function MobileCta({ availability }: { availability: string }) {
-  const onHome = usePathname() === "/";
+export function RouteMobileCta({ availability }: { availability: string }) {
+  return <MobileCta availability={availability} onHome={usePathname() === "/"} />;
+}
+
+export function MobileCta({ availability, onHome }: { availability: string; onHome: boolean }) {
   const [heroGone, setHeroGone] = useState(!onHome);
   const [contactInView, setContactInView] = useState(false);
 
