@@ -39,7 +39,7 @@ const SCRAMBLE_CHARS = "0123456789·ABCDEFGHIJKLMNOPRSTUVWXYZ";
  * compacts after the top, copper progress line.
  *  - The raised key marks the section in view and glides to whichever link
  *    you point at or focus (a spring slide, never magnetic).
- *  - A readout under the name says where you are ("04 · Process"),
+ *  - A readout under the name says where you are ("Process"),
  *    scrambling to each new chapter (GSAP ScrambleText).
  */
 export function Navbar({ availability, onHome, onWork = false, place, email, linkedin }: NavbarProps) {
@@ -186,19 +186,10 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
                         onFocus={() => setHover(l.id)}
                         onBlur={() => setHover(null)}
                         className={cn(
-                          "relative flex items-baseline gap-1.5 rounded-[9px] px-4 py-[9px] text-sm font-medium transition-colors duration-300",
+                          "relative block rounded-[9px] px-4 py-[9px] text-sm font-medium transition-colors duration-300",
                           lit || current ? "text-ink" : "text-muted hover:text-ink",
                         )}
                       >
-                        <span
-                          aria-hidden="true"
-                          className={cn(
-                            "hidden font-mono text-[9.5px] tracking-[0.08em] transition-colors duration-300 min-[1180px]:inline",
-                            current ? "text-walnut" : "text-muted",
-                          )}
-                        >
-                          {l.n}
-                        </span>
                         {l.label}
                       </a>
                     </li>
@@ -215,16 +206,17 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
               <div className="hidden min-[900px]:inline-flex">
                 <a
                   href={sectionHref("contact", onHome)}
-                  className="group/cta relative inline-flex min-h-[46px] flex-col items-center justify-center overflow-hidden rounded-control bg-[linear-gradient(180deg,#2a2826,var(--color-ink))] px-5 text-[15px] font-semibold text-paper shadow-[inset_0_1px_0_rgb(255_255_255/.14),0_2px_0_#000,0_12px_24px_-10px_rgb(17_17_17/.6)] transition-transform duration-100 active:translate-y-0.5"
+                  className="group/cta relative inline-flex min-h-[46px] items-center gap-2 overflow-hidden rounded-control bg-[linear-gradient(180deg,#2a2826,var(--color-ink))] px-5 text-[15px] font-semibold text-paper shadow-[inset_0_1px_0_rgb(255_255_255/.14),0_2px_0_#000,0_12px_24px_-10px_rgb(17_17_17/.6)] transition-transform duration-100 active:translate-y-0.5"
                 >
-                  <span className="block transition-transform duration-[450ms] ease-out-expo group-hover/cta:-translate-y-[140%] group-focus-visible/cta:-translate-y-[140%]">
-                    Start a project →
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className="absolute inset-x-0 top-full text-center font-mono text-[11px] leading-[46px] tracking-[0.08em] text-copper transition-transform duration-[450ms] ease-out-expo group-hover/cta:-translate-y-full group-focus-visible/cta:-translate-y-full"
-                  >
-                    Reply within 24h
+                  Start a project
+                  {/* The arrow slips out and a fresh one slides in on hover/focus. */}
+                  <span aria-hidden="true" className="relative inline-block w-[1em] overflow-hidden">
+                    <span className="block transition-transform duration-[450ms] ease-out-expo group-hover/cta:translate-x-full group-focus-visible/cta:translate-x-full">
+                      →
+                    </span>
+                    <span className="absolute inset-0 block -translate-x-full text-copper transition-transform duration-[450ms] ease-out-expo group-hover/cta:translate-x-0 group-focus-visible/cta:translate-x-0">
+                      →
+                    </span>
                   </span>
                 </a>
               </div>
@@ -344,7 +336,7 @@ function MobileMenu({
     { dependencies: [open] },
   );
 
-  const links = [...navLinks, { id: "contact", n: "08", label: "Contact" } as const];
+  const links = [...navLinks, { id: "contact", label: "Contact" } as const];
   const contacts = [
     email && { label: "Email", href: `mailto:${email}`, text: email },
     linkedin && { label: "LinkedIn", href: linkedin, text: linkedin.replace(/^https?:\/\/(www\.)?/, "") },
@@ -402,9 +394,6 @@ function MobileMenu({
                       aria-current={current ? "location" : undefined}
                       className="group flex items-baseline gap-4 py-1"
                     >
-                      <span aria-hidden="true" className={cn("w-7 font-mono text-xs tracking-[0.08em]", current ? "text-copper" : "text-muted-ink")}>
-                        {l.n}
-                      </span>
                       <span
                         className={cn(
                           "font-display text-[44px] font-extrabold uppercase leading-[1.05] tracking-[-0.03em] [font-variation-settings:'wdth'_118]",

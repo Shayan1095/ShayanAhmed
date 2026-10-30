@@ -22,11 +22,12 @@ const settle = async (page: Page) => {
 test.describe("navbar (desktop)", () => {
   test.use({ viewport: { width: 1366, height: 860 } });
 
-  test("lists the page's chapters with their numbers", async ({ page }) => {
+  test("lists the page's chapters, without numbers", async ({ page }) => {
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: "Main" });
     for (const name of ["Work", "Services", "Process", "About"]) await expect(nav.getByRole("link", { name })).toBeVisible();
     await expect(nav.getByRole("link", { name: "Process" })).toHaveAttribute("href", "#process");
+    await expect(nav).not.toContainText(/\d/);
   });
 
   test("scroll spy lights the section in view and the readout names it", async ({ page }) => {
@@ -36,7 +37,7 @@ test.describe("navbar (desktop)", () => {
     await scrollToSection(page, "services");
     const services = page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Services" });
     await expect(services).toHaveAttribute("aria-current", "location");
-    await expect(readout(page)).toHaveText("02 · Services", { timeout: 5000 });
+    await expect(readout(page)).toHaveText("Services", { timeout: 5000 });
   });
 
   test("the bar hides on scroll down and returns on scroll up", async ({ page }) => {
@@ -55,6 +56,14 @@ test.describe("navbar (desktop)", () => {
     await expect(work).toHaveAttribute("aria-current", "page");
     await expect(work).toHaveAttribute("href", "/work");
     await expect(readout(page)).toHaveText("Case study");
+  });
+
+  test("Start a project has no hover caption", async ({ page }) => {
+    await page.goto("/");
+    const cta = page.locator("header").first().getByRole("link", { name: "Start a project" });
+    await cta.hover();
+    await expect(cta).toHaveText(/^Start a project/);
+    await expect(page.locator("header").first()).not.toContainText("Reply within");
   });
 
   test("navbar looks right", async ({ page }) => {

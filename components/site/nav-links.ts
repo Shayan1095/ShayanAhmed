@@ -1,22 +1,22 @@
-/** Main navigation. Section ids on the homepage; numbers match each section's label. */
+/** Main navigation. Section ids on the homepage. */
 export const navLinks = [
-  { id: "work", n: "01", label: "Work" },
-  { id: "services", n: "02", label: "Services" },
-  { id: "process", n: "04", label: "Process" },
-  { id: "about", n: "05", label: "About" },
+  { id: "work", label: "Work" },
+  { id: "services", label: "Services" },
+  { id: "process", label: "Process" },
+  { id: "about", label: "About" },
 ] as const;
 
 export type NavId = (typeof navLinks)[number]["id"];
 
 /** Every homepage chapter the navbar can name in its "you are here" readout, in page order. */
 export const chapters = [
-  { id: "work", label: "01 · Selected work" },
-  { id: "services", label: "02 · Services" },
-  { id: "archive", label: "03 · Archive" },
-  { id: "process", label: "04 · Process" },
-  { id: "about", label: "05 · About" },
-  { id: "faq", label: "07 · Questions" },
-  { id: "contact", label: "08 · Contact" },
+  { id: "work", label: "Selected work" },
+  { id: "services", label: "Services" },
+  { id: "archive", label: "Archive" },
+  { id: "process", label: "Process" },
+  { id: "about", label: "About" },
+  { id: "faq", label: "Questions" },
+  { id: "contact", label: "Contact" },
 ] as const;
 
 export type ChapterId = (typeof chapters)[number]["id"];
