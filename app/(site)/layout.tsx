@@ -14,8 +14,10 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <style>{`[data-drawer-body]{height:auto!important;opacity:1!important}`}</style>
       </noscript>
       {/* The route streams in for pages rendered on demand; the fallback is the same bar for inner pages. */}
-      <Suspense fallback={<Navbar availability={settings.availability} onHome={false} />}>
-        <RouteNavbar availability={settings.availability} />
+      <Suspense
+        fallback={<Navbar availability={settings.availability} onHome={false} email={settings.email} linkedin={settings.linkedin} />}
+      >
+        <RouteNavbar availability={settings.availability} email={settings.email} linkedin={settings.linkedin} />
       </Suspense>
       {children}
       <Footer />

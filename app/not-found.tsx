@@ -16,7 +16,7 @@ export default async function NotFound() {
   const settings = await getSiteSettings();
   return (
     <SiteProviders>
-      <Navbar availability={settings.availability} onHome={false} />
+      <Navbar availability={settings.availability} onHome={false} place="Lost signal" email={settings.email} linkedin={settings.linkedin} />
       <main id="main" className="pb-24 pt-[calc(env(safe-area-inset-top)+120px)]">
         <div className="wrap grid grid-cols-1 items-center gap-12 min-[980px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] min-[980px]:gap-16">
           <div>

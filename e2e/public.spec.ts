@@ -23,19 +23,26 @@ test.describe("public site", () => {
     await expect(page.locator(".sr-only", { hasText: "Lost signal at /no-such-page" })).toHaveCount(1);
   });
 
-  test("admin libraries never reach visitors (JS budget)", async ({ page }) => {
+  test("admin libraries never reach visitors, and the JS budget holds", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
-    const kb = await page.evaluate(() =>
-      Math.round(
-        performance
-          .getEntriesByType("resource")
-          .filter((e) => (e as PerformanceResourceTiming).initiatorType === "script")
-          .reduce((a, e) => a + (e as PerformanceResourceTiming).decodedBodySize, 0) / 1024,
-      ),
+    const scripts = await page.evaluate(() =>
+      performance
+        .getEntriesByType("resource")
+        .filter((e) => (e as PerformanceResourceTiming).initiatorType === "script")
+        .map((e) => ({ url: e.name, size: (e as PerformanceResourceTiming).decodedBodySize })),
     );
-    // Baseline before React Hook Form / TanStack Table: 871 KB uncompressed.
-    expect(kb).toBeLessThanOrEqual(890);
+    const kb = Math.round(scripts.reduce((a, s) => a + s.size, 0) / 1024);
+    // 871 KB before the motion upgrade; GSAP Flip, DrawSVG, MorphSVG, ScrambleText,
+    // Observer and CustomEase add about 41 KB. Anything beyond this needs a reason.
+    expect(kb).toBeLessThanOrEqual(930);
+
+    // React Hook Form and TanStack Table are admin-only: none of their code ships here.
+    for (const { url } of scripts) {
+      const body = await (await page.request.get(url)).text();
+      expect(body, url).not.toContain("getPrePaginatedRowModel"); // TanStack Table
+      expect(body, url).not.toContain("shouldUnregister"); // React Hook Form
+    }
   });
 
   test("contact form sends an enquiry", async ({ page }) => {
