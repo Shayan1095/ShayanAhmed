@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/admin/page-header";
+import { projectTabs, SubTabs } from "@/components/admin/sub-tabs";
 import { getProjectById } from "@/lib/admin/data";
 import { requireAdmin } from "@/lib/auth/dal";
 import { canUpload } from "../../content-actions";
@@ -19,6 +20,7 @@ export default async function EditProjectPage({ params }: PageProps<"/admin/proj
   return (
     <>
       <PageHeader title={p.title} description={p.published ? "Live on the site." : "Draft: not on the site yet."} />
+      <SubTabs tabs={projectTabs} active="" />
       <ProjectEditor id={id} initial={{ ...emptyProject, ...rest }} canUpload={await canUpload()} />
     </>
   );

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DbNotice } from "@/components/admin/db-notice";
 import { PageHeader } from "@/components/admin/page-header";
+import { SubTabs, testimonialTabs } from "@/components/admin/sub-tabs";
 import { dbState, listProjects, listTestimonials } from "@/lib/admin/data";
 import { requireAdmin } from "@/lib/auth/dal";
 import { canUpload } from "../content-actions";
@@ -20,10 +21,17 @@ export default async function TestimonialsPage() {
     );
   const [items, projects] = await Promise.all([listTestimonials(), listProjects()]);
   return (
-    <TestimonialsManager
+    <>
+      <PageHeader
+        title="Testimonials"
+        description="Quotes from clients, shown in the Testimonials section and on the linked case study. Each one needs the client's consent before it can go live."
+      />
+      <SubTabs tabs={testimonialTabs} active="/admin/testimonials" />
+      <TestimonialsManager
       initial={items}
       projects={projects.map((p) => ({ slug: p.slug, title: p.title }))}
       canUpload={await canUpload()}
-    />
+      />
+    </>
   );
 }

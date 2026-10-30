@@ -2,30 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { ArrowDown, ArrowUp, Loader2, Pencil, Plus, Quote, ShieldAlert, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { ArrowDown, ArrowUp, Pencil, Quote, ShieldAlert, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmButton } from "@/components/admin/confirm-button";
-import { ImageField, SwitchField, TextAreaField, TextField } from "@/components/admin/fields";
-import { PageHeader } from "@/components/admin/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { ImageRef, Testimonial } from "@/lib/content/types";
-import { deleteTestimonial, reorderTestimonials, saveTestimonial } from "../content-actions";
-
-type Draft = {
-  name: string;
-  role: string;
-  company: string;
-  quote: string;
-  projectSlug?: string;
-  photo?: ImageRef;
-  consent: boolean;
-  published: boolean;
-};
-const empty: Draft = { name: "", role: "", company: "", quote: "", consent: false, published: false };
-const NONE = "__none";
+import type { Testimonial } from "@/lib/content/types";
+import { deleteTestimonial, reorderTestimonials } from "../content-actions";
+import { TestimonialForm, type TestimonialDraft } from "./testimonial-form";
 
 /** Quotes from clients. Consent is required before one can be published. */
 export function TestimonialsManager({
@@ -39,8 +25,8 @@ export function TestimonialsManager({
 }) {
   const router = useRouter();
   const [items, setItems] = useState(initial);
-  const [editing, setEditing] = useState<{ id: string | null; draft: Draft } | null>(null);
-  const [pending, start] = useTransition();
+  const [editing, setEditing] = useState<{ id: string; draft: TestimonialDraft } | null>(null);
+  const [, start] = useTransition();
 
   const move = (i: number, d: -1 | 1) => {
     const next = [...items];
@@ -53,35 +39,16 @@ export function TestimonialsManager({
     });
   };
 
-  const save = () =>
-    editing &&
-    start(async () => {
-      const res = await saveTestimonial(editing.id, editing.draft);
-      if (!res.ok) return void toast.error(res.error);
-      toast.success(editing.draft.published && editing.draft.consent ? "Saved and live" : "Saved");
-      setEditing(null);
-      router.refresh();
-    });
-
-  const d = editing?.draft;
-  const setD = (patch: Partial<Draft>) => editing && setEditing({ ...editing, draft: { ...editing.draft, ...patch } });
-
   return (
     <>
-      <PageHeader
-        title="Testimonials"
-        description="Quotes from clients, shown in the Testimonials section and on the linked case study. Each one needs the client's consent before it can go live."
-        actions={
-          <Button size="lg" onClick={() => setEditing({ id: null, draft: empty })}>
-            <Plus /> New testimonial
-          </Button>
-        }
-      />
       {items.length === 0 ? (
         <div className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-paper-edge bg-paper-hi p-6">
           <Quote className="size-5 text-[#8a521a]" aria-hidden="true" />
           <p className="font-semibold">No testimonials yet</p>
           <p className="text-[14px] text-muted">The section stays hidden on the site until one is published.</p>
+          <Link href="/admin/testimonials/new" className="text-[14px] font-semibold underline underline-offset-4">
+            Add your first testimonial
+          </Link>
         </div>
       ) : (
         <ol className="grid gap-3">
@@ -157,64 +124,22 @@ export function TestimonialsManager({
       <Dialog open={Boolean(editing)} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent className="max-h-[90dvh] overflow-y-auto bg-paper-hi sm:max-w-[620px]">
           <DialogHeader>
-            <DialogTitle>{editing?.id ? "Edit testimonial" : "New testimonial"}</DialogTitle>
+            <DialogTitle>Edit testimonial</DialogTitle>
             <DialogDescription>Use the client&apos;s exact words.</DialogDescription>
           </DialogHeader>
-          {d && (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                save();
+          {editing && (
+            <TestimonialForm
+              key={editing.id}
+              id={editing.id}
+              initial={editing.draft}
+              projects={projects}
+              canUpload={canUpload}
+              onCancel={() => setEditing(null)}
+              onSaved={() => {
+                setEditing(null);
+                router.refresh();
               }}
-              className="flex flex-col gap-4"
-            >
-              <TextAreaField label="Quote" required rows={4} value={d.quote} onChange={(v) => setD({ quote: v })} />
-              <div className="grid gap-4 sm:grid-cols-3">
-                <TextField label="Name" required value={d.name} onChange={(v) => setD({ name: v })} />
-                <TextField label="Role" value={d.role} onChange={(v) => setD({ role: v })} />
-                <TextField label="Company" value={d.company} onChange={(v) => setD({ company: v })} />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <span className="text-[13px] font-semibold">Linked project</span>
-                <Select value={d.projectSlug ?? NONE} onValueChange={(v) => setD({ projectSlug: v === NONE ? undefined : v })}>
-                  <SelectTrigger aria-label="Linked project" className="h-9 w-full bg-paper">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={NONE}>None</SelectItem>
-                    {projects.map((p) => (
-                      <SelectItem key={p.slug} value={p.slug}>
-                        {p.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-[12.5px] text-muted">Also shows on that project&apos;s case study.</p>
-              </div>
-              <ImageField label="Photo (optional)" value={d.photo} onChange={(v) => setD({ photo: v })} canUpload={canUpload} />
-              <SwitchField
-                label="The client agreed to publish this"
-                hint="Required before it can go live."
-                checked={d.consent}
-                onChange={(v) => setD({ consent: v, published: v ? d.published : false })}
-              />
-              <SwitchField
-                label="Published"
-                hint={d.consent ? "Shows on the site." : "Turn on consent first."}
-                checked={d.published}
-                disabled={!d.consent}
-                onChange={(v) => setD({ published: v })}
-              />
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setEditing(null)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={pending}>
-                  {pending && <Loader2 className="animate-spin" />}
-                  Save
-                </Button>
-              </div>
-            </form>
+            />
           )}
         </DialogContent>
       </Dialog>

@@ -20,8 +20,10 @@ Flat UI on the site's tokens (paper, ink, copper), shadcn primitives, keyboard f
 |---|---|---|
 | **Overview** | See new enquiries, tasks due today or overdue, this week's progress, and unpublished drafts | Start each day knowing what needs you |
 | **Inbox** | Read contact form enquiries, mark them read or replied, reply by email, archive | Never lose a lead; know who is waiting on a reply |
-| **Projects** | Add or edit projects; reorder them; switch featured, published and case study on or off | Grow the portfolio over time without code |
-| **Testimonials** | Add quotes and link each one to a project; publish only with consent | Social proof that stays honest (publishing is blocked without consent) |
+| **Projects → All projects** | Reorder; switch featured and published on or off; open any project to edit | Grow the portfolio over time without code |
+| **Projects → Add project** | Every field of a new project, saved as a draft | Add work as soon as it ships |
+| **Projects → Screenshots** | Drop or click to upload, replace or remove each project's customer view, owner view and cover, with alt text | Keep screenshots current without touching code; a replaced upload is deleted |
+| **Testimonials → All / Add** | List, reorder and edit quotes; add one on its own page; publish only with consent | Social proof that stays honest (publishing is blocked without consent) |
 | **FAQ** | Write answers, reorder them, publish | Answer objections before the first call |
 | **Settings** | Availability line, email, LinkedIn, booking link, starting price, budget ranges, project types, spec sheet, portrait | Keep the facts on the site true |
 | **Planner** | Personal to-do and progress tracking (below) | Plan the work and see progress |
@@ -61,7 +63,7 @@ First run: **Overview → Import starter content** copies the current site conte
 | `ADMIN_EMAIL` | The one admin login |
 | `ADMIN_PASSWORD_HASH` | bcrypt hash, base64 encoded. Set it with `npm run admin:password` |
 | `RESEND_API_KEY`, `CONTACT_TO`, `CONTACT_FROM` | Enquiry emails |
-| `CLOUDINARY_URL` | Image uploads from the admin (optional; without it, paste image URLs) |
+| `CLOUDINARY_URL` | Optional. Without it, uploads are stored in MongoDB and served from `/api/media/<id>` |
 
 ## Build order
 

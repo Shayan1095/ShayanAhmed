@@ -1,12 +1,13 @@
 "use server";
 
-import { v2 as cloudinary } from "cloudinary";
+import { z } from "zod";
 import { updateTag } from "next/cache";
 import { adminAction } from "@/lib/admin/action";
 import { defaultPlannerConfig } from "@/lib/admin/planner-defaults";
 import {
   faqSchema,
   idSchema,
+  imageRefSchema,
   orderSchema,
   projectSchema,
   settingsSchema,
@@ -15,6 +16,8 @@ import {
   type SettingsInput,
 } from "@/lib/admin/schemas";
 import { contentTags } from "@/lib/content";
+import { hasDatabase } from "@/lib/db/connect";
+import { deleteStoredImage, storeImage } from "@/lib/media";
 import { projects as starterProjects } from "@/lib/content/data/projects";
 import { faqs as starterFaqs, siteSettings, testimonials as starterTestimonials } from "@/lib/content/data/site";
 import type { ImageRef } from "@/lib/content/types";
@@ -96,7 +99,10 @@ export async function reorderProjects(ids: string[]) {
 
 export async function deleteProject(id: string) {
   return adminAction(async () => {
-    await ProjectModel.deleteOne({ _id: idSchema.parse(id) });
+    const doc = await ProjectModel.findByIdAndDelete(idSchema.parse(id)).lean();
+    for (const img of [doc?.cover, doc?.customerView, doc?.ownerView] as (ImageRef | undefined)[]) {
+      await deleteStoredImage(img?.src);
+    }
     updateTag(contentTags.projects);
   });
 }
@@ -184,24 +190,32 @@ export async function saveSettings(input: SettingsInput) {
 
 /* ---------- Images ---------- */
 
-const MAX_UPLOAD = 8 * 1024 * 1024;
-
-/** Uploads one image to Cloudinary (when CLOUDINARY_URL is set) and returns its ImageRef. */
+/** Uploads one image (Cloudinary if configured, else the database) and returns its ImageRef. */
 export async function uploadImage(formData: FormData) {
   return adminAction(async (): Promise<ImageRef> => {
-    if (!process.env.CLOUDINARY_URL) throw new Error("Uploads need CLOUDINARY_URL. Paste an image URL instead.");
     const file = formData.get("file");
-    if (!(file instanceof File) || !file.type.startsWith("image/")) throw new Error("Choose an image file.");
-    if (file.size > MAX_UPLOAD) throw new Error("Images must be under 8 MB.");
-    const bytes = Buffer.from(await file.arrayBuffer());
-    const res = await cloudinary.uploader.upload(`data:${file.type};base64,${bytes.toString("base64")}`, {
-      folder: "portfolio",
-      resource_type: "image",
-    });
-    return { src: res.secure_url, alt: "", width: res.width, height: res.height };
+    if (!(file instanceof File)) throw new Error("Choose an image file.");
+    return storeImage(file, { width: Number(formData.get("width")), height: Number(formData.get("height")) });
   });
 }
 
 export async function canUpload(): Promise<boolean> {
-  return Boolean(process.env.CLOUDINARY_URL);
+  return hasDatabase() || Boolean(process.env.CLOUDINARY_URL);
+}
+
+const slotSchema = z.enum(["cover", "customerView", "ownerView"]);
+
+/** Sets or clears one project image (Screenshots tab); a replaced upload is deleted. */
+export async function setProjectImage(id: string, slot: z.input<typeof slotSchema>, image: ImageRef | null) {
+  return adminAction(async () => {
+    const key = slotSchema.parse(slot);
+    const _id = idSchema.parse(id);
+    const next = image ? imageRefSchema.parse(image) : null;
+    const current = await ProjectModel.findById(_id).select(key).lean();
+    if (!current) throw new Error("That project no longer exists.");
+    const prev = (current as Record<string, unknown>)[key] as ImageRef | undefined;
+    await ProjectModel.updateOne({ _id }, next ? { $set: { [key]: next } } : { $unset: { [key]: 1 } });
+    if (prev?.src && prev.src !== next?.src) await deleteStoredImage(prev.src);
+    updateTag(contentTags.projects);
+  });
 }

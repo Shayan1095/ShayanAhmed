@@ -1,5 +1,6 @@
 import "server-only";
 import { readFile } from "node:fs/promises";
+import { MEDIA_PREFIX, openStoredImage } from "@/lib/media";
 import { join } from "node:path";
 import { cacheLife } from "next/cache";
 
@@ -31,10 +32,17 @@ export async function ogFonts() {
   ];
 }
 
-/** Reads a /public image as a data URL for embedding (e.g. a project screenshot). */
+/** Reads a /public image or an admin upload as a data URL for embedding (e.g. a project screenshot). */
 export async function publicImageDataUrl(src: string) {
   "use cache";
   cacheLife("max");
+  if (src.startsWith(MEDIA_PREFIX)) {
+    const file = await openStoredImage(src.slice(MEDIA_PREFIX.length));
+    if (!file) return undefined;
+    const chunks: Buffer[] = [];
+    for await (const chunk of file.stream) chunks.push(chunk as Buffer);
+    return `data:${file.contentType};base64,${Buffer.concat(chunks).toString("base64")}`;
+  }
   if (!src.startsWith("/")) return src;
   const buf = await readFile(join(process.cwd(), "public", src));
   const ext = src.split(".").pop()?.toLowerCase();

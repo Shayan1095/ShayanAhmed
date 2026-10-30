@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DbNotice } from "@/components/admin/db-notice";
 import { PageHeader } from "@/components/admin/page-header";
+import { projectTabs, SubTabs } from "@/components/admin/sub-tabs";
 import { dbState } from "@/lib/admin/data";
 import { requireAdmin } from "@/lib/auth/dal";
 import { canUpload } from "../../content-actions";
@@ -13,7 +14,8 @@ export default async function NewProjectPage() {
   const state = await dbState();
   return (
     <>
-      <PageHeader title="New project" description="Saved as a draft until you switch on Published." />
+      <PageHeader title="Projects" description="Add a project. It stays a draft until you switch on Published." />
+      <SubTabs tabs={projectTabs} active="/admin/projects/new" />
       {state === "ready" ? <ProjectEditor id={null} initial={emptyProject} canUpload={await canUpload()} /> : <DbNotice state={state} />}
     </>
   );

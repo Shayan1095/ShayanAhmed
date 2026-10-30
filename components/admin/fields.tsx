@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import type { ImageRef } from "@/lib/content/types";
 import { cn } from "@/lib/utils";
-import { uploadImage } from "@/app/admin/(panel)/content-actions";
+import { uploadFile } from "./upload";
 
 /* Small, consistent field set for the admin. Every field has a visible label and optional hint. */
 
@@ -270,7 +270,7 @@ export function RowsField<T extends Record<string, unknown>>({
   );
 }
 
-/** One image: upload to Cloudinary, or paste a URL / public path with its size and alt text. */
+/** One image: upload a file, or paste a URL / public path with its size and alt text. */
 export function ImageField({
   label,
   hint,
@@ -293,12 +293,13 @@ export function ImageField({
 
   const upload = (f: File) =>
     start(async () => {
-      const fd = new FormData();
-      fd.set("file", f);
-      const res = await uploadImage(fd);
-      if (!res.ok) return void toast.error(res.error);
-      onChange({ ...res.data!, alt: v?.alt ?? "" });
-      toast.success("Image uploaded");
+      try {
+        const img = await uploadFile(f);
+        onChange({ ...img, alt: v?.alt ?? "" });
+        toast.success("Image uploaded");
+      } catch (err) {
+        toast.error((err as Error).message);
+      }
     });
 
   return (
