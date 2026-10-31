@@ -1,15 +1,37 @@
 /** Admin-only data shapes shared by server and client components. */
 
+export type Stage = "new" | "contacted" | "proposal" | "won" | "lost";
+
+export type LeadActivity = {
+  id: string;
+  kind: "stage" | "note" | "followup" | "value" | "email" | "created";
+  text: string;
+  at: string;
+};
+
+/** A lead: a contact-form enquiry or one added by hand, tracked through the pipeline. */
 export type Inquiry = {
   id: string;
   name: string;
   email: string;
+  phone: string;
+  company: string;
   projectType: string;
   budget: string;
   message: string;
+  /** Inbox state: unread / read / replied, or archived (hidden from the pipeline). */
   status: "new" | "read" | "replied" | "archived";
   /** False when the notification email failed; the enquiry is still saved. */
   emailed: boolean;
+  source: string;
+  stage: Stage;
+  /** Expected deal value, in the CRM currency. 0 = not estimated yet. */
+  value: number;
+  /** ISO date at UTC midnight of the follow-up day, or null. */
+  followUpAt: string | null;
+  firstReplyAt: string | null;
+  closedAt: string | null;
+  activity: LeadActivity[];
   createdAt: string;
 };
 

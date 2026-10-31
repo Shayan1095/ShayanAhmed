@@ -8,6 +8,6 @@ setup("sign in as admin", async ({ page }) => {
   await page.getByLabel("Email").fill(E2E.email);
   await page.getByLabel("Password").fill(E2E.password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
   await page.context().storageState({ path: "e2e/.auth/admin.json" });
 });

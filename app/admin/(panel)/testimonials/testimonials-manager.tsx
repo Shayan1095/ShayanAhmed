@@ -42,8 +42,8 @@ export function TestimonialsManager({
   return (
     <>
       {items.length === 0 ? (
-        <div className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-paper-edge bg-paper-hi p-6">
-          <Quote className="size-5 text-[#8a521a]" aria-hidden="true" />
+        <div className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-paper-edge bg-paper-hi/60 p-6">
+          <Quote className="size-5 text-copper-ink" aria-hidden="true" />
           <p className="font-semibold">No testimonials yet</p>
           <p className="text-[14px] text-muted">The section stays hidden on the site until one is published.</p>
           <Link href="/admin/testimonials/new" className="text-[14px] font-semibold underline underline-offset-4">
@@ -53,7 +53,7 @@ export function TestimonialsManager({
       ) : (
         <ol className="grid gap-3">
           {items.map((t, i) => (
-            <li key={t.id} className="flex gap-4 rounded-xl border border-paper-edge/70 bg-paper-hi p-4">
+            <li key={t.id} className="flex gap-4 surface rounded-2xl p-4">
               <div className="min-w-0 flex-1">
                 <p className="line-clamp-2 text-[15px]">&ldquo;{t.quote}&rdquo;</p>
                 <p className="mt-1.5 text-[13px] text-muted">

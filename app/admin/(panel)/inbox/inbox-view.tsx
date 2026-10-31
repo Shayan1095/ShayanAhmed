@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore, useTransition } from "react";
 import {
   columnFilteringFeature,
   createColumnHelper,
@@ -19,36 +19,37 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import {
-  Archive,
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
+  BellRing,
   ChevronLeft,
   ChevronRight,
-  Copy,
   Inbox,
-  Mail,
-  MailCheck,
+  Kanban,
+  Rows3,
   Search,
-  Trash2,
-  TriangleAlert,
-  Undo2,
+  UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
-import { ConfirmButton } from "@/components/admin/confirm-button";
+import { notifyShell } from "@/components/admin/shell";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import type { Inquiry } from "@/lib/admin/types";
+import { inPipeline, money, openStages, stageLabel } from "@/lib/admin/crm";
+import { dayKey, dueKey } from "@/lib/admin/dates";
+import type { Inquiry, Stage } from "@/lib/admin/types";
 import { cn } from "@/lib/utils";
-import { deleteInquiry, setInquiryStatus } from "./actions";
+import { setInquiryStatus, updateLead } from "./actions";
+import { AddLeadDialog } from "./add-lead";
+import { LeadBoard, StageDot } from "./board";
+import { LeadPanel } from "./lead-panel";
 
 type Filter = "open" | "replied" | "archived";
 const filterLabels: Record<Filter, string> = { open: "Waiting", replied: "Replied", archived: "Archived" };
 const matches = (i: Inquiry, f: Filter) => (f === "open" ? i.status === "new" || i.status === "read" : i.status === f);
-const statusLabel: Record<Inquiry["status"], string> = { new: "New", read: "Read", replied: "Replied", archived: "Archived" };
 
 const when = (iso: string) => {
   const d = new Date(iso);
@@ -77,25 +78,65 @@ const columns = col.columns([
   col.accessor("budget", { header: "Budget", sortFn: "alphanumeric" }),
   col.accessor("message", { header: "Message", enableSorting: false }),
   col.accessor((i) => new Date(i.createdAt), { id: "received", header: "Received", sortFn: "datetime", sortDescFirst: true, enableGlobalFilter: false }),
-  col.accessor("status", { header: "Status", sortFn: "alphanumeric" }),
+  col.accessor((i) => stageLabel[i.stage], { id: "status", header: "Stage", sortFn: "alphanumeric" }),
+  col.accessor("value", { header: "Value", sortFn: "alphanumeric", enableGlobalFilter: false }),
   // Hidden from display, still searchable.
   col.accessor("email", { header: "Email" }),
 ]);
-const visible = ["name", "projectType", "budget", "message", "received", "status"];
+const visible = ["name", "projectType", "value", "message", "received", "status"];
+
+type View = "board" | "table";
+const VIEW_KEY = "sa-leads-view";
 
 /**
- * Enquiries as a sortable, searchable table (TanStack Table). The tabs split
- * waiting / replied / archived; opening one shows it in a side panel and
- * marks it read.
+ * Leads: the pipeline as a board (drag between stages) or as a sortable,
+ * searchable table (TanStack Table). Opening a lead shows it in a side panel
+ * and marks it read. ?lead=<id> opens one, ?new=1 opens "Add lead".
  */
-export function InboxView({ initial }: { initial: Inquiry[] }) {
+export function InboxView({
+  initial,
+  initialLead,
+  initialNew = false,
+  initialStage,
+}: {
+  initial: Inquiry[];
+  initialLead?: string;
+  initialNew?: boolean;
+  initialStage?: Stage;
+}) {
   const [items, setItems] = useState(initial);
+  const [view, setView] = useState<View>("board");
   const [filter, setFilter] = useState<Filter>("open");
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(initialLead && initial.some((i) => i.id === initialLead) ? initialLead : null);
+  const [adding, setAdding] = useState(initialNew);
   const [sorting, setSorting] = useState<SortingState>([{ id: "received", desc: true }]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 20 });
   const [, start] = useTransition();
+
+  // Remembered view (per browser). Read after mount so the server render matches.
+  useEffect(() => {
+    try {
+      const v = localStorage.getItem(VIEW_KEY);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync from browser storage
+      if (v === "board" || v === "table") setView(v);
+    } catch {
+      /* storage blocked */
+    }
+  }, []);
+  const pickView = (v: View) => {
+    setView(v);
+    try {
+      localStorage.setItem(VIEW_KEY, v);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  // Opened from a link (?lead=… or ?new=1): drop the query once handled so a refresh doesn't reopen it.
+  useEffect(() => {
+    if (initialLead || initialNew) window.history.replaceState(null, "", "/admin/inbox");
+  }, [initialLead, initialNew]);
 
   const data = useMemo(() => items.filter((i) => matches(i, filter)), [items, filter]);
   const table = useTable({
@@ -117,12 +158,32 @@ export function InboxView({ initial }: { initial: Inquiry[] }) {
   const open = items.find((i) => i.id === openId) ?? null;
   const shown = table.getFilteredRowModel().rows.length;
 
+  const replace = (l: Inquiry) => setItems((xs) => xs.map((x) => (x.id === l.id ? l : x)));
+
   const setStatus = (id: string, status: Inquiry["status"], note?: string) => {
     setItems((xs) => xs.map((x) => (x.id === id ? { ...x, status } : x)));
     start(async () => {
       const res = await setInquiryStatus(id, status);
-      if (!res.ok) toast.error(res.error);
-      else if (note) toast.success(note);
+      if (!res.ok) return void toast.error(res.error);
+      if (res.data) replace(res.data);
+      notifyShell();
+      if (note) toast.success(note);
+    });
+  };
+
+  const move = (id: string, stage: Stage) => {
+    const cur = items.find((x) => x.id === id);
+    if (!cur || cur.stage === stage) return;
+    setItems((xs) => xs.map((x) => (x.id === id ? { ...x, stage } : x)));
+    start(async () => {
+      const res = await updateLead(id, { stage });
+      if (!res.ok || !res.data) {
+        setItems((xs) => xs.map((x) => (x.id === id ? cur : x)));
+        return void toast.error(res.ok ? "Couldn't move it" : res.error);
+      }
+      replace(res.data);
+      notifyShell();
+      toast.success(`${cur.name} → ${stageLabel[stage]}`);
     });
   };
 
@@ -131,48 +192,107 @@ export function InboxView({ initial }: { initial: Inquiry[] }) {
     if (i.status === "new") setStatus(i.id, "read");
   };
 
+  // Board shows the live pipeline (archived leads stay in the table's Archived tab).
+  const q = globalFilter.trim().toLowerCase();
+  const boardItems = items.filter(
+    (i) => inPipeline(i) && (!q || [i.name, i.email, i.company, i.projectType, i.message].some((v) => v.toLowerCase().includes(q))),
+  );
+  const pipeline = items.filter((i) => inPipeline(i) && openStages.includes(i.stage));
+  const client = useSyncExternalStore(noop, () => true, () => false);
+  const today = client ? dayKey() : "";
+  const due = client ? pipeline.filter((i) => i.followUpAt && (dueKey(i.followUpAt) ?? "9999") <= today).length : 0;
+
   return (
     <div className="flex flex-col gap-4">
+      {/* Summary */}
+      <dl className="grid grid-cols-3 gap-3">
+        {[
+          { k: "Open deals", v: String(pipeline.length) },
+          { k: "Pipeline value", v: money(pipeline.reduce((s, i) => s + i.value, 0), true) },
+          { k: "Follow-ups due", v: String(due), alert: due > 0 },
+        ].map((x) => (
+          <div key={x.k} className="glass rounded-2xl px-4 py-3">
+            <dt className="text-[12px] text-muted">{x.k}</dt>
+            <dd className={cn("font-display text-[22px] font-extrabold leading-tight", x.alert && "text-alert")}>
+              {x.alert && <BellRing className="mr-1.5 inline size-4 -translate-y-0.5" aria-hidden="true" />}
+              {x.v}
+            </dd>
+          </div>
+        ))}
+      </dl>
+
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div role="tablist" aria-label="Filter" className="inline-flex rounded-lg border border-paper-edge/70 bg-paper-hi p-0.5">
-          {(Object.keys(filterLabels) as Filter[]).map((f) => (
-            <button
-              key={f}
-              role="tab"
-              aria-selected={filter === f}
-              onClick={() => {
-                setFilter(f);
-                setPagination((p) => ({ ...p, pageIndex: 0 }));
-              }}
-              className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-md px-3 text-[13px] font-medium text-muted hover:text-ink aria-selected:bg-ink aria-selected:text-paper"
-            >
-              {filterLabels[f]}
-              <span className="font-mono text-[11px] opacity-70">{items.filter((i) => matches(i, f)).length}</span>
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-2">
+          <div role="group" aria-label="View" className="inline-flex rounded-xl border border-paper-edge/60 bg-paper-hi/60 p-0.5">
+            {(
+              [
+                { id: "board", label: "Board", icon: Kanban },
+                { id: "table", label: "Table", icon: Rows3 },
+              ] as const
+            ).map((v) => (
+              <button
+                key={v.id}
+                type="button"
+                aria-pressed={view === v.id}
+                onClick={() => pickView(v.id)}
+                className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium text-muted hover:text-ink aria-pressed:bg-ink aria-pressed:text-paper"
+              >
+                <v.icon className="size-3.5" aria-hidden="true" />
+                {v.label}
+              </button>
+            ))}
+          </div>
+          {view === "table" && (
+            <div role="tablist" aria-label="Filter" className="inline-flex rounded-xl border border-paper-edge/60 bg-paper-hi/60 p-0.5">
+              {(Object.keys(filterLabels) as Filter[]).map((f) => (
+                <button
+                  key={f}
+                  role="tab"
+                  aria-selected={filter === f}
+                  onClick={() => {
+                    setFilter(f);
+                    setPagination((p) => ({ ...p, pageIndex: 0 }));
+                  }}
+                  className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium text-muted hover:text-ink aria-selected:bg-ink aria-selected:text-paper"
+                >
+                  {filterLabels[f]}
+                  <span className="font-mono text-[11px] opacity-70">{items.filter((i) => matches(i, f)).length}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-        <div className="relative w-full sm:w-72">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted" aria-hidden="true" />
-          <Input
-            type="search"
-            aria-label="Search enquiries"
-            placeholder="Search name, email, message…"
-            value={globalFilter}
-            onChange={(e) => table.setGlobalFilter(e.target.value)}
-            className="h-9 bg-paper-hi pl-8"
-          />
+        <div className="flex w-full items-center gap-2 sm:w-auto">
+          <div className="relative flex-1 sm:w-72">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted" aria-hidden="true" />
+            <Input
+              type="search"
+              aria-label="Search enquiries"
+              placeholder="Search name, company, message…"
+              value={globalFilter}
+              onChange={(e) => table.setGlobalFilter(e.target.value)}
+              className="h-9 bg-paper-hi/70 pl-8"
+            />
+          </div>
+          <Button size="lg" onClick={() => setAdding(true)}>
+            <UserPlus /> Add lead
+          </Button>
         </div>
       </div>
 
+      {view === "board" ? (
+        <LeadBoard items={boardItems} focusStage={initialStage} onOpen={select} onMove={move} />
+      ) : (
+        <>
       {data.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-paper-edge bg-paper-hi px-4 py-10 text-center">
+        <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-paper-edge bg-paper-hi/60 px-4 py-10 text-center">
           <Inbox className="size-5 text-muted" aria-hidden="true" />
           <p className="text-[14px] text-muted">
             {filter === "open" ? "No one is waiting on a reply." : `Nothing ${filterLabels[filter].toLowerCase()}.`}
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-paper-edge/70 bg-paper-hi">
+        <div className="overflow-hidden surface rounded-2xl">
           <Table className="table-fixed">
             <TableHeader>
               {table.getHeaderGroups().map((group) => (
@@ -189,10 +309,10 @@ export function InboxView({ initial }: { initial: Inquiry[] }) {
                             "h-10 px-3 font-mono text-[11px] uppercase tracking-[0.08em] text-muted",
                             header.column.id === "name" && "w-[34%] md:w-[22%]",
                             header.column.id === "projectType" && "hidden w-[18%] md:table-cell",
-                            header.column.id === "budget" && "hidden w-[12%] lg:table-cell",
+                            header.column.id === "value" && "hidden w-[10%] lg:table-cell",
                             header.column.id === "message" && "hidden lg:table-cell",
                             header.column.id === "received" && "w-[90px]",
-                            header.column.id === "status" && "w-[96px]",
+                            header.column.id === "status" && "w-[118px]",
                           )}
                         >
                           {header.column.getCanSort() ? (
@@ -247,11 +367,14 @@ export function InboxView({ initial }: { initial: Inquiry[] }) {
                       </button>
                     </TableCell>
                     <TableCell className="hidden truncate px-3 text-[13px] md:table-cell">{i.projectType || "—"}</TableCell>
-                    <TableCell className="hidden truncate px-3 text-[13px] lg:table-cell">{i.budget || "—"}</TableCell>
+                    <TableCell className="hidden truncate px-3 font-mono text-[12.5px] lg:table-cell">{i.value ? money(i.value, true) : "—"}</TableCell>
                     <TableCell className="hidden truncate px-3 text-[13px] text-ink/70 lg:table-cell">{i.message}</TableCell>
                     <TableCell className="px-3 font-mono text-[12px] text-muted">{when(i.createdAt)}</TableCell>
                     <TableCell className="px-3">
-                      <Badge variant={i.status === "new" ? "default" : "outline"}>{statusLabel[i.status]}</Badge>
+                      <Badge variant={i.stage === "new" ? "default" : "outline"} className="gap-1.5">
+                        <StageDot stage={i.stage} />
+                        {stageLabel[i.stage]}
+                      </Badge>
                     </TableCell>
                   </TableRow>
                 );
@@ -286,12 +409,16 @@ export function InboxView({ initial }: { initial: Inquiry[] }) {
           </div>
         </div>
       )}
+        </>
+      )}
 
       <Sheet open={Boolean(open)} onOpenChange={(o) => !o && setOpenId(null)}>
-        <SheetContent side="right" className="flex w-full flex-col gap-0 overflow-y-auto bg-paper-hi p-0 sm:max-w-[560px]">
+        <SheetContent side="right" className="flex w-full flex-col gap-0 overflow-y-auto p-0 sm:max-w-[580px]">
           {open && (
-            <Detail
-              inquiry={open}
+            <LeadPanel
+              key={open.id}
+              lead={open}
+              onChange={replace}
               onStatus={setStatus}
               onDeleted={() => {
                 setItems((xs) => xs.filter((x) => x.id !== open.id));
@@ -301,90 +428,17 @@ export function InboxView({ initial }: { initial: Inquiry[] }) {
           )}
         </SheetContent>
       </Sheet>
+
+      <AddLeadDialog
+        open={adding}
+        onOpenChange={setAdding}
+        onCreated={(l) => {
+          setItems((xs) => [l, ...xs]);
+          notifyShell();
+        }}
+      />
     </div>
   );
 }
 
-function Detail({
-  inquiry: i,
-  onStatus,
-  onDeleted,
-}: {
-  inquiry: Inquiry;
-  onStatus: (id: string, s: Inquiry["status"], note?: string) => void;
-  onDeleted: () => void;
-}) {
-  return (
-    <article className="flex min-h-full flex-col">
-      <header className="flex flex-col gap-2 border-b border-paper-edge/60 p-5 pr-12">
-        <SheetTitle className="font-display text-[20px] font-extrabold">{i.name}</SheetTitle>
-        <SheetDescription asChild>
-          <div className="flex flex-col gap-1 text-[13.5px] text-muted">
-            <span className="flex items-center gap-2">
-              {i.email}
-              <button
-                type="button"
-                aria-label="Copy email"
-                className="cursor-pointer rounded p-1 hover:bg-paper-edge/35"
-                onClick={() => navigator.clipboard.writeText(i.email).then(() => toast.success("Email copied"))}
-              >
-                <Copy className="size-3.5" />
-              </button>
-            </span>
-            <span className="text-[12.5px]">{new Date(i.createdAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}</span>
-          </div>
-        </SheetDescription>
-        <div className="flex flex-wrap gap-1.5">
-          {i.projectType && <Badge variant="secondary">{i.projectType}</Badge>}
-          {i.budget && <Badge variant="secondary">{i.budget}</Badge>}
-          <Badge variant="outline">{statusLabel[i.status]}</Badge>
-        </div>
-      </header>
-      {!i.emailed && (
-        <p className="mx-5 mt-4 flex items-start gap-2 rounded-lg bg-[#b8901c]/12 px-3 py-2 text-[12.5px] text-[#6d5410]">
-          <TriangleAlert className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
-          The email notification for this one wasn&apos;t sent (check the Resend settings). It&apos;s saved here.
-        </p>
-      )}
-      <p className="flex-1 whitespace-pre-wrap p-5 text-[15px] leading-relaxed">{i.message}</p>
-      <footer className="flex flex-wrap items-center gap-2 border-t border-paper-edge/60 p-4">
-        <a
-          href={`mailto:${i.email}?subject=${encodeURIComponent("Re: your project enquiry")}`}
-          className={buttonVariants({ size: "lg" })}
-          onClick={() => i.status !== "replied" && onStatus(i.id, "replied")}
-        >
-          <Mail /> Reply by email
-        </a>
-        {i.status !== "replied" && (
-          <Button variant="outline" size="lg" onClick={() => onStatus(i.id, "replied", "Marked as replied")}>
-            <MailCheck /> Mark replied
-          </Button>
-        )}
-        {i.status === "archived" ? (
-          <Button variant="outline" size="lg" onClick={() => onStatus(i.id, "read", "Moved back to waiting")}>
-            <Undo2 /> Unarchive
-          </Button>
-        ) : (
-          <Button variant="outline" size="lg" onClick={() => onStatus(i.id, "archived", "Archived")}>
-            <Archive /> Archive
-          </Button>
-        )}
-        <div className="ml-auto">
-          <ConfirmButton
-            title="Delete this enquiry?"
-            description={`The message from ${i.name} is removed permanently. Archive it instead to keep a record.`}
-            confirmLabel="Delete"
-            onConfirm={async () => {
-              const res = await deleteInquiry(i.id);
-              if (!res.ok) return void toast.error(res.error);
-              toast.success("Deleted");
-              onDeleted();
-            }}
-          >
-            <Trash2 /> Delete
-          </ConfirmButton>
-        </div>
-      </footer>
-    </article>
-  );
-}
+const noop = () => () => {};

@@ -54,8 +54,9 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // suppressHydrationWarning: the admin sets data-admin-theme on <html> before React loads (no theme flash).
   return (
-    <html lang="en" className={fontVariables}>
+    <html lang="en" className={fontVariables} suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );

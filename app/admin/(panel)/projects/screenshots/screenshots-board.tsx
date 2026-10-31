@@ -38,7 +38,7 @@ export function ScreenshotsBoard({ projects }: { projects: Row[] }) {
       {rows.map((p) => {
         const filled = slots.filter((s) => p[s.key]).length;
         return (
-          <section key={p.id} aria-labelledby={`shots-${p.id}`} className="rounded-xl border border-paper-edge/70 bg-paper-hi p-4 sm:p-5">
+          <section key={p.id} aria-labelledby={`shots-${p.id}`} className="surface rounded-2xl p-4 sm:p-5">
             <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 id={`shots-${p.id}`} className="font-display text-[17px] font-extrabold">
@@ -131,7 +131,7 @@ function SlotTile({
         className={cn(
           "group relative grid aspect-[16/10] w-full cursor-pointer place-items-center overflow-hidden rounded-lg border border-dashed border-paper-edge bg-paper transition-colors",
           "hover:border-ink/40 focus-visible:outline-2 focus-visible:outline-copper",
-          over && "border-copper bg-[#f6ead7]",
+          over && "border-copper bg-copper/12",
           image && "border-solid",
         )}
       >

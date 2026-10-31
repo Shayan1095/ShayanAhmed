@@ -56,17 +56,30 @@ export async function getSettings(): Promise<SiteSettings> {
   return { ...siteSettings, ...((d?.data as Partial<SiteSettings>) ?? {}) };
 }
 
-function toInquiry(d: unknown): Inquiry {
-  const raw = JSON.parse(JSON.stringify(d)) as Record<string, unknown>;
+export function toInquiry(d: unknown): Inquiry {
+  const raw = JSON.parse(JSON.stringify(d)) as Record<string, unknown> & {
+    activity?: { _id: string; kind: Inquiry["activity"][number]["kind"]; text: string; at: string }[];
+  };
+  const status = raw.status as Inquiry["status"];
   return {
     id: String(raw._id),
     name: String(raw.name),
-    email: String(raw.email),
+    email: String(raw.email ?? ""),
+    phone: String(raw.phone ?? ""),
+    company: String(raw.company ?? ""),
     projectType: String(raw.projectType ?? ""),
     budget: String(raw.budget ?? ""),
-    message: String(raw.message),
-    status: raw.status as Inquiry["status"],
+    message: String(raw.message ?? ""),
+    status,
     emailed: Boolean(raw.emailed),
+    source: String(raw.source ?? "website"),
+    // Enquiries saved before the pipeline existed: replied ones count as contacted.
+    stage: (raw.stage as Inquiry["stage"]) ?? (status === "replied" ? "contacted" : "new"),
+    value: Number(raw.value ?? 0),
+    followUpAt: (raw.followUpAt as string | null) ?? null,
+    firstReplyAt: (raw.firstReplyAt as string | null) ?? null,
+    closedAt: (raw.closedAt as string | null) ?? null,
+    activity: (raw.activity ?? []).map((a) => ({ id: String(a._id), kind: a.kind, text: a.text, at: a.at })),
     createdAt: String(raw.createdAt),
   };
 }

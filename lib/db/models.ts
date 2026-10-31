@@ -98,12 +98,36 @@ const settingsSchema = new Schema(
 const inquirySchema = new Schema(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true },
+    // Contact-form leads always have one; manual leads may have a phone instead.
+    email: { type: String, default: "" },
+    phone: { type: String, default: "" },
+    company: { type: String, default: "" },
     projectType: { type: String, default: "" },
     budget: { type: String, default: "" },
-    message: { type: String, required: true },
+    message: { type: String, default: "" },
     status: { type: String, enum: ["new", "read", "replied", "archived"], default: "new", index: true },
     emailed: { type: Boolean, default: false },
+    /* CRM: where the lead is in the sales pipeline, and what it's worth. */
+    source: { type: String, default: "website" },
+    stage: { type: String, enum: ["new", "contacted", "proposal", "won", "lost"], default: "new", index: true },
+    value: { type: Number, default: 0, min: 0 },
+    /** YYYY-MM-DD at UTC midnight, like planner due dates. */
+    followUpAt: { type: Date, default: null },
+    firstReplyAt: { type: Date, default: null },
+    closedAt: { type: Date, default: null },
+    activity: {
+      type: [
+        new Schema(
+          {
+            kind: { type: String, enum: ["stage", "note", "followup", "value", "email", "created"], required: true },
+            text: { type: String, required: true, maxlength: 4000 },
+            at: { type: Date, default: Date.now },
+          },
+          { _id: true },
+        ),
+      ],
+      default: [],
+    },
   },
   opts,
 );

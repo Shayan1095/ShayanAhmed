@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { leadSources } from "./crm";
 
 /** zod shapes for admin input. They mirror lib/content/types.ts. */
 
@@ -107,3 +108,20 @@ export type SettingsInput = z.input<typeof settingsSchema>;
 
 export const idSchema = z.string().regex(/^[a-f0-9]{24}$/, "invalid id");
 export const orderSchema = z.array(idSchema).max(500);
+
+/** Admin: a lead added by hand (Leads → Add lead). */
+export const newLeadSchema = z
+  .object({
+    name: z.string().trim().min(2, "Add their name").max(120),
+    email: z.union([z.literal(""), z.email("Enter a valid email")]),
+    phone: z.string().trim().max(40),
+    company: z.string().trim().max(120),
+    projectType: z.string().trim().max(120),
+    source: z.enum(leadSources),
+    value: z.coerce.number().min(0, "Value can't be negative").max(100_000_000),
+    stage: z.enum(["new", "contacted", "proposal", "won", "lost"]),
+    message: z.string().trim().max(5000),
+  })
+  .refine((d) => d.email || d.phone, { message: "Add an email or a phone number", path: ["email"] });
+
+export type NewLeadInput = z.input<typeof newLeadSchema>;

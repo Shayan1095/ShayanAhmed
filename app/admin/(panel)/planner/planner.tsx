@@ -24,7 +24,18 @@ const priorityRank: Record<Priority, number> = { urgent: 0, high: 1, medium: 2, 
 export type PlannerView = "board" | "list" | "today";
 
 /** Personal task planner: board, list and today views over the same tasks. */
-export function Planner({ config, initial, initialView }: { config: PlannerConfig; initial: Task[]; initialView: View }) {
+export function Planner({
+  config,
+  initial,
+  initialView,
+  focusAdd = false,
+}: {
+  config: PlannerConfig;
+  initial: Task[];
+  initialView: View;
+  /** Opened from "New → Task": put the cursor in the add box. */
+  focusAdd?: boolean;
+}) {
   const [tasks, setTasks] = useState(initial);
   const [view, setViewState] = useState<View>(initialView);
   const [filters, setFilters] = useState<Filters>({ q: "", list: ALL, tag: ALL, priority: ALL });
@@ -40,6 +51,14 @@ export function Planner({ config, initial, initialView }: { config: PlannerConfi
     else url.searchParams.set("view", v);
     window.history.replaceState(null, "", url);
   };
+
+  useEffect(() => {
+    if (!focusAdd) return;
+    quickAdd.current?.focus();
+    const url = new URL(window.location.href);
+    url.searchParams.delete("new");
+    window.history.replaceState(null, "", url);
+  }, [focusAdd]);
 
   // "N" adds a task from anywhere on the page.
   useEffect(() => {
@@ -172,7 +191,7 @@ export function Planner({ config, initial, initialView }: { config: PlannerConfi
       {/* Toolbar */}
       <div className="mb-5 flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div role="tablist" aria-label="View" className="inline-flex rounded-lg border border-paper-edge/70 bg-paper-hi p-0.5">
+          <div role="tablist" aria-label="View" className="inline-flex rounded-lg border border-paper-edge/60 bg-paper-hi/70 p-0.5">
             {(
               [
                 ["board", "Board", Columns3],
@@ -351,8 +370,8 @@ function Board({
                 setDragId(null);
               }}
               className={cn(
-                "flex w-[272px] flex-col rounded-xl border border-paper-edge/60 bg-[#efe5d4] p-2 transition-colors lg:w-auto",
-                isHover && "border-copper/60 bg-[#f1e4cd]",
+                "flex w-[272px] flex-col rounded-xl border border-paper-edge/60 bg-paper-lo/55 p-2 transition-colors lg:w-auto",
+                isHover && "border-copper/60 bg-copper/10",
               )}
             >
               <header className="flex items-center justify-between px-1.5 pb-2 pt-1">
@@ -511,7 +530,7 @@ function ListView({
       {rows.length === 0 ? (
         <Empty text="Nothing here. Add a task above or clear the filters." />
       ) : (
-        <ul className="overflow-hidden rounded-xl border border-paper-edge/70 bg-paper-hi">
+        <ul className="overflow-hidden surface rounded-2xl">
           {rows.map((t) => {
             const done = doneCols.has(t.columnId);
             const col = config.columns.find((c) => c.id === t.columnId);
@@ -522,7 +541,7 @@ function ListView({
                   checked={done}
                   aria-label={done ? `Reopen ${t.title}` : `Mark ${t.title} done`}
                   onChange={() => onMove(t.id, done ? firstOpen : firstDone)}
-                  className="size-4 shrink-0 cursor-pointer accent-[#5d7a4a]"
+                  className="size-4 shrink-0 cursor-pointer accent-good-mark"
                 />
                 <div className="min-w-0 flex-1">
                   <TaskCard task={t} config={config} done={done} onOpen={() => onOpen(t.id)} onMove={(c) => onMove(t.id, c)} />
@@ -586,7 +605,7 @@ function TodayView({
                 checked={doneCols.has(t.columnId)}
                 aria-label={`Mark ${t.title} done`}
                 onChange={() => onMove(t.id, firstDone)}
-                className="mt-3.5 size-4 shrink-0 cursor-pointer accent-[#5d7a4a]"
+                className="mt-3.5 size-4 shrink-0 cursor-pointer accent-good-mark"
               />
               <div className="min-w-0 flex-1">
                 <TaskCard task={t} config={config} done={doneCols.has(t.columnId)} onOpen={() => onOpen(t.id)} onMove={(c) => onMove(t.id, c)} />
@@ -600,26 +619,26 @@ function TodayView({
   const nothing = overdue.length + dueToday.length + upcoming.length === 0;
   return (
     <div className="flex flex-col gap-7">
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl border border-paper-edge/70 bg-paper-hi px-4 py-3 text-[13.5px]">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 surface rounded-2xl px-4 py-3 text-[13.5px]">
         <span className="font-semibold">{new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}</span>
         <span className="text-muted">
           <strong className="text-ink">{dueToday.length}</strong> due today
         </span>
         <span className="text-muted">
-          <strong className={overdue.length ? "text-[#a2353f]" : "text-ink"}>{overdue.length}</strong> overdue
+          <strong className={overdue.length ? "text-alert" : "text-ink"}>{overdue.length}</strong> overdue
         </span>
         <span className="text-muted">
-          <strong className="text-[#4b6a3a]">{doneToday.length}</strong> done today
+          <strong className="text-good">{doneToday.length}</strong> done today
         </span>
       </div>
       {nothing && <Empty text="Nothing due this week. Give tasks a due date to plan them here." />}
-      {group("Overdue", overdue, <CalendarClock className="size-4" aria-hidden="true" />, "text-[#a2353f]")}
-      {group("Today", dueToday, <Sun className="size-4 text-[#8a521a]" aria-hidden="true" />)}
+      {group("Overdue", overdue, <CalendarClock className="size-4" aria-hidden="true" />, "text-alert")}
+      {group("Today", dueToday, <Sun className="size-4 text-copper-ink" aria-hidden="true" />)}
       {group("Next 7 days", upcoming, <CalendarClock className="size-4 text-muted" aria-hidden="true" />)}
     </div>
   );
 }
 
 function Empty({ text }: { text: string }) {
-  return <p className="rounded-xl border border-dashed border-paper-edge bg-paper-hi px-4 py-8 text-center text-[14px] text-muted">{text}</p>;
+  return <p className="rounded-xl border border-dashed border-paper-edge bg-paper-hi/60 px-4 py-8 text-center text-[14px] text-muted">{text}</p>;
 }

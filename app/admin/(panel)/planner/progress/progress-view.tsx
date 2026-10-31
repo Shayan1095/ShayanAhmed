@@ -71,7 +71,7 @@ function Stats({ config, tasks }: { config: PlannerConfig; tasks: Task[] }) {
     <div className="flex flex-col gap-5">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {/* Goal ring: a single headline, so a ring plus the number, not a chart */}
-        <div className="flex items-center gap-4 rounded-xl border border-paper-edge/70 bg-paper-hi p-4 sm:col-span-2 lg:col-span-1">
+        <div className="flex items-center gap-4 surface rounded-2xl p-4 sm:col-span-2 lg:col-span-1">
           <svg viewBox="0 0 64 64" className="size-16 shrink-0 -rotate-90" aria-hidden="true">
             <circle cx="32" cy="32" r="27" fill="none" stroke="var(--color-paper-edge)" strokeOpacity=".5" strokeWidth="7" />
             <circle
@@ -109,7 +109,7 @@ function Stats({ config, tasks }: { config: PlannerConfig; tasks: Task[] }) {
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <WeeksChart weeks={s.weeks} goal={goal} />
-        <section className="rounded-xl border border-paper-edge/70 bg-paper-hi p-5">
+        <section className="surface rounded-2xl p-5">
           <h2 className="text-[14px] font-semibold">Progress by list</h2>
           <p className="mb-4 text-[12.5px] text-muted">Done out of all tasks in each list.</p>
           {s.lists.length === 0 ? (
@@ -144,7 +144,7 @@ function Stats({ config, tasks }: { config: PlannerConfig; tasks: Task[] }) {
         </section>
       </div>
 
-      <section className="rounded-xl border border-paper-edge/70 bg-paper-hi p-5">
+      <section className="surface rounded-2xl p-5">
         <h2 className="mb-3 text-[14px] font-semibold">Recently finished</h2>
         {s.recent.length === 0 ? (
           <p className="text-[13.5px] text-muted">Finished tasks show here. Move a task into a done column to log it.</p>
@@ -155,7 +155,7 @@ function Stats({ config, tasks }: { config: PlannerConfig; tasks: Task[] }) {
               return (
                 <li key={t.id} className="flex items-center justify-between gap-3 py-2 text-[14px]">
                   <span className="flex min-w-0 items-center gap-2">
-                    <CircleCheck className="size-4 shrink-0 text-[#4b6a3a]" aria-hidden="true" />
+                    <CircleCheck className="size-4 shrink-0 text-good" aria-hidden="true" />
                     <span className="truncate">{t.title}</span>
                     {list && <span className="hidden shrink-0 text-[12px] text-muted sm:inline">· {list.name}</span>}
                   </span>
@@ -184,13 +184,13 @@ function Stat({
   warn?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-paper-edge/70 bg-paper-hi p-4">
+    <div className="surface rounded-2xl p-4">
       <p className="flex items-center gap-1.5 text-[12.5px] text-muted">
         {icon}
         {label}
       </p>
       <p className="mt-1 font-display text-[26px] font-extrabold leading-tight">{value}</p>
-      <p className={warn ? "text-[12.5px] font-medium text-[#a2353f]" : "text-[12.5px] text-muted"}>{unit}</p>
+      <p className={warn ? "text-[12.5px] font-medium text-alert" : "text-[12.5px] text-muted"}>{unit}</p>
     </div>
   );
 }
@@ -212,7 +212,7 @@ function WeeksChart({ weeks, goal }: { weeks: { start: string; count: number }[]
   const label = (start: string) => shortDate.format(new Date(`${start}T12:00:00`));
 
   return (
-    <section className="rounded-xl border border-paper-edge/70 bg-paper-hi p-5">
+    <section className="surface rounded-2xl p-5">
       <h2 className="text-[14px] font-semibold">Tasks done per week</h2>
       <p className="mb-3 text-[12.5px] text-muted">Last {weeks.length} weeks. The dashed line is your weekly goal ({goal}).</p>
       <div className="relative">

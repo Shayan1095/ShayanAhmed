@@ -11,14 +11,14 @@ export const metadata: Metadata = { title: "Planner" };
 export default async function PlannerPage({ searchParams }: PageProps<"/admin/planner">) {
   await requireAdmin();
   const state = await dbState();
-  const { view } = await searchParams;
+  const { view, new: isNew } = await searchParams;
   const initialView = view === "list" || view === "today" ? view : "board";
   return (
     <>
       <PageHeader title="Planner" description="Plan your work, keep today in focus, and track what gets done." />
       <PlannerTabs active="tasks" />
       {state === "ready" || state === "empty" ? (
-        <Planner config={await getPlannerConfig()} initial={await listTasks()} initialView={initialView} />
+        <Planner config={await getPlannerConfig()} initial={await listTasks()} initialView={initialView} focusAdd={isNew === "1"} />
       ) : (
         <DbNotice state={state} />
       )}

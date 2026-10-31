@@ -19,8 +19,8 @@ export function DbNotice({ state }: { state: Exclude<DbState, "ready"> }) {
     },
   }[state];
   return (
-    <div className="flex flex-col items-start gap-3 rounded-xl border border-dashed border-paper-edge bg-paper-hi p-6">
-      <Database className="size-5 text-[#8a521a]" aria-hidden="true" />
+    <div className="flex flex-col items-start gap-3 rounded-xl border border-dashed border-paper-edge bg-paper-hi/60 p-6">
+      <Database className="size-5 text-copper-ink" aria-hidden="true" />
       <h2 className="font-display text-lg font-extrabold">{copy.title}</h2>
       <p className="max-w-[60ch] text-[14px] text-muted">{copy.text}</p>
       {state === "empty" && (

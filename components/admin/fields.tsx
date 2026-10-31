@@ -426,7 +426,7 @@ export function FormSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-paper-edge/70 bg-paper-hi p-5 sm:p-6">
+    <section className="surface rounded-2xl p-5 sm:p-6">
       <h2 className="font-display text-[17px] font-extrabold">{title}</h2>
       {description && <p className="mb-4 mt-0.5 text-[13.5px] text-muted">{description}</p>}
       <div className={cn("flex flex-col gap-4", !description && "mt-4")}>{children}</div>

@@ -314,7 +314,7 @@ function SaveBar({
           <span
             aria-hidden="true"
             className={
-              errorCount ? "size-2 rounded-full bg-destructive" : isDirty ? "size-2 rounded-full bg-copper" : "size-2 rounded-full bg-[#5d7a4a]"
+              errorCount ? "size-2 rounded-full bg-destructive" : isDirty ? "size-2 rounded-full bg-copper" : "size-2 rounded-full bg-good-mark"
             }
           />
           <span role="status" className={errorCount ? "font-medium text-destructive" : undefined}>

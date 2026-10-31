@@ -1,22 +1,37 @@
 import { Suspense } from "react";
-import { AdminNav, AdminNavFallback } from "@/components/admin/admin-nav";
 import { PageSkeleton } from "@/components/admin/page-header";
+import { ShellProvider, ShellRefresh, Sidebar, SidebarLive, TopBar, TopBarLive } from "@/components/admin/shell";
 
 /**
- * Admin shell. The navigation is static; each page reads the session and
- * its data behind this Suspense boundary (and checks the session itself).
+ * Admin shell: floating glass sidebar and top bar around a readable work area.
+ * The chrome is static (the URL streams in behind Suspense); each page reads
+ * the session and its data behind its own boundary.
  */
 export default function PanelLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="lg:flex">
-      <Suspense fallback={<AdminNavFallback />}>
-        <AdminNav />
-      </Suspense>
-      <main id="main" className="min-w-0 flex-1 px-4 py-6 sm:px-8 lg:py-9">
-        <div className="mx-auto max-w-[1180px]">
-          <Suspense fallback={<PageSkeleton />}>{children}</Suspense>
+    <ShellProvider>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-ink focus:px-3 focus:py-2 focus:text-paper"
+      >
+        Skip to content
+      </a>
+      <div className="lg:flex lg:gap-5 lg:p-4">
+        <Suspense fallback={<Sidebar pathname="" />}>
+          <SidebarLive />
+        </Suspense>
+        <div className="min-w-0 flex-1">
+          <Suspense fallback={<TopBar pathname="" />}>
+            <TopBarLive />
+            <ShellRefresh />
+          </Suspense>
+          <main id="main" className="px-4 pb-12 sm:px-6 lg:px-2">
+            <div className="mx-auto max-w-[1240px]">
+              <Suspense fallback={<PageSkeleton />}>{children}</Suspense>
+            </div>
+          </main>
         </div>
-      </main>
-    </div>
+      </div>
+    </ShellProvider>
   );
 }

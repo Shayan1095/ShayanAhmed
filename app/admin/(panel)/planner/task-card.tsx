@@ -22,8 +22,8 @@ export const priorityMeta: Record<Priority, { label: string; color: string }> = 
 };
 
 const toneClass = {
-  overdue: "text-[#a2353f] font-semibold",
-  today: "text-[#8a521a] font-semibold",
+  overdue: "text-alert font-semibold",
+  today: "text-copper-ink font-semibold",
   soon: "text-ink/80",
   later: "text-muted",
 };
@@ -56,7 +56,7 @@ export function TaskCard({
     <div
       {...dragProps}
       className={cn(
-        "group/card relative rounded-lg border border-paper-edge/70 bg-paper-hi p-3 transition-shadow hover:border-paper-edge hover:shadow-[0_2px_10px_-4px_rgb(17_17_17/.18)]",
+        "group/card relative rounded-lg border border-paper-edge/60 bg-paper-hi/70 p-3 transition-shadow hover:border-paper-edge hover:shadow-[0_2px_10px_-4px_rgb(17_17_17/.18)]",
         dragProps?.draggable && "cursor-grab active:cursor-grabbing",
         done && "opacity-70",
       )}
@@ -107,7 +107,7 @@ export function TaskCard({
             </span>
           )}
           {checks > 0 && (
-            <span className={cn("inline-flex items-center gap-1 text-muted", checked === checks && "text-[#4b6a3a]")}>
+            <span className={cn("inline-flex items-center gap-1 text-muted", checked === checks && "text-good")}>
               <CheckSquare className="size-3" aria-hidden="true" />
               {checked}/{checks}
             </span>

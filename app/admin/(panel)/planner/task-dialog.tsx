@@ -237,7 +237,7 @@ export function TaskDialog({
           </div>
           {task.checklist.length > 0 && (
             <div aria-hidden="true" className="mb-3 h-1 overflow-hidden rounded-full bg-paper-edge/50">
-              <div className="h-full rounded-full bg-[#5d7a4a] transition-[width]" style={{ width: `${(checked / task.checklist.length) * 100}%` }} />
+              <div className="h-full rounded-full bg-good-mark transition-[width]" style={{ width: `${(checked / task.checklist.length) * 100}%` }} />
             </div>
           )}
           <ul className="flex flex-col gap-1">

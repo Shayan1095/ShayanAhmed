@@ -450,3 +450,134 @@ html[data-power="low"] .ink-screen {
     opacity: 0;
   }
 }
+
+/* =========================================================================
+   Admin: frosted-glass CRM theme (ADMIN.md). Glass only on chrome (sidebar,
+   top bar, palette, dialogs, KPI cards); data sits on near-solid surfaces.
+   Dark mode swaps the palette tokens on <html> while the admin is open, so
+   dialogs and sheets (portalled to <body>) follow too.
+   ========================================================================= */
+@theme {
+  --color-copper-ink: #8a521a;
+  --color-alert: #a2353f;
+  --color-good: #4b6a3a;
+  --color-good-mark: #5d7a4a;
+  --color-warn: #b8901c;
+  --color-warn-ink: #6d5410;
+  --color-on-copper: #111111;
+  --color-chart: #b06f2e;
+}
+
+:root {
+  --glass-bg: rgb(251 246 236 / 0.58);
+  --glass-bg-strong: rgb(251 246 236 / 0.78);
+  --glass-border: rgb(255 255 255 / 0.62);
+  --glass-edge: rgb(17 17 17 / 0.07);
+  --glass-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), 0 1px 2px rgb(17 17 17 / 0.05), 0 18px 40px -24px rgb(60 36 12 / 0.38);
+  --surface-bg: rgb(251 246 236 / 0.9);
+  --surface-border: rgb(205 191 166 / 0.7);
+  --canvas-a: rgb(201 133 63 / 0.26);
+  --canvas-b: rgb(107 74 47 / 0.16);
+  --canvas-c: rgb(255 250 240 / 0.9);
+}
+
+html[data-admin-theme="dark"] {
+  color-scheme: dark;
+  --color-paper: #110f0d;
+  --color-paper-hi: #1b1815;
+  --color-paper-lo: #25211c;
+  --color-paper-edge: #3b342b;
+  --color-ink: #f3eadb;
+  --color-ink-2: #e4d8c3;
+  --color-ink-3: #cdbfa6;
+  --color-muted: #ab9f8c;
+  --color-walnut: #d4a373;
+  --color-copper-ink: #e2a566;
+  --color-alert: #f08f8f;
+  --color-good: #a3c98f;
+  --color-good-mark: #7fa86a;
+  --color-warn-ink: #e8c76a;
+  --color-chart: #c07c38;
+  --color-danger: #f0846a;
+
+  --glass-bg: rgb(32 28 24 / 0.52);
+  --glass-bg-strong: rgb(30 26 22 / 0.8);
+  --glass-border: rgb(255 255 255 / 0.08);
+  --glass-edge: rgb(0 0 0 / 0.4);
+  --glass-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.3), 0 22px 44px -24px rgb(0 0 0 / 0.8);
+  --surface-bg: rgb(27 24 21 / 0.92);
+  --surface-border: rgb(255 255 255 / 0.08);
+  --canvas-a: rgb(201 133 63 / 0.2);
+  --canvas-b: rgb(120 70 30 / 0.22);
+  --canvas-c: rgb(17 15 13 / 0);
+
+  --shadow-raised: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 24px -14px rgb(0 0 0 / 0.7);
+  --shadow-raised-sm: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-inset: inset 0 2px 5px rgb(0 0 0 / 0.5), inset 0 -1px 0 rgb(255 255 255 / 0.04);
+  --grain: none;
+}
+
+/* Frosted glass: blur + saturate behind a translucent fill, a bright top edge. */
+@utility glass {
+  background-color: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+}
+@utility glass-strong {
+  background-color: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+}
+/* Near-solid panel for tables, forms and long text: readable first. */
+@utility surface {
+  background-color: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  box-shadow: 0 1px 2px rgb(17 17 17 / 0.04);
+}
+
+/* The warm light the glass sits on. Static: an animated backdrop would force
+   every blurred panel to repaint each frame. */
+.admin-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 50% at 8% 0%, var(--canvas-a), transparent 70%),
+    radial-gradient(50% 45% at 100% 30%, var(--canvas-b), transparent 70%),
+    radial-gradient(55% 50% at 60% 110%, var(--canvas-a), transparent 70%),
+    radial-gradient(80% 60% at 50% 40%, var(--canvas-c), transparent 80%),
+    var(--color-paper);
+}
+
+/* No blur where it's expensive or unsupported: same look, solid fill. */
+html[data-power="low"] :is(.glass, .glass-strong) {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background-color: var(--surface-bg);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :is(.glass, .glass-strong) {
+    background-color: var(--surface-bg);
+  }
+}
+
+/* Dialogs, sheets and menus in the admin get the glass treatment. */
+html[data-admin-theme] [data-slot="dialog-content"],
+html[data-admin-theme] [data-slot="sheet-content"],
+html[data-admin-theme] [data-slot="dropdown-menu-content"],
+html[data-admin-theme] [data-slot="select-content"] {
+  background-color: var(--glass-bg-strong);
+  border-color: var(--glass-border);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+}
+html[data-admin-theme][data-power="low"] :is([data-slot="dialog-content"], [data-slot="sheet-content"], [data-slot="dropdown-menu-content"], [data-slot="select-content"]) {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background-color: var(--color-paper-hi);
+}

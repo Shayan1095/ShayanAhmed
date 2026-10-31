@@ -12,9 +12,9 @@ export function ImportStarter() {
   const router = useRouter();
   const [pending, start] = useTransition();
   return (
-    <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-copper/50 bg-[#f6ead7] p-5">
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-4 glass rounded-2xl border-copper/50 p-5">
       <div className="flex items-start gap-3">
-        <DatabaseZap className="mt-0.5 size-5 shrink-0 text-[#8a521a]" aria-hidden="true" />
+        <DatabaseZap className="mt-0.5 size-5 shrink-0 text-copper-ink" aria-hidden="true" />
         <div>
           <h2 className="font-semibold">Import the site content to start editing</h2>
           <p className="max-w-[60ch] text-[13.5px] text-muted">

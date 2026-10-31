@@ -96,7 +96,7 @@ export function SettingsForm({ initial, canUpload }: { initial: SettingsInput; c
           />
         </FormSection>
 
-        <div className="sticky bottom-4 flex items-center justify-end gap-3 rounded-xl border border-paper-edge/70 bg-paper-hi/95 p-3 backdrop-blur">
+        <div className="sticky bottom-4 flex items-center justify-end gap-3 surface rounded-2xl/95 p-3 backdrop-blur">
           <span role="status" className="text-[13px] text-muted">
             {isDirty ? "Unsaved changes" : "All changes saved"}
           </span>

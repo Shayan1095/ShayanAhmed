@@ -44,7 +44,7 @@ export function ProjectsTable({ initial }: { initial: ProjectRow[] }) {
   if (rows.length === 0) return <p className="text-muted">No projects yet. Add your first one.</p>;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-paper-edge/70 bg-paper-hi">
+    <div className="overflow-hidden surface rounded-2xl">
       <div className="hidden grid-cols-[28px_minmax(0,1fr)_120px_96px_96px_72px] items-center gap-3 border-b border-paper-edge/70 px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.1em] text-muted md:grid">
         <span />
         <span>Project</span>

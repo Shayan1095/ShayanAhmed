@@ -54,7 +54,7 @@ test.describe("projects", () => {
     await page.getByLabel("Title").fill("Another");
     await page.getByLabel("URL slug").fill("brands-attire");
     await page.getByRole("button", { name: "Create project" }).click();
-    await expect(page.getByText("Another project already uses this slug.")).toBeVisible();
+    await expect(page.getByRole("main").getByText("Another project already uses this slug.")).toBeVisible();
   });
 
   test("Screenshots tab uploads, replaces and removes images", async ({ page, request }) => {

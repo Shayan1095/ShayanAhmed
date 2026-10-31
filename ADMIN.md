@@ -18,8 +18,8 @@ Flat UI on the site's tokens (paper, ink, copper), shadcn primitives, keyboard f
 
 | Screen | What you do there | Why it exists |
 |---|---|---|
-| **Overview** | See new enquiries, tasks due today or overdue, this week's progress, and unpublished drafts | Start each day knowing what needs you |
-| **Inbox** | Read contact form enquiries, mark them read or replied, reply by email, archive | Never lose a lead; know who is waiting on a reply |
+| **Dashboard** | KPIs (new leads vs last month, waiting for reply, average first-reply time, open pipeline value, win rate), leads per week, pipeline by stage, who needs you (unanswered + follow-ups due), today's tasks, site health, recent activity | Know how the business is doing and what needs you, in one screen. Every number comes from your own records |
+| **Leads** (`/admin/inbox`) | Pipeline board (New → Contacted → Proposal → Won / Lost, drag to move) or table; per lead: stage, deal value, follow-up date, notes timeline, reply by email, archive; add leads from WhatsApp, LinkedIn or referrals by hand | Never lose a lead, reply fast, follow up on time, and see what the pipeline is worth |
 | **Projects → All projects** | Reorder; switch featured and published on or off; open any project to edit | Grow the portfolio over time without code |
 | **Projects → Add project** | Every field of a new project, saved as a draft | Add work as soon as it ships |
 | **Projects → Screenshots** | Drop or click to upload, replace or remove each project's customer view, owner view and cover, with alt text | Keep screenshots current without touching code; a replaced upload is deleted |
@@ -43,16 +43,26 @@ Flat UI on the site's tokens (paper, ink, copper), shadcn primitives, keyboard f
 
 Completion is recorded automatically when a task enters a "done" column. It's cleared if the task leaves that column, which keeps the progress numbers honest.
 
+## CRM theme and chrome
+
+- **Frosted glass, used selectively.** Glass (blur + translucent fill) only on the chrome: sidebar, top bar, KPI cards, the command palette, dialogs and side panels. Tables, forms and long text sit on near-solid `surface` panels so they stay readable. Utilities: `glass`, `glass-strong`, `surface` in `app/globals.css`.
+- **Light and dark.** The moon/sun button in the top bar (or Ctrl+K → Dark mode). The choice is saved per browser; the first visit follows the system setting. Dark mode swaps the palette tokens on `<html>` only while the admin is open; the public site is unaffected.
+- **Low-power devices** get the same look without blur (solid fills), like the public site's lite tier.
+- **Ctrl+K** opens search and commands: jump to any page, lead or project; create a lead, task, project or testimonial; switch theme; sign out.
+- **New** (top bar) creates a lead, task, project or testimonial from anywhere.
+- **Sidebar badges**: red = follow-ups due, copper = leads waiting for a first reply.
+- Deal values are in USD (`CRM_CURRENCY` in `lib/admin/crm.ts`).
+
 ## Contact form (public)
 
 - zod validation (shared rules with the client), honeypot, rate limit of 5 per hour per IP (stored in MongoDB with an auto-expiry).
-- Saves an `Inquiry`, then emails Shayan through Resend with reply-to set to the visitor. If the email fails, the enquiry is still saved and shows in the Inbox.
+- Saves an `Inquiry`, then emails Shayan through Resend with reply-to set to the visitor. If the email fails, the enquiry is still saved and shows in Leads.
 
 ## Data (MongoDB)
 
 `Project`, `Testimonial`, `Faq`, `Settings` (single doc), `Inquiry`, `Task`, `PlannerConfig` (single doc: columns, lists, tags, weekly goal), `RateLimit` (expires automatically).
 
-First run: **Overview → Import starter content** copies the current site content into the database. The button only shows while the database is empty.
+First run: **Dashboard → Import content** copies the current site content into the database. The button only shows while the database is empty.
 
 ## Environment variables
 

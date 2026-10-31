@@ -24,9 +24,9 @@ export function TodayCard({ tasks, config }: { tasks: Task[]; config: PlannerCon
   const pct = Math.min(100, (doneWeek / config.weeklyGoal) * 100);
 
   return (
-    <section className="flex flex-col rounded-xl border border-paper-edge/70 bg-paper-hi p-5">
+    <section className="flex flex-col surface rounded-2xl p-5">
       <h2 className="mb-3 flex items-center gap-2 text-[14px] font-semibold">
-        <Sun className="size-4 text-[#8a521a]" aria-hidden="true" /> Today
+        <Sun className="size-4 text-copper-ink" aria-hidden="true" /> Today
       </h2>
       <div className="flex flex-wrap gap-x-6 gap-y-1">
         <p>
@@ -34,7 +34,7 @@ export function TodayCard({ tasks, config }: { tasks: Task[]; config: PlannerCon
           <span className="ml-1.5 text-[13px] text-muted">due today</span>
         </p>
         <p>
-          <span className={overdue.length ? "font-display text-[34px] font-extrabold leading-none text-[#a2353f]" : "font-display text-[34px] font-extrabold leading-none"}>
+          <span className={overdue.length ? "font-display text-[34px] font-extrabold leading-none text-alert" : "font-display text-[34px] font-extrabold leading-none"}>
             {overdue.length}
           </span>
           <span className="ml-1.5 text-[13px] text-muted">overdue</span>
@@ -45,7 +45,7 @@ export function TodayCard({ tasks, config }: { tasks: Task[]; config: PlannerCon
           {focus.map((t) => (
             <li key={t.id} className="flex items-center justify-between gap-3 py-2 text-[13.5px]">
               <span className="truncate">{t.title}</span>
-              <span className={(dueKey(t.due) ?? "") < today ? "shrink-0 text-[12px] font-semibold text-[#a2353f]" : "shrink-0 text-[12px] text-[#8a521a]"}>
+              <span className={(dueKey(t.due) ?? "") < today ? "shrink-0 text-[12px] font-semibold text-alert" : "shrink-0 text-[12px] text-copper-ink"}>
                 {(dueKey(t.due) ?? "") < today ? "Overdue" : "Today"}
               </span>
             </li>

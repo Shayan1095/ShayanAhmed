@@ -53,7 +53,7 @@ export function FaqManager({ initial }: { initial: Faq[] }) {
             e.preventDefault();
             save(r);
           }}
-          className="flex flex-col gap-3 rounded-xl border border-paper-edge/70 bg-paper-hi p-4"
+          className="flex flex-col gap-3 surface rounded-2xl p-4"
         >
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
@@ -65,7 +65,7 @@ export function FaqManager({ initial }: { initial: Faq[] }) {
               ) : (
                 <Badge variant="outline">Hidden</Badge>
               )}
-              {r.dirty && <span className="text-[12px] text-[#8a521a]">Unsaved</span>}
+              {r.dirty && <span className="text-[12px] text-copper-ink">Unsaved</span>}
             </div>
             <div className="flex items-center gap-0.5">
               <Button type="button" variant="ghost" size="icon-sm" aria-label="Move up" disabled={i === 0 || r.isNew} onClick={() => move(i, -1)}>

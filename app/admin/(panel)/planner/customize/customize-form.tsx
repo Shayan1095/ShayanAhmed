@@ -167,7 +167,7 @@ export function CustomizeForm({ initial }: { initial: PlannerConfig }) {
           max={10}
         />
         {removedCols.length > 0 && (
-          <p role="status" className="text-[12.5px] text-[#8a521a]">
+          <p role="status" className="text-[12.5px] text-copper-ink">
             Tasks in {removedCols.map((c) => c.name).join(", ")} will move to the first open column when you save.
           </p>
         )}
@@ -196,7 +196,7 @@ export function CustomizeForm({ initial }: { initial: PlannerConfig }) {
         </div>
       </FormSection>
 
-      <div className="sticky bottom-4 flex items-center justify-end gap-3 rounded-xl border border-paper-edge/70 bg-paper-hi/95 p-3 backdrop-blur">
+      <div className="sticky bottom-4 flex items-center justify-end gap-3 surface rounded-2xl/95 p-3 backdrop-blur">
         <span role="status" className="text-[13px] text-muted">
           {dirty ? "Unsaved changes" : "All changes saved"}
         </span>
