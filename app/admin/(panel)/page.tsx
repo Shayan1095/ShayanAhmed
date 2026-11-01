@@ -23,6 +23,8 @@ import { InstrumentCard, SourceBars, StageFunnel, StepSpark, WeeklyLeadsChart } 
 import { Attention, Feed, Greeting, HealthList } from "./dashboard/widgets";
 import { ImportStarter } from "./import-starter";
 import { TodayCard } from "./today-card";
+import { FunnelChart, MoneyColumns } from "./analytics/instruments";
+import { funnel, salesFacts, wonByMonth } from "@/lib/admin/analytics";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -172,6 +174,18 @@ export default async function DashboardPage() {
           </dl>
         </InstrumentCard>
       </div>
+
+      {/* Conversion + money (deeper views on Analytics) */}
+      {inquiries.length > 0 && (
+        <div className="mb-5 grid gap-5 lg:grid-cols-[1fr_1.3fr]">
+          <InstrumentCard title="Conversion" meta="All time" action={{ href: "/admin/analytics", label: "Analytics" }}>
+            <FunnelChart steps={funnel(inquiries)} />
+          </InstrumentCard>
+          <InstrumentCard title="Revenue won" meta={`Forecast ${money(salesFacts(inquiries).forecast, true)}`}>
+            <MoneyColumns months={wonByMonth(inquiries)} />
+          </InstrumentCard>
+        </div>
+      )}
 
       {/* Today */}
       <div className="mb-5 grid gap-5 lg:grid-cols-3">
