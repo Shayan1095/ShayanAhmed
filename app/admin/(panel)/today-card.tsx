@@ -70,7 +70,7 @@ export function TodayCard({ tasks, config }: { tasks: Task[]; config: PlannerCon
           <div className="h-full rounded-full bg-copper transition-[width]" style={{ width: `${pct}%` }} />
         </div>
       </div>
-      <Link href="/admin/planner?view=today" className="mt-auto inline-flex items-center gap-1 pt-4 text-[13.5px] font-semibold hover:underline">
+      <Link href="/admin/planner/today" className="mt-auto inline-flex items-center gap-1 pt-4 text-[13.5px] font-semibold hover:underline">
         Open planner <ArrowRight className="size-3.5" />
       </Link>
     </section>

@@ -20,6 +20,8 @@ Flat UI on the site's tokens (paper, ink, copper), shadcn primitives, keyboard f
 |---|---|---|
 | **Dashboard** | KPIs (new leads vs last month, waiting for reply, average first-reply time, open pipeline value, win rate), leads per week, pipeline by stage, who needs you (unanswered + follow-ups due), today's tasks, site health, recent activity | Know how the business is doing and what needs you, in one screen. Every number comes from your own records |
 | **Leads** (`/admin/inbox`) | Pipeline board (New → Contacted → Proposal → Won / Lost, drag to move) or table; per lead: stage, deal value, follow-up date, notes timeline, reply by email, archive; add leads from WhatsApp, LinkedIn or referrals by hand | Never lose a lead, reply fast, follow up on time, and see what the pipeline is worth |
+| **Analytics** | Forecast, average deal, sales cycle, lead-to-won rate; conversion funnel with the weakest step named; reply speed; revenue won by month; open deals by age (cold ones in red); when leads arrive (weekday × time of day); what leads ask for; how the forecast is calculated | See how leads turn into money and which step to improve. Each instrument has a one-line takeaway |
+| **Planner → Today** | Morning plan (one intention, top 3), focus timer (Pomodoro, logs minutes), habits with 7-day history and streaks, due-now tasks, daily goal, streak, points and level, 16-week activity map, evening review (win, better tomorrow, energy) | A daily ritual that builds discipline: plan, focus, finish, review |
 | **Projects → All projects** | Reorder; switch featured and published on or off; open any project to edit | Grow the portfolio over time without code |
 | **Projects → Add project** | Every field of a new project, saved as a draft | Add work as soon as it ships |
 | **Projects → Screenshots** | Drop or click to upload, replace or remove each project's customer view, owner view and cover, with alt text | Keep screenshots current without touching code; a replaced upload is deleted |
@@ -42,6 +44,17 @@ Flat UI on the site's tokens (paper, ink, copper), shadcn primitives, keyboard f
 | **Customise**: rename, add, reorder and colour columns; choose which column counts as done; manage lists and tags; set the weekly goal | Make the planner fit how you work |
 
 Completion is recorded automatically when a task enters a "done" column. It's cleared if the task leaves that column, which keeps the progress numbers honest.
+
+## Dashboard instruments
+
+Charts are skeuomorphic instruments built from DESIGN.md's materials: raised cream panels with corner screws and an engraved label, readouts on recessed ink screens (lit copper columns, LED meters, amber digits), slider-track bars with keycap counters. Utilities: `instrument`, `screen`, `groove`, `lit`, `keycap`, `led`, `engraved` in `app/globals.css`.
+
+## Today: points, streak and level
+
+- Points: a finished task 10–25 by priority, a focus session 5, a habit 5, closing the day 10 (`lib/admin/ritual.ts`).
+- Streak: consecutive days with at least the daily goal of tasks finished (set on the Today page). Today counts once the goal is met; until then the streak runs to yesterday.
+- Level: every level needs 100 more points than the last (100, 300, 600, …), with a title per level.
+- Days are stored per local date (`PlannerDay`: intention, top 3, habits, focus minutes, review). The focus timer keeps running across pages in the same browser.
 
 ## CRM theme and chrome
 

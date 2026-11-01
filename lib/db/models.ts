@@ -166,6 +166,31 @@ const plannerConfigSchema = new Schema(
     lists: { type: [{ id: String, name: String, color: String }], default: [] },
     tags: { type: [{ id: String, name: String, color: String }], default: [] },
     weeklyGoal: { type: Number, default: 10 },
+    /** Today page: tasks to finish for a day to count towards the streak. */
+    dailyGoal: { type: Number, default: 3 },
+    /** Today page: daily habits (checked per day on PlannerDay). */
+    habits: { type: [{ id: String, name: String, color: String }], default: undefined },
+    /** Focus timer length in minutes. */
+    focusLength: { type: Number, default: 25 },
+  },
+  opts,
+);
+
+/** One document per local day (YYYY-MM-DD): the morning plan, habits, focus time and the evening review. */
+const plannerDaySchema = new Schema(
+  {
+    date: { type: String, required: true, unique: true },
+    intention: { type: String, default: "" },
+    top3: { type: [String], default: [] },
+    habits: { type: [String], default: [] },
+    focusMinutes: { type: Number, default: 0 },
+    focusSessions: { type: Number, default: 0 },
+    review: {
+      win: { type: String, default: "" },
+      improve: { type: String, default: "" },
+      energy: { type: Number, default: 0 },
+    },
+    reviewedAt: { type: Date, default: null },
   },
   opts,
 );
@@ -178,6 +203,7 @@ export const InquiryModel = model("Inquiry", inquirySchema);
 export const RateLimitModel = model("RateLimit", rateLimitSchema);
 export const TaskModel = model("Task", taskSchema);
 export const PlannerConfigModel = model("PlannerConfig", plannerConfigSchema);
+export const PlannerDayModel = model("PlannerDay", plannerDaySchema);
 
 export type InquiryDoc = InferSchemaType<typeof inquirySchema> & { _id: mongoose.Types.ObjectId };
 export type TaskDoc = InferSchemaType<typeof taskSchema> & { _id: mongoose.Types.ObjectId };

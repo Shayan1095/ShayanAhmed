@@ -2,12 +2,13 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 const tabs = [
+  { href: "/admin/planner/today", label: "Today", key: "today" },
   { href: "/admin/planner", label: "Tasks", key: "tasks" },
   { href: "/admin/planner/progress", label: "Progress", key: "progress" },
   { href: "/admin/planner/customize", label: "Customise", key: "customize" },
 ] as const;
 
-/** Planner sections: the tasks themselves, how it's going, and how it's set up. */
+/** Planner sections: the daily ritual, the tasks themselves, how it's going, and how it's set up. */
 export function PlannerTabs({ active }: { active: (typeof tabs)[number]["key"] }) {
   return (
     <nav aria-label="Planner" className="mb-6 flex gap-1 border-b border-paper-edge/70">

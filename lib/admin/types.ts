@@ -57,9 +57,28 @@ export type PlannerColumn = { id: string; name: string; color: string; done: boo
 export type PlannerList = { id: string; name: string; color: string };
 export type PlannerTag = { id: string; name: string; color: string };
 
+export type PlannerHabit = { id: string; name: string; color: string };
+
 export type PlannerConfig = {
   columns: PlannerColumn[];
   lists: PlannerList[];
   tags: PlannerTag[];
   weeklyGoal: number;
+  /** Tasks to finish for a day to count towards the streak. */
+  dailyGoal: number;
+  habits: PlannerHabit[];
+  /** Focus timer length, minutes. */
+  focusLength: number;
+};
+
+/** One local day on the Today page. */
+export type PlannerDay = {
+  date: string;
+  intention: string;
+  top3: string[];
+  habits: string[];
+  focusMinutes: number;
+  focusSessions: number;
+  review: { win: string; improve: string; energy: number };
+  reviewedAt: string | null;
 };

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, use, useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import {
+  ChartNoAxesCombined,
   ChevronRight,
   ExternalLink,
   FolderKanban,
@@ -73,7 +74,8 @@ const groups: { label: string; items: NavItem[] }[] = [
               ? { n: d.waiting, tone: "copper", label: `${d.waiting} waiting for a reply` }
               : null,
       },
-      { href: "/admin/planner", label: "Planner", icon: ListTodo },
+      { href: "/admin/analytics", label: "Analytics", icon: ChartNoAxesCombined },
+      { href: "/admin/planner/today", label: "Planner", icon: ListTodo },
     ],
   },
   {
@@ -91,7 +93,9 @@ const groups: { label: string; items: NavItem[] }[] = [
 const crumbNames: Record<string, string> = {
   admin: "Dashboard",
   inbox: "Leads",
+  analytics: "Analytics",
   planner: "Planner",
+  today: "Today",
   progress: "Progress",
   customize: "Customise",
   projects: "Projects",
@@ -102,7 +106,8 @@ const crumbNames: Record<string, string> = {
   settings: "Settings",
 };
 
-const isActive = (pathname: string, href: string) => (href === "/admin" ? pathname === href : pathname.startsWith(href));
+const isActive = (pathname: string, href: string) =>
+  href === "/admin" ? pathname === href : href.startsWith("/admin/planner") ? pathname.startsWith("/admin/planner") : pathname.startsWith(href);
 
 /* ------------------------------------------------------------------ */
 /* Shared state: shell data + palette                                  */

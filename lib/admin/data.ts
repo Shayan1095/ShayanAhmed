@@ -7,13 +7,14 @@ import {
   FaqModel,
   InquiryModel,
   PlannerConfigModel,
+  PlannerDayModel,
   ProjectModel,
   SettingsModel,
   TaskModel,
   TestimonialModel,
 } from "@/lib/db/models";
-import { defaultPlannerConfig } from "./planner-defaults";
-import type { Inquiry, PlannerConfig, Task } from "./types";
+import { defaultHabits, defaultPlannerConfig } from "./planner-defaults";
+import type { Inquiry, PlannerConfig, PlannerDay, Task } from "./types";
 
 /**
  * Admin reads. Callers must have run requireAdmin() first. These are not
@@ -101,6 +102,9 @@ export async function getPlannerConfig(): Promise<PlannerConfig> {
     lists: strip(raw.lists),
     tags: strip(raw.tags),
     weeklyGoal: raw.weeklyGoal,
+    dailyGoal: raw.dailyGoal ?? 3,
+    habits: raw.habits ? strip(raw.habits) : defaultHabits,
+    focusLength: raw.focusLength ?? 25,
   };
 }
 
@@ -120,6 +124,25 @@ export function toTask(d: unknown): Task {
     completedAt: (raw.completedAt as string | null) ?? null,
     createdAt: String(raw.createdAt),
   };
+}
+
+export function toDay(d: unknown): PlannerDay {
+  const raw = JSON.parse(JSON.stringify(d)) as Partial<PlannerDay> & { date: string };
+  return {
+    date: raw.date,
+    intention: raw.intention ?? "",
+    top3: raw.top3 ?? [],
+    habits: raw.habits ?? [],
+    focusMinutes: raw.focusMinutes ?? 0,
+    focusSessions: raw.focusSessions ?? 0,
+    review: { win: raw.review?.win ?? "", improve: raw.review?.improve ?? "", energy: raw.review?.energy ?? 0 },
+    reviewedAt: raw.reviewedAt ?? null,
+  };
+}
+
+/** Planner days from `since` (YYYY-MM-DD) on, oldest first. */
+export async function listDays(since: string): Promise<PlannerDay[]> {
+  return (await PlannerDayModel.find({ date: { $gte: since } }).sort({ date: 1 }).lean()).map(toDay);
 }
 
 export async function listTasks(): Promise<Task[]> {
