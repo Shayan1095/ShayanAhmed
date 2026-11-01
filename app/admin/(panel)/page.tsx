@@ -12,6 +12,7 @@ import {
   listFaqs,
   listInquiries,
   listProjects,
+  listDays,
   listTasks,
   listTestimonials,
 } from "@/lib/admin/data";
@@ -27,6 +28,11 @@ import { FunnelChart, MoneyColumns } from "./analytics/instruments";
 import { funnel, salesFacts, wonByMonth } from "@/lib/admin/analytics";
 
 export const metadata: Metadata = { title: "Dashboard" };
+
+/** Planner history for the streak and level (UTC date, with slack for time zones). */
+function historyStart() {
+  return new Date(Date.now() - 130 * 86_400_000).toISOString().slice(0, 10);
+}
 
 /**
  * The CRM home: how the business is doing (leads, replies, pipeline, wins),
@@ -44,7 +50,7 @@ export default async function DashboardPage() {
       </>
     );
 
-  const [inquiries, tasks, config, projects, testimonials, faqs, settings] = await Promise.all([
+  const [inquiries, tasks, config, projects, testimonials, faqs, settings, days] = await Promise.all([
     listInquiries(),
     listTasks(),
     getPlannerConfig(),
@@ -52,6 +58,7 @@ export default async function DashboardPage() {
     listTestimonials(),
     listFaqs(),
     getSettings(),
+    listDays(historyStart()),
   ]);
   const m = leadMetrics(inquiries);
   const feed = activityFeed(inquiries, tasks);
@@ -202,7 +209,7 @@ export default async function DashboardPage() {
           </PanelTitle>
           <Attention waiting={m.waiting.map(pick)} followUps={followUps.map(pick)} />
         </Panel>
-        <TodayCard tasks={tasks} config={config} />
+        <TodayCard tasks={tasks} config={config} days={days} />
         <InstrumentCard title="Site health">
           {state === "ready" ? <HealthList checks={health} /> : <Empty text="Import the starter content to check the site." />}
         </InstrumentCard>

@@ -27,7 +27,7 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1, // tests share one database
   retries: process.env.CI ? 1 : 0,
-  timeout: 60_000,
+  timeout: 90_000, // remote test database (Atlas) and accessibility scans on a modest machine
   expect: { timeout: 10_000, toHaveScreenshot: { maxDiffPixelRatio: 0.01, animations: "disabled" } },
   reporter: [["list"], ["html", { open: "never", outputFolder: "e2e/.report" }]],
   globalSetup: "./e2e/global-setup.ts",

@@ -13,17 +13,18 @@ test("Analytics shows the instruments (or how to switch them on)", async ({ page
 });
 
 test("Today: plan the day, finish a top-3 task, tick a habit, close the day", async ({ page }) => {
+  // A whole day's journey: many saves to the remote test database.
+  test.setTimeout(180_000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   // A task to plan around.
   await page.goto("/admin/planner");
   await page.getByLabel("New task").fill("E2E: today's main task");
+  // The board shows new tasks straight away and saves in the background (a server action POST):
+  // wait for that save to finish before leaving, or the navigation cancels it.
+  const saved = page.waitForResponse((r) => r.request().method() === "POST" && r.url().includes("/admin/planner"), { timeout: 45_000 });
   await page.getByLabel("New task").press("Enter");
-  await expect(page.getByText("E2E: today's main task").first()).toBeVisible({ timeout: 30_000 });
-  // The board shows new tasks straight away and saves in the background: wait until it's stored.
-  await expect(async () => {
-    await page.reload();
-    await expect(page.getByText("E2E: today's main task").first()).toBeVisible({ timeout: 5_000 });
-  }).toPass({ timeout: 45_000 });
+  expect((await saved).ok()).toBe(true);
+  await expect(page.getByText("E2E: today's main task").first()).toBeVisible();
 
   await page.goto("/admin/planner/today");
   await expect(page.getByRole("navigation", { name: "Planner" }).getByRole("link", { name: "Today" })).toHaveAttribute("aria-current", "page");
