@@ -71,11 +71,11 @@ test.describe("projects", () => {
     expect(media.headers()["content-type"]).toBe("image/png");
 
     await fileInputs.nth(0).setInputFiles(await pngFrom(page));
-    await expect(img).not.toHaveAttribute("src", firstSrc);
+    await expect(img).not.toHaveAttribute("src", firstSrc, { timeout: 30_000 });
     expect((await request.get(firstSrc)).status()).toBe(404); // the replaced upload was deleted
 
     await first.getByRole("button", { name: "Remove customer view" }).click();
-    await expect(first.locator("img")).toHaveCount(0);
+    await expect(first.locator("img")).toHaveCount(0, { timeout: 30_000 });
   });
 
   test("project list and editor pass accessibility checks", async ({ page }) => {

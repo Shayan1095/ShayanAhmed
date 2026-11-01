@@ -19,6 +19,7 @@ import {
   Quote,
   Search,
   Settings,
+  Sparkles,
   Sun,
   UserPlus,
   Users,
@@ -48,7 +49,7 @@ import { getShellData, type ShellData } from "@/app/admin/(panel)/shell-actions"
 import { stageLabel } from "@/lib/admin/crm";
 import type { Stage } from "@/lib/admin/types";
 import { cn } from "@/lib/utils";
-import { ThemeToggle, useAdminTheme } from "./theme";
+import { FxToggle, fxLabel, ThemeToggle, useAdminFx, useAdminTheme } from "./theme";
 
 /* ------------------------------------------------------------------ */
 /* Navigation map                                                      */
@@ -263,7 +264,7 @@ function Account() {
 /** Floating glass sidebar on desktop. */
 export function Sidebar({ pathname }: { pathname: string }) {
   return (
-    <aside className="glass sticky top-4 hidden h-[calc(100dvh-2rem)] w-[248px] shrink-0 flex-col gap-7 rounded-[22px] p-4 lg:flex">
+    <aside className="glass liquid sticky top-4 hidden h-[calc(100dvh-2rem)] w-[248px] shrink-0 flex-col gap-7 rounded-[22px] p-4 lg:flex">
       <div className="px-1 pt-1">
         <Brand />
       </div>
@@ -320,7 +321,7 @@ const quickCreate = [
 export function TopBar({ pathname }: { pathname: string }) {
   const { setPalette, menu, setMenu } = useShell();
   return (
-    <header className="glass sticky top-0 z-30 mb-6 flex h-14 items-center gap-2 rounded-b-2xl px-3 sm:px-4 lg:top-4 lg:rounded-2xl">
+    <header className="glass liquid sticky top-0 z-30 mb-6 flex h-14 items-center gap-2 rounded-b-2xl px-3 sm:px-4 lg:top-4 lg:rounded-2xl">
       <button
         type="button"
         onClick={() => setMenu(true)}
@@ -367,6 +368,7 @@ export function TopBar({ pathname }: { pathname: string }) {
           </DropdownMenuContent>
         </DropdownMenu>
 
+        <FxToggle className="hidden sm:grid" />
         <ThemeToggle />
         <a
           href="/"
@@ -408,6 +410,7 @@ function CommandPalette() {
   const { data, palette, setPalette } = useShell();
   const router = useRouter();
   const { theme, toggle } = useAdminTheme();
+  const { fx, setFx } = useAdminFx();
   const [, start] = useTransition();
 
   const go = (href: string) => {
@@ -417,7 +420,7 @@ function CommandPalette() {
 
   return (
     <Dialog open={palette} onOpenChange={setPalette}>
-      <DialogContent showCloseButton={false} className="top-[18%] translate-y-0 overflow-hidden rounded-2xl p-0 sm:max-w-[600px]">
+      <DialogContent showCloseButton={false} className="liquid top-[18%] translate-y-0 overflow-hidden rounded-[22px] p-0 sm:max-w-[600px]">
         <DialogTitle className="sr-only">Search and commands</DialogTitle>
         <DialogDescription className="sr-only">Jump to a page, a lead or a project, or run a quick action.</DialogDescription>
         {/* Plain "contains" matching: predictable for names (fuzzy matched "sara" to "Dashboard"). */}
@@ -485,6 +488,21 @@ function CommandPalette() {
                 {theme === "dark" ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
                 {theme === "dark" ? "Light mode" : "Dark mode"}
               </CommandItem>
+              {(["full", "lite", "auto"] as const)
+                .filter((v) => v !== fx)
+                .map((v) => (
+                  <CommandItem
+                    key={v}
+                    value={`glass effects liquid ${fxLabel[v]}`}
+                    onSelect={() => {
+                      setFx(v);
+                      setPalette(false);
+                    }}
+                  >
+                    <Sparkles aria-hidden="true" /> Glass effects: {fxLabel[v]}
+                    <CommandShortcut>{v === "full" ? "Liquid glass" : v === "lite" ? "Fastest" : "Detect"}</CommandShortcut>
+                  </CommandItem>
+                ))}
               <CommandItem
                 value="view site"
                 onSelect={() => {

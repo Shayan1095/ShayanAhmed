@@ -8,6 +8,7 @@ setup("sign in as admin", async ({ page }) => {
   await page.getByLabel("Email").fill(E2E.email);
   await page.getByLabel("Password").fill(E2E.password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  // The first sign-in compiles and reads the remote database, so allow it time.
+  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible({ timeout: 45_000 });
   await page.context().storageState({ path: "e2e/.auth/admin.json" });
 });
