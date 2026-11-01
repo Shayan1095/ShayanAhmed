@@ -19,7 +19,7 @@ import { contentHealth } from "@/lib/admin/health";
 import { activityFeed, leadMetrics, type Kpi } from "@/lib/admin/metrics";
 import { requireAdmin } from "@/lib/auth/dal";
 import { cn } from "@/lib/utils";
-import { BrutalCard, SourceBars, StageFunnel, StepSpark, WeeklyLeadsChart } from "./dashboard/charts";
+import { InstrumentCard, SourceBars, StageFunnel, StepSpark, WeeklyLeadsChart } from "./dashboard/charts";
 import { Attention, Feed, Greeting, HealthList } from "./dashboard/widgets";
 import { ImportStarter } from "./import-starter";
 import { TodayCard } from "./today-card";
@@ -148,26 +148,29 @@ export default async function DashboardPage() {
 
       {/* Trend + pipeline */}
       <div className="mb-5 grid gap-5 lg:grid-cols-[1.65fr_1fr]">
-        <BrutalCard index="01" title="Leads per week" meta="12 weeks">
+        <InstrumentCard title="Leads per week" meta="12 weeks">
           {inquiries.length ? (
             <WeeklyLeadsChart weeks={m.weeks} />
           ) : (
             <Empty text="No leads yet. Enquiries from the contact form, and leads you add, are counted here." />
           )}
-        </BrutalCard>
-        <BrutalCard index="02" title="Pipeline" action={{ href: "/admin/inbox", label: "Board" }}>
+        </InstrumentCard>
+        <InstrumentCard title="Pipeline" action={{ href: "/admin/inbox", label: "Board" }}>
           <StageFunnel rows={m.byStage} />
           <dl className="mt-auto grid grid-cols-2 gap-2 pt-4 font-mono text-[10.5px] uppercase tracking-[0.1em]">
-            <div className="brutal-sm rounded-[3px] bg-paper px-3 py-2">
-              <dt className="text-muted">Open value</dt>
-              <dd className="mt-0.5 text-[17px] font-bold normal-case tracking-normal text-ink">{money(m.pipelineValue)}</dd>
-            </div>
-            <div className="brutal-sm rounded-[3px] bg-chart px-3 py-2 text-on-copper">
-              <dt>Won</dt>
-              <dd className="mt-0.5 text-[17px] font-bold normal-case tracking-normal">{money(m.wonValue)}</dd>
-            </div>
+            {[
+              { k: "Open value", v: m.pipelineValue },
+              { k: "Won", v: m.wonValue },
+            ].map((x) => (
+              <div key={x.k} className="screen px-3 py-2">
+                <dt className="relative z-[1] text-[var(--screen-dim)]">{x.k}</dt>
+                <dd className="relative z-[1] mt-0.5 text-[17px] font-semibold normal-case tracking-normal text-[var(--screen-amber)] [text-shadow:0_0_10px_rgb(224_154_79/0.45)]">
+                  {money(x.v)}
+                </dd>
+              </div>
+            ))}
           </dl>
-        </BrutalCard>
+        </InstrumentCard>
       </div>
 
       {/* Today */}
@@ -186,16 +189,16 @@ export default async function DashboardPage() {
           <Attention waiting={m.waiting.map(pick)} followUps={followUps.map(pick)} />
         </Panel>
         <TodayCard tasks={tasks} config={config} />
-        <BrutalCard index="03" title="Site health">
+        <InstrumentCard title="Site health">
           {state === "ready" ? <HealthList checks={health} /> : <Empty text="Import the starter content to check the site." />}
-        </BrutalCard>
+        </InstrumentCard>
       </div>
 
       {/* Context */}
       <div className="grid gap-5 lg:grid-cols-[1fr_1.4fr]">
-        <BrutalCard index="04" title="What leads ask for" meta="By project type">
+        <InstrumentCard title="What leads ask for" meta="By project type">
           {m.sources.length ? <SourceBars rows={m.sources} /> : <Empty text="Project types from the contact form are counted here." />}
-        </BrutalCard>
+        </InstrumentCard>
         <Panel className="p-5">
           <PanelTitle icon={<Activity className="size-4 text-copper-ink" aria-hidden="true" />}>Recent activity</PanelTitle>
           <Feed items={feed} />

@@ -9,6 +9,7 @@ import type { HealthCheck } from "@/lib/admin/health";
 import type { FeedItem } from "@/lib/admin/metrics";
 import type { Inquiry } from "@/lib/admin/types";
 import { cn } from "@/lib/utils";
+import { LedMeter } from "./charts";
 
 const subscribe = () => () => {};
 const useClient = () => useSyncExternalStore(subscribe, () => true, () => false);
@@ -85,14 +86,8 @@ export function HealthList({ checks }: { checks: HealthCheck[] }) {
             done
           </span>
         </p>
-        <div role="img" aria-label={`Site ${pct}% complete: ${ok} of ${checks.length} checks done`} className="mt-3 flex gap-1">
-          {checks.map((c) => (
-            <span
-              key={c.id}
-              title={c.label}
-              className={cn("h-5 flex-1 border-2 border-[var(--brutal-line)]", c.ok ? "bg-chart" : "bg-paper [background-image:var(--brutal-hatch)] opacity-70")}
-            />
-          ))}
+        <div className="mt-3">
+          <LedMeter lit={ok} total={checks.length} label={`Site ${pct}% complete: ${ok} of ${checks.length} checks done`} />
         </div>
         <p className="mt-2 font-mono text-[10.5px] uppercase tracking-[0.1em] text-muted">
           {todo.length ? "Fix these to win more clients" : "The site is complete"}

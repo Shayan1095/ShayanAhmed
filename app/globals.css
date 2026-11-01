@@ -622,80 +622,128 @@ html[data-admin-theme][data-power="low"] :is([data-slot="dialog-content"], [data
 }
 
 /* =========================================================================
-   Admin charts: brutalist. Hard 2px frames, offset block shadows (no blur),
-   hatched fills, square ends, raw mono labels, and stepped motion. A loud,
-   deliberate counterpoint to the soft glass around it.
+   Admin instruments (skeuomorphic, DESIGN.md materials): charts live on
+   raised cream panels with screws and an engraved label, and read out on
+   recessed ink screens: lit copper columns, LED meters, inset slider tracks.
    ========================================================================= */
 :root {
-  --brutal-line: #111111;
-  --brutal-shadow: 6px 6px 0 #111111;
-  --brutal-shadow-sm: 3px 3px 0 #111111;
-  --brutal-hatch: repeating-linear-gradient(-45deg, transparent 0 5px, rgb(17 17 17 / 0.32) 5px 7px);
-}
-html[data-admin-theme="dark"] {
-  --brutal-line: #f3eadb;
-  --brutal-shadow: 6px 6px 0 #c9853f;
-  --brutal-shadow-sm: 3px 3px 0 #c9853f;
-}
-
-@utility brutal {
-  background-color: var(--color-paper-hi);
-  border: 2px solid var(--brutal-line);
-  border-radius: 6px;
-  box-shadow: var(--brutal-shadow);
-}
-@utility brutal-sm {
-  border: 2px solid var(--brutal-line);
-  box-shadow: var(--brutal-shadow-sm);
-}
-/* Copper with diagonal ink hatching (past values); solid copper = now. */
-@utility hatch {
-  background-color: var(--color-chart);
-  background-image: var(--brutal-hatch);
+  --screen-fg: #f3eadb;
+  --screen-dim: #a89d8b;
+  --screen-amber: #e2a566;
+  --screen-grid: rgb(201 133 63 / 0.16);
+  --led-on: #e09a4f;
+  --led-off: rgb(255 255 255 / 0.06);
+  --lit-copper: linear-gradient(180deg, #f0b46c 0%, #c9853f 38%, #9a5c22 100%);
+  --lit-cream: linear-gradient(180deg, #fffaf0 0%, #e9dcc4 100%);
+  --lit-glow: 0 0 14px rgb(224 154 79 / 0.55), 0 0 2px rgb(255 214 160 / 0.9);
 }
 
-/* Stepped growth: bars snap up in blocks, not a smooth ease. */
-@keyframes brutal-rise {
-  from { transform: scaleY(0); }
-  to { transform: scaleY(1); }
+@utility instrument {
+  position: relative;
+  border-radius: 22px;
+  background: linear-gradient(180deg, var(--color-paper-hi), var(--color-paper));
+  border: 1px solid rgb(255 255 255 / 0.55);
+  box-shadow: var(--shadow-raised);
 }
-@keyframes brutal-extend {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
+html[data-admin-theme="dark"] .instrument {
+  border-color: rgb(255 255 255 / 0.06);
+  background: linear-gradient(180deg, #221e1a, #171411);
 }
-@keyframes brutal-pop {
-  0%, 60% { opacity: 0; transform: translateY(4px); }
-  100% { opacity: 1; transform: none; }
+/* Letterpress label: text pressed into the panel. */
+@utility engraved {
+  color: var(--color-muted);
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.8);
 }
-.brutal-chart [data-rise] {
-  transform-origin: bottom;
-  transform: scaleY(0);
+html[data-admin-theme="dark"] .engraved {
+  text-shadow: 0 -1px 0 rgb(0 0 0 / 0.8);
 }
-.brutal-chart [data-extend] {
-  transform-origin: left;
-  transform: scaleX(0);
+/* Status light. */
+@utility led {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffd6a0, #c9853f 60%, #8a521a);
+  box-shadow: 0 0 8px 1px rgb(201 133 63 / 0.75);
 }
-.brutal-chart [data-pop] {
-  opacity: 0;
+/* Panel screws in the corners. */
+.instrument-screw {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, #cdbfa6 55%, #8f826e);
+  box-shadow: inset 0 0 0 0.5px rgb(17 17 17 / 0.25), 0 1px 0 rgb(255 255 255 / 0.6);
 }
-.brutal-chart[data-in] [data-rise] {
-  animation: brutal-rise 640ms steps(6, end) forwards;
-  animation-delay: calc(var(--i, 0) * 55ms);
+.instrument-screw::after {
+  content: "";
+  position: absolute;
+  inset: 3px 1px;
+  background: rgb(17 17 17 / 0.35);
+  transform: rotate(-35deg);
 }
-.brutal-chart[data-in] [data-extend] {
-  animation: brutal-extend 560ms steps(7, end) forwards;
-  animation-delay: calc(var(--i, 0) * 90ms);
-}
-.brutal-chart[data-in] [data-pop] {
-  animation: brutal-pop 700ms steps(3, end) forwards;
-  animation-delay: calc(var(--i, 0) * 55ms + 300ms);
-}
-@media (prefers-reduced-motion: reduce) {
-  .brutal-chart [data-rise],
-  .brutal-chart [data-extend],
-  .brutal-chart [data-pop] {
-    animation: none !important;
-    transform: none;
-    opacity: 1;
+/* The recessed screen charts read out on (ink-screen, with admin-safe text colours). */
+@utility screen {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 14px;
+  color: var(--screen-fg);
+  background: radial-gradient(120% 90% at 50% 0%, #24211d 0%, #0e0d0c 72%);
+  box-shadow: inset 0 2px 8px rgb(0 0 0 / 0.75), inset 0 0 0 1px rgb(255 255 255 / 0.04), 0 1px 0 rgb(255 255 255 / 0.7);
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    border-radius: inherit;
+    background:
+      repeating-linear-gradient(0deg, rgb(255 255 255 / 0.03) 0 1px, transparent 1px 3px),
+      linear-gradient(115deg, rgb(255 255 255 / 0.07), transparent 42%);
   }
 }
+html[data-admin-theme="dark"] .screen {
+  box-shadow: inset 0 2px 8px rgb(0 0 0 / 0.85), inset 0 0 0 1px rgb(255 255 255 / 0.05), 0 1px 0 rgb(255 255 255 / 0.05);
+}
+/* Inset track (slider groove) and the lit fill that runs in it. */
+@utility groove {
+  border-radius: 999px;
+  background: var(--color-paper-lo);
+  box-shadow: inset 0 2px 4px rgb(17 17 17 / 0.22), inset 0 -1px 0 rgb(255 255 255 / 0.7);
+}
+html[data-admin-theme="dark"] .groove {
+  background: #0d0c0b;
+  box-shadow: inset 0 2px 5px rgb(0 0 0 / 0.8), inset 0 -1px 0 rgb(255 255 255 / 0.04);
+}
+@utility lit {
+  background: var(--lit-copper);
+  box-shadow: var(--lit-glow), inset 0 1px 0 rgb(255 255 255 / 0.55);
+}
+/* Small keycap chip (count badges, readout chips). */
+@utility keycap {
+  border-radius: 10px;
+  background: linear-gradient(180deg, #fffaf1, var(--color-paper));
+  box-shadow: inset 0 1px 0 #fff, inset 0 -3px 0 var(--color-paper-lo), 0 3px 0 var(--color-paper-edge), 0 6px 10px -4px rgb(17 17 17 / 0.3);
+}
+html[data-admin-theme="dark"] .keycap {
+  background: linear-gradient(180deg, #2c2722, #1d1a16);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), inset 0 -3px 0 #120f0d, 0 3px 0 #0a0908, 0 6px 10px -4px rgb(0 0 0 / 0.6);
+}
+
+/* Motion: columns rise and fills run in with a smooth settle; LEDs light in sequence. */
+@keyframes inst-rise { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes inst-run { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes inst-light { from { opacity: 0.15; } to { opacity: 1; } }
+.instrument-chart [data-rise] { transform-origin: bottom; transform: scaleY(0); }
+.instrument-chart [data-run] { transform-origin: left; transform: scaleX(0); }
+.instrument-chart [data-light] { opacity: 0.15; }
+.instrument-chart[data-in] [data-rise] { animation: inst-rise 900ms var(--ease-out-expo) forwards; animation-delay: calc(var(--i, 0) * 45ms); }
+.instrument-chart[data-in] [data-run] { animation: inst-run 1000ms var(--ease-out-expo) forwards; animation-delay: calc(var(--i, 0) * 80ms); }
+.instrument-chart[data-in] [data-light] { animation: inst-light 260ms ease-out forwards; animation-delay: calc(var(--i, 0) * 40ms + 200ms); }
+@media (prefers-reduced-motion: reduce) {
+  .instrument-chart [data-rise],
+  .instrument-chart [data-run],
+  .instrument-chart [data-light] { animation: none !important; transform: none; opacity: 1; }
+}
+html[data-power="low"] .screen::after { display: none; }

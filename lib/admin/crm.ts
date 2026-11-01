@@ -27,6 +27,9 @@ export const sourceLabel: Record<string, string> = {
 /** Leads in the pipeline: everything not archived. */
 export const inPipeline = (i: Inquiry) => i.status !== "archived";
 
+/** Your time zone, for "when do leads arrive" (weekday and time of day). */
+export const CRM_TZ = "Asia/Karachi";
+
 /** Currency for deal values. Change here if you quote in another currency. */
 export const CRM_CURRENCY = "USD";
 
