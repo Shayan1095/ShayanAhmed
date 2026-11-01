@@ -93,7 +93,7 @@ export function TopThree({
                         {due.text}
                       </span>
                     )}
-                    {t.priority !== "none" && <span className="shrink-0 font-mono text-[10px] uppercase text-muted">{t.priority}</span>}
+                    {t.priority !== "none" && <span className="hidden shrink-0 font-mono text-[10px] uppercase text-muted sm:inline">{t.priority}</span>}
                   </button>
                 </li>
               );

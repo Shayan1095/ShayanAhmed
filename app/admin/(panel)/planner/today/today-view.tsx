@@ -99,7 +99,7 @@ function Today({ config: initialConfig, initialTasks, initialDays }: { config: P
   return (
     <div className="flex flex-col gap-5">
       {/* Hero: intention + the three numbers that keep you honest */}
-      <section aria-label="Today at a glance" className="instrument grid gap-5 p-5 lg:grid-cols-[1.25fr_1fr] lg:p-6">
+      <section aria-label="Today at a glance" className="instrument grid grid-cols-[minmax(0,1fr)] gap-5 p-5 lg:grid-cols-[1.25fr_1fr] lg:p-6">
         <div className="flex flex-col justify-between gap-4">
           <div>
             <p className="engraved font-mono text-[11px] uppercase tracking-[0.16em]">
@@ -165,7 +165,7 @@ function Today({ config: initialConfig, initialTasks, initialDays }: { config: P
         </div>
       </section>
 
-      <div className="grid gap-5 lg:grid-cols-[1.25fr_1fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[1.25fr_1fr]">
         <InstrumentCard title="Top 3 today" meta={`${day.top3.filter((id) => doneCols.has(tasks.find((t) => t.id === id)?.columnId ?? "")).length}/${day.top3.length || 3} done`}>
           <TopThree today={today} day={day} tasks={tasks} doneCols={doneCols} onDay={putDay} onToggle={toggleTask} />
         </InstrumentCard>
@@ -184,7 +184,7 @@ function Today({ config: initialConfig, initialTasks, initialDays }: { config: P
         </InstrumentCard>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_1fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[1fr_1fr]">
         <InstrumentCard title="Habits" meta={`${day.habits.filter((h) => config.habits.some((x) => x.id === h)).length}/${config.habits.length} today`}>
           <Habits today={today} day={day} days={days} habits={config.habits} onDay={putDay} onHabits={(habits) => setConfig((c) => ({ ...c, habits }))} />
         </InstrumentCard>
@@ -193,7 +193,7 @@ function Today({ config: initialConfig, initialTasks, initialDays }: { config: P
         </InstrumentCard>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[1.4fr_1fr]">
         <InstrumentCard title="Activity" meta="16 weeks">
           <Heatmap today={today} stats={stats} goal={config.dailyGoal} />
         </InstrumentCard>

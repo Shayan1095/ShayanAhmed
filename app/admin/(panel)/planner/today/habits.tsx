@@ -117,7 +117,7 @@ export function Habits({
 
   return (
     <div className="flex flex-1 flex-col gap-2">
-      <div aria-hidden="true" className="mb-1 grid grid-cols-[1fr_repeat(7,14px)_44px] items-center gap-1.5 px-1">
+      <div aria-hidden="true" className="mb-1 hidden grid-cols-[minmax(0,1fr)_repeat(7,14px)_44px] items-center gap-1.5 px-1 sm:grid">
         <span />
         {week.map((d) => (
           <span key={d} className={cn("text-center font-mono text-[9px] uppercase", d === today ? "text-copper-ink" : "text-muted")}>
@@ -131,7 +131,7 @@ export function Habits({
           const done = day.habits.includes(h.id);
           const streak = habitStreak(days, h.id, today);
           return (
-            <li key={h.id} className="grid grid-cols-[1fr_repeat(7,14px)_44px] items-center gap-1.5">
+            <li key={h.id} className="grid grid-cols-[minmax(0,1fr)_44px] items-center gap-1.5 sm:grid-cols-[minmax(0,1fr)_repeat(7,14px)_44px]">
               <button
                 type="button"
                 role="checkbox"
@@ -153,7 +153,7 @@ export function Habits({
                   <span
                     key={d}
                     title={`${d}: ${on ? "done" : "missed"}`}
-                    className={cn("size-3.5 rounded-[4px]", !on && "groove !rounded-[4px]", d === today && "ring-1 ring-copper/60 ring-offset-1 ring-offset-transparent")}
+                    className={cn("hidden size-3.5 rounded-[4px] sm:block", !on && "groove !rounded-[4px]", d === today && "ring-1 ring-copper/60 ring-offset-1 ring-offset-transparent")}
                     style={on ? { background: h.color, boxShadow: `0 0 6px ${h.color}` } : undefined}
                   />
                 );
