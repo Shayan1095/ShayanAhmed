@@ -581,3 +581,82 @@ html[data-admin-theme][data-power="low"] :is([data-slot="dialog-content"], [data
   -webkit-backdrop-filter: none;
   background-color: var(--color-paper-hi);
 }
+
+/* =========================================================================
+   Admin charts: brutalist. Hard 2px frames, offset block shadows (no blur),
+   hatched fills, square ends, raw mono labels, and stepped motion. A loud,
+   deliberate counterpoint to the soft glass around it.
+   ========================================================================= */
+:root {
+  --brutal-line: #111111;
+  --brutal-shadow: 6px 6px 0 #111111;
+  --brutal-shadow-sm: 3px 3px 0 #111111;
+  --brutal-hatch: repeating-linear-gradient(-45deg, transparent 0 5px, rgb(17 17 17 / 0.32) 5px 7px);
+}
+html[data-admin-theme="dark"] {
+  --brutal-line: #f3eadb;
+  --brutal-shadow: 6px 6px 0 #c9853f;
+  --brutal-shadow-sm: 3px 3px 0 #c9853f;
+}
+
+@utility brutal {
+  background-color: var(--color-paper-hi);
+  border: 2px solid var(--brutal-line);
+  border-radius: 6px;
+  box-shadow: var(--brutal-shadow);
+}
+@utility brutal-sm {
+  border: 2px solid var(--brutal-line);
+  box-shadow: var(--brutal-shadow-sm);
+}
+/* Copper with diagonal ink hatching (past values); solid copper = now. */
+@utility hatch {
+  background-color: var(--color-chart);
+  background-image: var(--brutal-hatch);
+}
+
+/* Stepped growth: bars snap up in blocks, not a smooth ease. */
+@keyframes brutal-rise {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+@keyframes brutal-extend {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes brutal-pop {
+  0%, 60% { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: none; }
+}
+.brutal-chart [data-rise] {
+  transform-origin: bottom;
+  transform: scaleY(0);
+}
+.brutal-chart [data-extend] {
+  transform-origin: left;
+  transform: scaleX(0);
+}
+.brutal-chart [data-pop] {
+  opacity: 0;
+}
+.brutal-chart[data-in] [data-rise] {
+  animation: brutal-rise 640ms steps(6, end) forwards;
+  animation-delay: calc(var(--i, 0) * 55ms);
+}
+.brutal-chart[data-in] [data-extend] {
+  animation: brutal-extend 560ms steps(7, end) forwards;
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+.brutal-chart[data-in] [data-pop] {
+  animation: brutal-pop 700ms steps(3, end) forwards;
+  animation-delay: calc(var(--i, 0) * 55ms + 300ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .brutal-chart [data-rise],
+  .brutal-chart [data-extend],
+  .brutal-chart [data-pop] {
+    animation: none !important;
+    transform: none;
+    opacity: 1;
+  }
+}

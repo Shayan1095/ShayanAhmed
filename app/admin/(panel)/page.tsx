@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Activity, ArrowRight, ArrowUpRight, BellRing, Gauge, Layers, MessageSquareText, Plus, TrendingUp } from "lucide-react";
+import { Activity, ArrowRight, BellRing, Plus, TrendingUp } from "lucide-react";
 import { DbNotice } from "@/components/admin/db-notice";
 import { PageHeader, Panel, PanelTitle } from "@/components/admin/page-header";
 import { buttonVariants } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import { contentHealth } from "@/lib/admin/health";
 import { activityFeed, leadMetrics, type Kpi } from "@/lib/admin/metrics";
 import { requireAdmin } from "@/lib/auth/dal";
 import { cn } from "@/lib/utils";
-import { SourceBars, StageFunnel, WeeklyLeadsChart } from "./dashboard/charts";
+import { BrutalCard, SourceBars, StageFunnel, StepSpark, WeeklyLeadsChart } from "./dashboard/charts";
 import { Attention, Feed, Greeting, HealthList } from "./dashboard/widgets";
 import { ImportStarter } from "./import-starter";
 import { TodayCard } from "./today-card";
@@ -141,43 +141,33 @@ export default async function DashboardPage() {
                 {k.delta.text}
               </p>
             )}
-            {k.spark && <Spark values={k.spark} />}
+            {k.spark && <StepSpark values={k.spark} />}
           </Panel>
         ))}
       </section>
 
       {/* Trend + pipeline */}
       <div className="mb-5 grid gap-5 lg:grid-cols-[1.65fr_1fr]">
-        <Panel className="flex flex-col p-5">
-          <PanelTitle
-            icon={<Activity className="size-4 text-copper-ink" aria-hidden="true" />}
-            aside={<span className="font-mono text-[11px] text-muted">12 weeks</span>}
-          >
-            Leads per week
-          </PanelTitle>
+        <BrutalCard index="01" title="Leads per week" meta="12 weeks">
           {inquiries.length ? (
             <WeeklyLeadsChart weeks={m.weeks} />
           ) : (
             <Empty text="No leads yet. Enquiries from the contact form, and leads you add, are counted here." />
           )}
-        </Panel>
-        <Panel className="p-5">
-          <PanelTitle
-            icon={<Layers className="size-4 text-copper-ink" aria-hidden="true" />}
-            aside={
-              <Link href="/admin/inbox" className="inline-flex items-center gap-1 text-[12.5px] font-semibold hover:underline">
-                Board <ArrowUpRight className="size-3.5" aria-hidden="true" />
-              </Link>
-            }
-          >
-            Pipeline
-          </PanelTitle>
+        </BrutalCard>
+        <BrutalCard index="02" title="Pipeline" action={{ href: "/admin/inbox", label: "Board" }}>
           <StageFunnel rows={m.byStage} />
-          <p className="mt-4 border-t border-paper-edge/50 pt-3 text-[12.5px] text-muted">
-            Open value <span className="font-semibold text-ink">{money(m.pipelineValue)}</span> · Won{" "}
-            <span className="font-semibold text-ink">{money(m.wonValue)}</span>
-          </p>
-        </Panel>
+          <dl className="mt-auto grid grid-cols-2 gap-2 pt-4 font-mono text-[10.5px] uppercase tracking-[0.1em]">
+            <div className="brutal-sm rounded-[3px] bg-paper px-3 py-2">
+              <dt className="text-muted">Open value</dt>
+              <dd className="mt-0.5 text-[17px] font-bold normal-case tracking-normal text-ink">{money(m.pipelineValue)}</dd>
+            </div>
+            <div className="brutal-sm rounded-[3px] bg-chart px-3 py-2 text-on-copper">
+              <dt>Won</dt>
+              <dd className="mt-0.5 text-[17px] font-bold normal-case tracking-normal">{money(m.wonValue)}</dd>
+            </div>
+          </dl>
+        </BrutalCard>
       </div>
 
       {/* Today */}
@@ -196,18 +186,16 @@ export default async function DashboardPage() {
           <Attention waiting={m.waiting.map(pick)} followUps={followUps.map(pick)} />
         </Panel>
         <TodayCard tasks={tasks} config={config} />
-        <Panel className="p-5">
-          <PanelTitle icon={<Gauge className="size-4 text-copper-ink" aria-hidden="true" />}>Site health</PanelTitle>
+        <BrutalCard index="03" title="Site health">
           {state === "ready" ? <HealthList checks={health} /> : <Empty text="Import the starter content to check the site." />}
-        </Panel>
+        </BrutalCard>
       </div>
 
       {/* Context */}
       <div className="grid gap-5 lg:grid-cols-[1fr_1.4fr]">
-        <Panel className="p-5">
-          <PanelTitle icon={<MessageSquareText className="size-4 text-copper-ink" aria-hidden="true" />}>What leads ask for</PanelTitle>
+        <BrutalCard index="04" title="What leads ask for" meta="By project type">
           {m.sources.length ? <SourceBars rows={m.sources} /> : <Empty text="Project types from the contact form are counted here." />}
-        </Panel>
+        </BrutalCard>
         <Panel className="p-5">
           <PanelTitle icon={<Activity className="size-4 text-copper-ink" aria-hidden="true" />}>Recent activity</PanelTitle>
           <Feed items={feed} />
@@ -219,15 +207,4 @@ export default async function DashboardPage() {
 
 function Empty({ text }: { text: string }) {
   return <p className="flex flex-1 items-center justify-center py-10 text-center text-[13px] text-muted">{text}</p>;
-}
-
-/** Tiny trend line in the corner of a KPI card (decorative; the number carries the meaning). */
-function Spark({ values }: { values: number[] }) {
-  const max = Math.max(1, ...values);
-  const pts = values.map((v, i) => `${(i / (values.length - 1)) * 100},${28 - (v / max) * 24}`).join(" ");
-  return (
-    <svg aria-hidden="true" viewBox="0 0 100 30" preserveAspectRatio="none" className="absolute right-4 top-4 h-7 w-20 opacity-80">
-      <polyline points={pts} fill="none" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" className="stroke-chart" />
-    </svg>
-  );
 }

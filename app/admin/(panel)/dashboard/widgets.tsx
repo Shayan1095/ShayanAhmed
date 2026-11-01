@@ -69,26 +69,34 @@ export function Attention({ waiting, followUps }: { waiting: Row[]; followUps: R
   );
 }
 
-/** Share of checks passed as a ring, plus the open items as links. */
+/** Brutal segmented meter: one block per check (solid = done), plus the open items as links. */
 export function HealthList({ checks }: { checks: HealthCheck[] }) {
   const ok = checks.filter((c) => c.ok).length;
   const pct = Math.round((ok / checks.length) * 100);
-  const r = 26;
-  const c = 2 * Math.PI * r;
   const todo = checks.filter((x) => !x.ok);
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-4">
-        <svg viewBox="0 0 64 64" className="size-16 shrink-0 -rotate-90" role="img" aria-label={`Site ${pct}% complete`}>
-          <circle cx="32" cy="32" r={r} fill="none" strokeWidth="7" className="stroke-paper-edge/45" />
-          <circle cx="32" cy="32" r={r} fill="none" strokeWidth="7" strokeLinecap="round" className="stroke-chart" strokeDasharray={`${(pct / 100) * c} ${c}`} />
-        </svg>
-        <div>
-          <p className="font-display text-[28px] font-extrabold leading-none">{pct}%</p>
-          <p className="mt-1 text-[12.5px] text-muted">
-            {ok} of {checks.length} done{todo.length ? " · fix these to win more clients" : " · the site is complete"}
-          </p>
+      <div>
+        <p className="flex items-end gap-2">
+          <span className="font-display text-[48px] font-extrabold leading-[0.8] tracking-[-0.04em]">{pct}%</span>
+          <span className="pb-0.5 font-mono text-[10.5px] uppercase leading-tight tracking-[0.12em] text-muted">
+            {ok}/{checks.length}
+            <br />
+            done
+          </span>
+        </p>
+        <div role="img" aria-label={`Site ${pct}% complete: ${ok} of ${checks.length} checks done`} className="mt-3 flex gap-1">
+          {checks.map((c) => (
+            <span
+              key={c.id}
+              title={c.label}
+              className={cn("h-5 flex-1 border-2 border-[var(--brutal-line)]", c.ok ? "bg-chart" : "bg-paper [background-image:var(--brutal-hatch)] opacity-70")}
+            />
+          ))}
         </div>
+        <p className="mt-2 font-mono text-[10.5px] uppercase tracking-[0.1em] text-muted">
+          {todo.length ? "Fix these to win more clients" : "The site is complete"}
+        </p>
       </div>
       <ul className="-mx-2 flex flex-col">
         {(todo.length ? todo : checks).slice(0, 5).map((x) => (

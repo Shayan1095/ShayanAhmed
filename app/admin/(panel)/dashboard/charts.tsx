@@ -1,16 +1,116 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { ArrowUpRight } from "lucide-react";
 import { money } from "@/lib/admin/crm";
 import type { SourceBar, StageBar, WeekBar } from "@/lib/admin/metrics";
+import type { Stage } from "@/lib/admin/types";
 import { cn } from "@/lib/utils";
 
 /*
- * Dashboard charts in plain HTML (no chart library): one series each, in the
- * validated chart copper (--color-chart, light and dark). Thin bars with 4px
- * rounded data-ends, 2px gaps, recessive grid, a hover tooltip on every bar,
- * and a table for screen readers.
+ * Dashboard charts, brutalist: hard 2px frames, offset block shadows, hatched
+ * copper fills, square ends, raw uppercase mono labels and stepped motion
+ * (bars snap up in blocks when they scroll into view). Text stays in ink, the
+ * chart copper is the validated --color-chart, every chart has a table or
+ * written values for screen readers, and reduced motion shows it settled.
  */
+
+/** Adds data-in once the element is on screen, which starts the stepped animations. */
+function useInView<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          el.dataset.in = "";
+          io.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -10% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return ref;
+}
+
+/** Integer that ticks up in coarse steps (an odometer, not a tween). */
+export function Ticker({ value, className }: { value: number; className?: string }) {
+  const [shown, setShown] = useState(value);
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !value || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let timer = 0;
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      const steps = Math.min(value, 9);
+      let i = 0;
+      const tick = () => {
+        i += 1;
+        setShown(i >= steps ? value : Math.round((value * i) / steps));
+        if (i < steps) timer = window.setTimeout(tick, 70);
+      };
+      setShown(0);
+      timer = window.setTimeout(tick, 120);
+    });
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      window.clearTimeout(timer);
+    };
+  }, [value]);
+  return (
+    <span ref={ref} className={cn("tabular-nums", className)}>
+      <span className="sr-only">{value}</span>
+      <span aria-hidden="true">{shown}</span>
+    </span>
+  );
+}
+
+/** Brutal card: hard frame + offset shadow, an inverted label tape as the title. */
+export function BrutalCard({
+  index,
+  title,
+  meta,
+  action,
+  className,
+  children,
+}: {
+  index: string;
+  title: string;
+  meta?: React.ReactNode;
+  action?: { href: string; label: string };
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section aria-label={title} className={cn("brutal flex flex-col p-0", className)}>
+      <header className="flex items-stretch justify-between gap-3 border-b-2 border-[var(--brutal-line)]">
+        <h2 className="flex items-stretch font-mono text-[11.5px] font-semibold uppercase tracking-[0.12em]">
+          <span className="grid place-items-center border-r-2 border-[var(--brutal-line)] bg-ink px-2.5 text-paper">{index}</span>
+          <span className="grid place-items-center px-3 py-2.5">{title}</span>
+        </h2>
+        <div className="flex items-center gap-3 pr-3">
+          {meta && <span className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-muted">{meta}</span>}
+          {action && (
+            <Link
+              href={action.href}
+              className="brutal-sm inline-flex items-center gap-1 rounded-[3px] bg-paper-hi px-2 py-0.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] transition-transform hover:-translate-x-px hover:-translate-y-px active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+            >
+              {action.label} <ArrowUpRight className="size-3" aria-hidden="true" />
+            </Link>
+          )}
+        </div>
+      </header>
+      <div className="flex flex-1 flex-col p-4 sm:p-5">{children}</div>
+    </section>
+  );
+}
 
 function niceMax(n: number) {
   if (n <= 4) return 4;
@@ -18,66 +118,123 @@ function niceMax(n: number) {
   return Math.ceil(n / step) * step;
 }
 
+/* ------------------------------------------------------------------ */
+/* Leads per week: blocky columns, won stacked solid at the base       */
+/* ------------------------------------------------------------------ */
+
 export function WeeklyLeadsChart({ weeks }: { weeks: WeekBar[] }) {
+  const ref = useInView<HTMLElement>();
   const [hover, setHover] = useState<number | null>(null);
   const max = niceMax(Math.max(...weeks.map((w) => w.leads)));
   const total = weeks.reduce((s, w) => s + w.leads, 0);
+  const won = weeks.reduce((s, w) => s + w.won, 0);
+  const peak = Math.max(...weeks.map((w) => w.leads));
   const last = weeks.length - 1;
 
   return (
-    <figure className="flex h-full flex-col">
-      <figcaption className="sr-only">Leads per week for the last 12 weeks. {total} in total.</figcaption>
-      <div className="relative flex-1 pl-7">
-        {/* Grid: recessive hairlines at 0, half and max. */}
-        {[1, 0.5, 0].map((f) => (
-          <div key={f} aria-hidden="true" className="absolute inset-x-0 flex items-center" style={{ bottom: `${f * 100}%` }}>
-            <span className="w-7 -translate-y-px pr-2 text-right font-mono text-[10px] text-muted">{Math.round(max * f)}</span>
-            <span className={cn("h-px flex-1", f === 0 ? "bg-paper-edge" : "bg-paper-edge/45")} />
-          </div>
-        ))}
-        <div aria-hidden="true" className="relative flex h-full min-h-[180px] items-end gap-[2px]" onMouseLeave={() => setHover(null)}>
-          {weeks.map((w, i) => (
-            <div
-              key={w.start}
-              className="group relative flex h-full flex-1 cursor-default items-end justify-center"
-              onMouseEnter={() => setHover(i)}
-            >
-              {/* Bar: thin, centred in a wider hit area. */}
-              <div
-                className={cn(
-                  "w-[min(70%,22px)] rounded-t-[4px] bg-chart transition-[height,opacity] duration-500",
-                  hover !== null && hover !== i && "opacity-45",
-                )}
-                style={{ height: `${(w.leads / max) * 100}%`, minHeight: w.leads ? 3 : 0 }}
-              />
-              {i === last && w.leads > 0 && hover === null && (
-                <span className="absolute font-mono text-[11px] font-semibold" style={{ bottom: `calc(${(w.leads / max) * 100}% + 4px)` }}>
-                  {w.leads}
-                </span>
-              )}
-              {hover === i && (
-                <div
-                  className="glass-strong pointer-events-none absolute z-10 w-max -translate-x-1/2 rounded-lg px-2.5 py-1.5 text-[12px] leading-snug"
-                  style={{ bottom: `calc(${(w.leads / max) * 100}% + 8px)`, left: "50%" }}
-                >
-                  <p className="font-semibold">Week of {w.label}</p>
-                  <p className="text-muted">
-                    {w.leads} {w.leads === 1 ? "lead" : "leads"}
-                    {w.won > 0 && ` · ${w.won} won`}
-                  </p>
-                </div>
-              )}
+    <figure ref={ref} className="brutal-chart flex h-full flex-col">
+      <figcaption className="sr-only">
+        Leads per week for the last 12 weeks: {total} leads, {won} won.
+      </figcaption>
+
+      {/* Headline numbers */}
+      <div aria-hidden="true" className="mb-5 flex flex-wrap items-end gap-x-6 gap-y-2">
+        <p className="flex items-end gap-2">
+          <Ticker value={total} className="font-display text-[56px] font-extrabold leading-[0.8] tracking-[-0.04em]" />
+          <span className="pb-0.5 font-mono text-[10.5px] uppercase leading-tight tracking-[0.12em] text-muted">
+            Leads
+            <br />
+            12 wks
+          </span>
+        </p>
+        <dl className="flex gap-2 font-mono text-[10.5px] uppercase tracking-[0.1em]">
+          {[
+            { k: "Now", v: weeks[last].leads },
+            { k: "Peak", v: peak },
+            { k: "Won", v: won },
+          ].map((x) => (
+            <div key={x.k} className="brutal-sm rounded-[3px] bg-paper px-2 py-1">
+              <dt className="text-muted">{x.k}</dt>
+              <dd className="text-[15px] font-bold leading-none text-ink">{x.v}</dd>
             </div>
           ))}
+        </dl>
+        <div className="ml-auto flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
+          <span className="flex items-center gap-1.5">
+            <span className="hatch inline-block size-3 border-2 border-[var(--brutal-line)]" /> Leads
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block size-3 border-2 border-[var(--brutal-line)] bg-ink" /> Won
+          </span>
         </div>
       </div>
-      <div aria-hidden="true" className="mt-2 flex gap-[2px] pl-7">
+
+      {/* Plot */}
+      <div aria-hidden="true" className="relative flex-1 pl-8">
+        {[1, 0.5].map((f) => (
+          <div key={f} className="absolute inset-x-0 flex items-center" style={{ bottom: `${f * 100}%` }}>
+            <span className="w-8 pr-2 text-right font-mono text-[10px] font-semibold text-muted">{Math.round(max * f)}</span>
+            <span className="flex-1 border-t-2 border-dashed border-paper-edge" />
+          </div>
+        ))}
+        <div className="relative flex h-full min-h-[200px] items-end gap-1.5" onMouseLeave={() => setHover(null)}>
+          {weeks.map((w, i) => {
+            const pct = (w.leads / max) * 100;
+            const now = i === last;
+            const active = hover === i;
+            return (
+              <div key={w.start} className="relative flex h-full flex-1 items-end justify-center" onMouseEnter={() => setHover(i)}>
+                {/* Crosshair + hard-block tooltip beside the column */}
+                {active && <span className="absolute inset-y-0 left-1/2 border-l-2 border-dashed border-[var(--brutal-line)] opacity-50" />}
+                {active && (
+                  <div
+                    className={cn(
+                      "pointer-events-none absolute top-0 z-10 w-max border-2 border-[var(--brutal-line)] bg-ink px-3 py-2 font-mono text-[11px] uppercase tracking-[0.08em] text-paper shadow-[4px_4px_0_var(--color-chart)]",
+                      i > weeks.length / 2 ? "right-full mr-2" : "left-full ml-2",
+                    )}
+                  >
+                    <p className="font-bold">Wk of {w.label}</p>
+                    <p>
+                      {w.leads} {w.leads === 1 ? "lead" : "leads"} · {w.won} won
+                    </p>
+                  </div>
+                )}
+                {w.leads > 0 && (
+                  <div
+                    data-rise
+                    style={{ height: `${pct}%`, ["--i" as string]: i }}
+                    className={cn(
+                      "relative flex w-full max-w-[34px] flex-col justify-end border-2 border-b-0 border-[var(--brutal-line)] transition-colors",
+                      active ? "bg-ink" : now ? "bg-chart" : "hatch",
+                      hover !== null && !active && "opacity-60",
+                    )}
+                  >
+                    {w.won > 0 && <div className={cn("w-full", active ? "bg-copper" : "bg-ink")} style={{ height: `${(w.won / w.leads) * 100}%` }} />}
+                    <span
+                      data-pop
+                      style={{ ["--i" as string]: i }}
+                      className="absolute -top-6 left-1/2 -translate-x-1/2 font-mono text-[12px] font-bold"
+                    >
+                      {w.leads}
+                    </span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {/* Baseline */}
+        <div className="h-[3px] bg-[var(--brutal-line)]" />
+
+      </div>
+      <div aria-hidden="true" className="mt-2 flex gap-1.5 pl-8">
         {weeks.map((w, i) => (
-          <span key={w.start} className="flex-1 text-center font-mono text-[10px] text-muted">
-            {i % 3 === 2 || i === last ? w.label : ""}
+          <span key={w.start} className={cn("flex-1 whitespace-nowrap text-center font-mono text-[9.5px] uppercase tracking-[0.06em]", i === last ? "font-bold text-ink" : "text-muted")}>
+            {i === last ? "Now" : i % 3 === 2 ? w.label : ""}
           </span>
         ))}
       </div>
+
       <table className="sr-only">
         <thead>
           <tr>
@@ -100,50 +257,55 @@ export function WeeklyLeadsChart({ weeks }: { weeks: WeekBar[] }) {
   );
 }
 
-/** Horizontal bars with the value written beside each (no colour-only reading). */
-export function BarList({
-  rows,
-  caption,
-  format = (r) => String(r.count),
-  href,
-}: {
-  rows: { key: string; label: string; count: number; sub?: string }[];
-  caption: string;
-  format?: (r: { count: number; sub?: string }) => string;
-  href?: (key: string) => string;
-}) {
-  const [hover, setHover] = useState<string | null>(null);
+/* ------------------------------------------------------------------ */
+/* Block bars: pipeline stages and what leads ask for                  */
+/* ------------------------------------------------------------------ */
+
+type BlockRow = { key: string; label: string; count: number; note?: string; solid?: boolean; href?: string };
+
+function BlockBars({ rows, caption, rank = false }: { rows: BlockRow[]; caption: string; rank?: boolean }) {
+  const ref = useInView<HTMLElement>();
   const max = Math.max(1, ...rows.map((r) => r.count));
   return (
-    <figure>
+    <figure ref={ref} className="brutal-chart">
       <figcaption className="sr-only">{caption}</figcaption>
-      <ul className="flex flex-col gap-2.5" onMouseLeave={() => setHover(null)}>
-        {rows.map((r) => {
+      <ul className="flex flex-col gap-2.5">
+        {rows.map((r, i) => {
           const body = (
-            <>
-              <div className="mb-1 flex items-baseline justify-between gap-3 text-[13px]">
-                <span className="truncate">{r.label}</span>
-                <span className="shrink-0 font-mono text-[12px]">
-                  {format(r)}
-                  {r.sub && <span className="ml-1.5 text-muted">{r.sub}</span>}
-                </span>
+            <div className="flex items-stretch gap-2.5">
+              <span className="grid w-9 shrink-0 place-items-center border-2 border-[var(--brutal-line)] bg-ink font-mono text-[13px] font-bold text-paper">
+                {rank ? String(i + 1).padStart(2, "0") : r.count}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="mb-1 flex items-baseline justify-between gap-2 font-mono text-[11px] uppercase tracking-[0.08em]">
+                  <span className="truncate font-semibold">{r.label}</span>
+                  <span className="shrink-0 text-muted">
+                    {rank ? r.count : ""}
+                    {r.note && <span className="ml-1.5 font-semibold text-ink">{r.note}</span>}
+                  </span>
+                </div>
+                <div className="h-4 border-2 border-[var(--brutal-line)] bg-paper">
+                  <div
+                    data-extend
+                    style={{ width: `${(r.count / max) * 100}%`, ["--i" as string]: i }}
+                    className={cn("h-full", r.solid ? "bg-chart" : "hatch", r.count && "border-r-2 border-[var(--brutal-line)]")}
+                  />
+                </div>
               </div>
-              <div aria-hidden="true" className="h-2 overflow-hidden rounded-full bg-paper-edge/35">
-                <div
-                  className={cn("h-full rounded-full bg-chart transition-[width,opacity] duration-500", hover && hover !== r.key && "opacity-45")}
-                  style={{ width: `${(r.count / max) * 100}%`, minWidth: r.count ? 6 : 0 }}
-                />
-              </div>
-            </>
+            </div>
           );
           return (
-            <li key={r.key} onMouseEnter={() => setHover(r.key)}>
-              {href ? (
-                <a href={href(r.key)} className="block rounded-md outline-offset-4 hover:[&_span:first-child]:underline">
+            <li key={r.key}>
+              {r.href ? (
+                <Link
+                  href={r.href}
+                  className="block rounded-[3px] p-1 transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-paper hover:shadow-[var(--brutal-shadow-sm)] focus-visible:outline-2 focus-visible:outline-offset-2"
+                >
                   {body}
-                </a>
+                  <span className="sr-only">: {r.count}{r.note ? `, ${r.note}` : ""}</span>
+                </Link>
               ) : (
-                body
+                <div className="p-1">{body}</div>
               )}
             </li>
           );
@@ -153,16 +315,53 @@ export function BarList({
   );
 }
 
+const closed = new Set<Stage>(["won", "lost"]);
+
 export function StageFunnel({ rows }: { rows: StageBar[] }) {
   return (
-    <BarList
+    <BlockBars
       caption="Leads in each pipeline stage, with their value"
-      rows={rows.map((r) => ({ key: r.id, label: r.label, count: r.count, sub: r.value ? money(r.value, true) : undefined }))}
-      href={(stage) => `/admin/inbox?stage=${stage}`}
+      rows={rows.map((r) => ({
+        key: r.id,
+        label: r.label,
+        count: r.count,
+        note: r.value ? money(r.value, true) : undefined,
+        solid: r.id === "won",
+        href: closed.has(r.id) ? "/admin/inbox" : `/admin/inbox?stage=${r.id}`,
+      }))}
     />
   );
 }
 
 export function SourceBars({ rows }: { rows: SourceBar[] }) {
-  return <BarList caption="What leads asked for" rows={rows.map((r) => ({ key: r.label, label: r.label, count: r.count }))} />;
+  const total = rows.reduce((s, r) => s + r.count, 0) || 1;
+  return (
+    <BlockBars
+      rank
+      caption="What leads asked for"
+      rows={rows.map((r, i) => ({ key: r.label, label: r.label, count: r.count, note: `${Math.round((r.count / total) * 100)}%`, solid: i === 0 }))}
+    />
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* KPI step line                                                       */
+/* ------------------------------------------------------------------ */
+
+/** Stepped trend line with square markers (decorative; the number carries the meaning). */
+export function StepSpark({ values }: { values: number[] }) {
+  const max = Math.max(1, ...values);
+  const w = 100 / (values.length - 1);
+  const y = (v: number) => 26 - (v / max) * 22;
+  let d = `M0 ${y(values[0])}`;
+  values.slice(1).forEach((v, i) => {
+    d += ` H${(i + 1) * w} V${y(v)}`;
+  });
+  const lastY = y(values[values.length - 1]);
+  return (
+    <svg aria-hidden="true" viewBox="-3 -3 106 34" preserveAspectRatio="none" className="absolute right-4 top-4 h-8 w-24 overflow-visible">
+      <path d={d} fill="none" strokeWidth="2.5" vectorEffect="non-scaling-stroke" strokeLinejoin="miter" className="stroke-[var(--brutal-line)]" />
+      <rect x={100 - 3} y={lastY - 3} width="6" height="6" className="fill-chart stroke-[var(--brutal-line)]" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+    </svg>
+  );
 }
