@@ -15,6 +15,13 @@ const MIN_WDTH = 80;
 const MAX_WDTH = 150;
 const RADIUS = 320;
 
+const LIT: React.CSSProperties = {
+  backgroundImage: "linear-gradient(180deg, #f6c487 0%, #e09a4f 34%, #c9853f 56%, #8a521a 100%)",
+  WebkitBackgroundClip: "text",
+  backgroundClip: "text",
+  color: "transparent",
+};
+
 export function Wordmark({ text, className }: { text: string; className?: string }) {
   const root = useRef<HTMLDivElement>(null);
   const fine = useFinePointer();
@@ -83,8 +90,10 @@ export function Wordmark({ text, className }: { text: string; className?: string
       ref={root}
       role="img"
       aria-label={text}
+      // Soft copper glow around the lit letters (inline so it can never be lost to stale CSS).
+      style={{ filter: "drop-shadow(0 0 22px rgb(224 154 79 / 0.32)) drop-shadow(0 1px 0 rgb(0 0 0 / 0.6))" }}
       className={cn(
-        "wordmark-lit flex select-none justify-between whitespace-nowrap font-display font-black uppercase leading-[0.85] tracking-[-0.04em]",
+        "flex select-none justify-between whitespace-nowrap font-display font-black uppercase leading-[0.85] tracking-[-0.04em]",
         "text-[min(11cqi,184px)]",
       )}
     >
@@ -93,7 +102,9 @@ export function Wordmark({ text, className }: { text: string; className?: string
           key={i}
           data-letter
           aria-hidden="true"
-          className="wordmark-letter inline-block transition-[font-variation-settings] duration-200 ease-out [font-variation-settings:'wdth'_100]"
+          className="inline-block transition-[font-variation-settings] duration-200 ease-out [font-variation-settings:'wdth'_100] forced-colors:text-[CanvasText]"
+          // Each letter carries the full copper gradient, so it survives the per-letter rise and width animation.
+          style={LIT}
         >
           {ch === " " ? " " : ch}
         </span>

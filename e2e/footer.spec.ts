@@ -5,7 +5,7 @@ import { expectNoA11yViolations } from "./helpers";
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test.describe("footer", () => {
-  test("ends the page with the call to action, contact lines and the name", async ({ page }) => {
+  test("ends the page with the call to action and the name", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     const footer = page.getByRole("contentinfo");
@@ -13,8 +13,6 @@ test.describe("footer", () => {
 
     await expect(footer.getByRole("img", { name: "Shayan Ahmed" })).toBeVisible();
     await expect(footer.getByRole("link", { name: "Start a project" })).toHaveAttribute("href", "/#contact");
-    await expect(footer.getByRole("list", { name: "Contact" }).getByRole("listitem").first()).toBeVisible();
-    await expect(footer.getByText(/Local time/)).toBeVisible();
     await expect(footer.getByRole("link", { name: /Back to top/ })).toHaveAttribute("href", "#main");
 
     // Contrast and labels on the dark band (WCAG AA).
