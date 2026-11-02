@@ -21,7 +21,7 @@ export function Storefront({ image }: { image?: ImageRef }) {
   ];
 
   return (
-    <div className="absolute inset-0 flex flex-col gap-[1.6cqw] bg-paper-hi px-[4.1cqw] pt-[2.2cqw] text-ink">
+    <div className="keep-light absolute inset-0 flex flex-col gap-[1.6cqw] bg-paper-hi px-[4.1cqw] pt-[2.2cqw] text-ink">
       <div className="flex items-center justify-between border-b border-paper-lo pb-[1.6cqw]">
         <span className="font-display text-[2.3cqw] font-extrabold uppercase [font-variation-settings:'wdth'_112]">
           Brands Attire

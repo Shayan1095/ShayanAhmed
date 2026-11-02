@@ -49,6 +49,10 @@
   --tone-hairline: var(--color-paper-edge);
 }
 .tone-ink {
+  /* Ink bands and panels use the admin's espresso palette (warm, not flat black). */
+  --color-ink: #110f0d;
+  --color-ink-2: #1b1815;
+  --color-ink-3: #3b342b;
   --tone-fg: var(--color-paper);
   --tone-muted: var(--color-muted-ink);
   --tone-accent: var(--color-copper);
@@ -174,7 +178,7 @@ body {
 .hero-surface {
   background:
     var(--grain),
-    radial-gradient(110% 80% at 72% 60%, var(--color-paper-hi) 0%, var(--color-paper) 55%, #ece1cd 100%);
+    radial-gradient(110% 80% at 72% 60%, var(--color-paper-hi) 0%, var(--color-paper) 55%, var(--hero-edge, #ece1cd) 100%);
 }
 
 /* =========================================================================
@@ -265,7 +269,7 @@ body {
 
 /* Navbar: the section you're in glows copper (dark copper text keeps AA contrast on paper). */
 @utility nav-glow {
-  color: #8a521a;
+  color: var(--nav-glow-ink, #8a521a);
   text-shadow:
     0 0 10px rgb(201 133 63 / 0.55),
     0 0 22px rgb(201 133 63 / 0.3);
@@ -273,8 +277,8 @@ body {
 
 /* Navbar once scrolled: frosted paper glass. Solid on low-power devices (see below). */
 @utility nav-glass {
-  background-color: rgb(251 246 236 / 0.72);
-  border: 1px solid rgb(205 191 166 / 0.55);
+  background-color: var(--nav-glass-bg, rgb(251 246 236 / 0.72));
+  border: 1px solid var(--nav-glass-border, rgb(205 191 166 / 0.55));
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.7),
     0 10px 30px -16px rgb(17 17 17 / 0.28);
@@ -372,7 +376,7 @@ body {
    No grain, no scanline overlays, compact shadows, no backdrop work. */
 /* Blur is expensive without a GPU: keep the glass look, solid. */
 html[data-power="low"] .nav-glass {
-  background-color: rgb(251 246 236 / 0.97);
+  background-color: var(--nav-glass-solid, rgb(251 246 236 / 0.97));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -747,3 +751,110 @@ html[data-admin-theme="dark"] .keycap {
   .instrument-chart [data-light] { animation: none !important; transform: none; opacity: 1; }
 }
 html[data-power="low"] .screen::after { display: none; }
+
+/* =========================================================================
+   Site dark theme (same espresso and copper as the admin). Set by the theme
+   script in app/layout.tsx as html[data-theme="dark"]; the admin keeps its
+   own toggle, so these rules stay out of it (:not([data-admin-theme])).
+   ========================================================================= */
+html[data-theme="dark"]:not([data-admin-theme]) {
+  color-scheme: dark;
+  --color-paper: #110f0d;
+  --color-paper-hi: #1b1815;
+  --color-paper-lo: #25211c;
+  --color-paper-edge: #3b342b;
+  --color-ink: #f3eadb;
+  --color-ink-2: #e4d8c3;
+  --color-ink-3: #cdbfa6;
+  --color-muted: #ab9f8c;
+  --color-walnut: #d4a373;
+  --color-danger: #f0846a;
+  --tone-accent: #e2a566;
+
+  --shadow-raised: inset 0 1px 0 rgb(255 255 255 / 0.06), inset 0 -1px 0 rgb(0 0 0 / 0.3), 0 1px 2px rgb(0 0 0 / 0.45), 0 14px 28px -16px rgb(0 0 0 / 0.8);
+  --shadow-raised-sm: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 1px 2px rgb(0 0 0 / 0.45), 0 4px 10px -4px rgb(0 0 0 / 0.6);
+  --shadow-inset: inset 0 2px 5px rgb(0 0 0 / 0.55), inset 0 1px 1px rgb(0 0 0 / 0.4), inset 0 -1px 0 rgb(255 255 255 / 0.05);
+  --shadow-keycap: inset 0 1px 0 rgb(255 255 255 / 0.08), inset 0 -6px 0 #0d0c0b, 0 6px 0 #070606, 0 10px 16px -6px rgb(0 0 0 / 0.7);
+  --grain: none;
+
+  --nav-glow-ink: #e2a566;
+  --nav-glass-bg: rgb(27 24 21 / 0.72);
+  --nav-glass-border: rgb(255 255 255 / 0.08);
+  --nav-glass-solid: rgb(27 24 21 / 0.97);
+  --hero-edge: #0b0a09;
+  /* "Ink" keys (primary buttons) become cream keys on the dark page, like the admin. */
+  --ink-key-top: #fffaf1;
+  --ink-key-bottom: #e4d8c3;
+  --footer-band: radial-gradient(70% 60% at 50% 110%, rgb(201 133 63 / 0.3), transparent 70%), radial-gradient(120% 80% at 50% 0%, #15120f 0%, #070606 65%);
+}
+/* Ink bands (contact panel, phone menu, dark bands) stay dark in dark mode,
+   a step deeper than the page, with the light theme's meaning restored inside. */
+html[data-theme="dark"]:not([data-admin-theme]) .tone-ink {
+  --color-ink: #0b0a09;
+  --color-ink-2: #1a1816;
+  --color-ink-3: #2c2925;
+  --color-paper: #f3eadb;
+  --color-paper-hi: #fbf6ec;
+  --color-paper-lo: #e4d8c3;
+  --color-paper-edge: #cdbfa6;
+  --color-muted: #675e52;
+  --color-walnut: #6b4a2f;
+  --ink-key-top: #2a2826;
+  --ink-key-bottom: #0b0a09;
+}
+html[data-theme="dark"]:not([data-admin-theme]) .screw {
+  box-shadow: inset 0 -1px 1px rgb(0 0 0 / 0.5), 0 1px 0 rgb(255 255 255 / 0.06);
+}
+/* Smooth switch between themes (colours only; skipped for reduced motion). */
+@media (prefers-reduced-motion: no-preference) {
+  html.theme-switching,
+  html.theme-switching *,
+  html.theme-switching *::before,
+  html.theme-switching *::after {
+    transition: background-color 420ms ease, color 420ms ease, border-color 420ms ease, box-shadow 420ms ease !important;
+  }
+}
+
+/* =========================================================================
+   Espresso bands (process, contact, ink strips): the admin's dark canvas,
+   espresso with soft copper light in the corners, in both themes.
+   ========================================================================= */
+[data-band="ink"],
+.ink-band {
+  background-color: #110f0d;
+  background-image:
+    radial-gradient(55% 45% at 6% 0%, rgb(201 133 63 / 0.16), transparent 70%),
+    radial-gradient(45% 40% at 100% 28%, rgb(140 80 36 / 0.2), transparent 70%),
+    radial-gradient(60% 50% at 62% 112%, rgb(201 133 63 / 0.13), transparent 70%);
+}
+/* Dark site: the page itself gets the admin's warm glow; bands sit a step deeper. */
+html[data-theme="dark"]:not([data-admin-theme]) body {
+  background-color: #110f0d;
+  background-image:
+    radial-gradient(60% 50% at 8% 0%, rgb(201 133 63 / 0.14), transparent 70%),
+    radial-gradient(50% 45% at 100% 30%, rgb(140 80 36 / 0.18), transparent 70%),
+    radial-gradient(55% 50% at 60% 110%, rgb(201 133 63 / 0.1), transparent 70%);
+  background-attachment: fixed;
+}
+html[data-theme="dark"][data-power="low"]:not([data-admin-theme]) body {
+  background-attachment: scroll;
+}
+html[data-theme="dark"]:not([data-admin-theme]) :is([data-band="ink"], .ink-band) {
+  background-color: #0b0a09;
+  box-shadow: inset 0 1px 0 rgb(224 154 79 / 0.12), inset 0 -1px 0 rgb(224 154 79 / 0.08);
+}
+
+/* Mockups of client websites (e.g. the hero storefront) keep their real light
+   colours in the dark theme: they depict someone else's site, not this one. */
+html[data-theme="dark"]:not([data-admin-theme]) .keep-light {
+  color-scheme: light;
+  --color-paper: #f3eadb;
+  --color-paper-hi: #fbf6ec;
+  --color-paper-lo: #e4d8c3;
+  --color-paper-edge: #cdbfa6;
+  --color-ink: #111111;
+  --color-ink-2: #1e1c1a;
+  --color-ink-3: #2c2925;
+  --color-muted: #675e52;
+  --color-walnut: #6b4a2f;
+}

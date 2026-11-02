@@ -10,6 +10,7 @@ import { gsap, MQ, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { easeOutExpo, motionGrammar } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { Clock } from "./clock";
+import { ThemeToggle } from "./theme";
 import { chapters, navLinks, sectionHref, type ChapterId, type NavId, type NavProject } from "./nav-links";
 
 type NavbarProps = {
@@ -242,10 +243,11 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
                 <StatusLight label={availability} className="text-[13px] font-semibold" />
                 <Clock className="font-mono text-[10px] tracking-[0.1em] text-muted" />
               </div>
+              <ThemeToggle className="raised-sm hidden size-[42px] rounded-control text-ink hover:text-copper min-[900px]:inline-flex" />
               <div className="hidden min-[900px]:inline-flex">
                 <a
                   href={sectionHref("contact", onHome)}
-                  className="group/cta relative inline-flex min-h-[46px] items-center gap-2 overflow-hidden rounded-control bg-[linear-gradient(180deg,#2a2826,var(--color-ink))] px-5 text-[15px] font-semibold text-paper shadow-[inset_0_1px_0_rgb(255_255_255/.14),0_2px_0_#000,0_12px_24px_-10px_rgb(17_17_17/.6)] transition-transform duration-100 active:translate-y-0.5"
+                  className="group/cta relative inline-flex min-h-[46px] items-center gap-2 overflow-hidden rounded-control bg-[linear-gradient(180deg,var(--ink-key-top,#2a2826),var(--ink-key-bottom,var(--color-ink)))] px-5 text-[15px] font-semibold text-paper shadow-[inset_0_1px_0_rgb(255_255_255/.14),0_2px_0_#000,0_12px_24px_-10px_rgb(17_17_17/.6)] transition-transform duration-100 active:translate-y-0.5"
                 >
                   Start a project
                   {/* The arrow slips out and a fresh one slides in on hover/focus. */}
@@ -586,6 +588,7 @@ function MobileMenu({
             )}
             <StatusLight label={availability} />
             <Clock />
+            <ThemeToggle withLabel className="ink-inset min-h-12 rounded-control font-sans text-[15px] font-semibold tracking-normal text-paper" />
             <a
               href={sectionHref("contact", onHome)}
               onClick={onClose}

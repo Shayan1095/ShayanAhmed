@@ -14,8 +14,9 @@ import { Wordmark } from "./wordmark";
  * time and back to top. Links are absolute so they work from every page.
  */
 const BAND: React.CSSProperties = {
+  // Espresso on the light site; dark mode sets --footer-band to a deeper night band (globals.css).
   backgroundImage:
-    "radial-gradient(70% 55% at 50% 108%, rgb(201 133 63 / 0.22), transparent 70%), radial-gradient(120% 80% at 50% 0%, #24211d 0%, #110f0d 62%)",
+    "var(--footer-band, radial-gradient(70% 55% at 50% 108%, rgb(201 133 63 / 0.22), transparent 70%), radial-gradient(120% 80% at 50% 0%, #24211d 0%, #110f0d 62%))",
 };
 async function currentYear() {
   "use cache";
@@ -29,7 +30,7 @@ export async function Footer() {
 
   return (
     <footer
-      className="tone-ink relative mt-10 overflow-hidden rounded-t-[32px] bg-[#110f0d] pb-8 pt-[88px] text-paper min-[900px]:rounded-t-[44px]"
+      className="tone-ink relative overflow-hidden rounded-t-[32px] bg-[#110f0d] pb-8 pt-[88px] text-paper min-[900px]:rounded-t-[44px]"
       style={BAND}
     >
       {/* Copper hairline catching the light along the top edge. */}

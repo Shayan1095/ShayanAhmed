@@ -72,8 +72,8 @@ export function VelocityMarquee({ items, tone = "paper", className }: VelocityMa
     <div
       ref={root}
       className={cn(
-        "relative overflow-clip py-7 min-[900px]:py-10",
-        tone === "ink" ? "tone-ink bg-ink text-paper" : "text-ink",
+        "relative overflow-clip py-4 min-[900px]:py-6",
+        tone === "ink" ? "tone-ink ink-band text-paper" : "text-ink",
         className,
       )}
     >
@@ -81,7 +81,7 @@ export function VelocityMarquee({ items, tone = "paper", className }: VelocityMa
       <div
         ref={track}
         aria-hidden="true"
-        className="flex w-max font-display text-[clamp(44px,8vw,120px)] font-extrabold uppercase leading-none tracking-[-0.035em] will-change-transform [font-variation-settings:'wdth'_112]"
+        className="flex w-max font-display text-[clamp(22px,3vw,42px)] font-extrabold uppercase leading-none tracking-[-0.035em] will-change-transform [font-variation-settings:'wdth'_112]"
       >
         {run(0)}
         {run(1)}

@@ -51,7 +51,7 @@ export function MobileCta({ availability, onHome }: { availability: string; onHo
     >
       <a
         href={onHome ? "#contact" : "/#contact"}
-        className="flex min-h-14 items-center justify-between gap-3 rounded-card bg-[linear-gradient(180deg,#2a2826,var(--color-ink))] px-5 text-paper shadow-[inset_0_1px_0_rgb(255_255_255/.14),0_14px_28px_-12px_rgb(17_17_17/.7)]"
+        className="flex min-h-14 items-center justify-between gap-3 rounded-card bg-[linear-gradient(180deg,var(--ink-key-top,#2a2826),var(--ink-key-bottom,var(--color-ink)))] px-5 text-paper shadow-[inset_0_1px_0_rgb(255_255_255/.14),0_14px_28px_-12px_rgb(17_17_17/.7)]"
       >
         <span className="flex min-w-0 items-center gap-2.5 font-mono text-[10.5px] uppercase tracking-[0.08em] text-muted-ink">
           <StatusLight size="sm" pulse={false} />

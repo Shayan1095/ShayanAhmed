@@ -26,7 +26,7 @@ const base =
 
 const variants: Record<Variant, string> = {
   ink:
-    "bg-[linear-gradient(180deg,#2a2826,var(--color-ink))] text-paper " +
+    "bg-[linear-gradient(180deg,var(--ink-key-top,#2a2826),var(--ink-key-bottom,var(--color-ink)))] text-paper " +
     "shadow-[inset_0_1px_0_rgb(255_255_255/.14),0_2px_0_#000,0_12px_24px_-10px_rgb(17_17_17/.6)] " +
     "active:shadow-[inset_0_1px_0_rgb(255_255_255/.1),0_0_0_#000]",
   paper:

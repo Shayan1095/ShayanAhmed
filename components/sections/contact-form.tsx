@@ -65,7 +65,7 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
   const sent = state.status === "ok";
 
   return (
-    <div className="tone-ink relative rounded-[28px] bg-[linear-gradient(165deg,#2a2724,var(--color-ink-2)_55%,#171614)] p-[22px] shadow-ink-raised min-[560px]:p-[30px]">
+    <div className="tone-ink relative rounded-[28px] bg-[linear-gradient(165deg,#2a231c,var(--color-ink-2)_55%,#14110e)] p-[22px] shadow-ink-raised min-[560px]:p-[30px]">
       <Screws tone="ink" />
       <Screen ref={screen} bootOn="view" className="mb-5 min-h-14 px-4 py-3.5 font-mono text-[12.5px] leading-[1.8]">
         <div role="status" aria-live="polite" className="relative z-[3]">

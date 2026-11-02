@@ -44,12 +44,12 @@ export function Process({ children }: { children?: React.ReactNode }) {
             }
             intro="Milestones you approve, a live link every week, and a clean handover at the end."
           />
-          <div className="relative rounded-[26px] bg-[linear-gradient(180deg,var(--color-ink-2),#161513)] p-[26px] shadow-ink-raised min-[900px]:p-9">
+          <div className="relative rounded-[26px] bg-[linear-gradient(180deg,#221d18,var(--color-ink-2)_45%,#14110e)] p-[26px] shadow-ink-raised min-[900px]:p-9">
             <Screws tone="ink" />
             {/* progress rail */}
             <div
               aria-hidden="true"
-              className="ink-inset relative mb-9 h-1.5 overflow-hidden rounded-full bg-[#0a0a0a]"
+              className="ink-inset relative mb-9 h-1.5 overflow-hidden rounded-full bg-[#0b0908]"
             >
               <span
                 data-rail

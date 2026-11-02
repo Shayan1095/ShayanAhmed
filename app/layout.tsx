@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { fontVariables } from "./fonts";
 import { site } from "@/lib/site";
+import { siteThemeScript } from "@/lib/theme-script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -48,15 +49,21 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F3EADB",
-  colorScheme: "light",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F3EADB" },
+    { media: "(prefers-color-scheme: dark)", color: "#110F0D" },
+  ],
+  colorScheme: "light dark",
   viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // suppressHydrationWarning: the admin sets data-admin-theme on <html> before React loads (no theme flash).
+  // suppressHydrationWarning: the theme scripts set data-theme / data-admin-theme on <html> before React loads (no flash).
   return (
     <html lang="en" className={fontVariables} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: siteThemeScript }} />
+      </head>
       <body>{children}</body>
     </html>
   );
