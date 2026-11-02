@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-type Variant = "ink" | "paper";
+type Variant = "ink" | "paper" | "copper";
 type Size = "md" | "lg";
 
 type CommonProps = {
@@ -32,6 +32,12 @@ const variants: Record<Variant, string> = {
   paper:
     "bg-[linear-gradient(180deg,var(--color-paper-hi),var(--color-paper))] text-ink " +
     "shadow-[var(--shadow-raised-sm),0_2px_0_var(--color-paper-edge)] active:shadow-inset",
+  /** Lit copper key, for dark (ink) bands: the one call to action there. */
+  copper:
+    "bg-[linear-gradient(180deg,#f0b46c,#c9853f_48%,#a56626)] text-ink " +
+    "shadow-[inset_0_1px_0_rgb(255_255_255/.5),0_2px_0_#6b4a2f,0_14px_32px_-10px_rgb(224_154_79/.65)] " +
+    "hover:shadow-[inset_0_1px_0_rgb(255_255_255/.55),0_2px_0_#6b4a2f,0_16px_40px_-8px_rgb(224_154_79/.85)] " +
+    "active:shadow-[inset_0_1px_0_rgb(255_255_255/.4),0_0_0_#6b4a2f]",
 };
 
 const sizes: Record<Size, string> = {

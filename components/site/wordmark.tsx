@@ -84,8 +84,8 @@ export function Wordmark({ text, className }: { text: string; className?: string
       role="img"
       aria-label={text}
       className={cn(
-        "flex select-none justify-between whitespace-nowrap font-display font-black uppercase leading-[0.85] tracking-[-0.04em] text-paper",
-        "text-[min(11cqi,184px)] [text-shadow:0_1px_0_rgb(255_255_255/.9),0_-1px_0_rgb(17_17_17/.24),0_-2px_4px_rgb(17_17_17/.08)]",
+        "wordmark-lit flex select-none justify-between whitespace-nowrap font-display font-black uppercase leading-[0.85] tracking-[-0.04em]",
+        "text-[min(11cqi,184px)]",
       )}
     >
       {Array.from(text).map((ch, i) => (
@@ -93,7 +93,7 @@ export function Wordmark({ text, className }: { text: string; className?: string
           key={i}
           data-letter
           aria-hidden="true"
-          className="inline-block transition-[font-variation-settings] duration-200 ease-out [font-variation-settings:'wdth'_100]"
+          className="wordmark-letter inline-block transition-[font-variation-settings] duration-200 ease-out [font-variation-settings:'wdth'_100]"
         >
           {ch === " " ? " " : ch}
         </span>
