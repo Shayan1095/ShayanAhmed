@@ -96,7 +96,7 @@ function Stats({ config, tasks }: { config: PlannerConfig; tasks: Task[] }) {
             <p className="text-[12.5px] text-muted">{doneThisWeek >= goal ? "Goal reached" : `${goal - doneThisWeek} to go`}</p>
           </div>
         </div>
-        <Stat icon={<Flame className="size-3.5" aria-hidden="true" />} label="Streak" value={s.streak} unit={s.streak === 1 ? "day" : "days"} />
+        <Stat icon={<Flame className="size-3.5" aria-hidden="true" />} label="Active days in a row" value={s.streak} unit={s.streak === 1 ? "day" : "days"} />
         <Stat icon={<CircleCheck className="size-3.5" aria-hidden="true" />} label="Done all time" value={s.doneAll} unit="tasks" />
         <Stat
           icon={<TriangleAlert className="size-3.5" aria-hidden="true" />}
