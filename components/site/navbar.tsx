@@ -4,16 +4,14 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Keycap, StatusLight } from "@/components/system";
+import { Keycap } from "@/components/system";
 import { useSmoothScroll } from "@/components/providers/smooth-scroll";
 import { gsap, MQ, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { easeOutExpo, motionGrammar } from "@/lib/motion";
 import { cn } from "@/lib/utils";
-import { Clock } from "./clock";
 import { chapters, navLinks, sectionHref, type ChapterId, type NavId, type NavProject } from "./nav-links";
 
 type NavbarProps = {
-  availability: string;
   onHome: boolean;
   /** On /work or a case study: "Work" stays lit and links to the work page. */
   onWork?: boolean;
@@ -46,7 +44,7 @@ const SCRAMBLE_CHARS = "0123456789·ABCDEFGHIJKLMNOPRSTUVWXYZ";
  *  - Once you scroll, the bar slims into frosted glass (solid on low-power devices).
  *  - Hovering or focusing Work opens a preview of the featured case studies.
  */
-export function Navbar({ availability, onHome, onWork = false, place, email, linkedin, projects = [] }: NavbarProps) {
+export function Navbar({ onHome, onWork = false, place, email, linkedin, projects = [] }: NavbarProps) {
   const progress = useRef<HTMLSpanElement>(null);
   const readout = useRef<HTMLSpanElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
@@ -238,10 +236,6 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
             </nav>
 
             <div className="flex items-center gap-4">
-              <div className="hidden flex-col items-end gap-px leading-tight min-[900px]:flex">
-                <StatusLight label={availability} className="text-[13px] font-semibold" />
-                <Clock className="font-mono text-[10px] tracking-[0.1em] text-muted" />
-              </div>
               <div className="hidden min-[900px]:inline-flex">
                 <a
                   href={sectionHref("contact", onHome)}
@@ -288,7 +282,6 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
         onHome={onHome}
         onWork={onWork}
         active={active}
-        availability={availability}
         email={email}
         linkedin={linkedin}
         latest={projects[0]}
@@ -409,7 +402,6 @@ function MobileMenu({
   onHome,
   onWork,
   active,
-  availability,
   email,
   linkedin,
   latest,
@@ -420,7 +412,6 @@ function MobileMenu({
   onHome: boolean;
   onWork: boolean;
   active: NavId | null;
-  availability: string;
   email?: string;
   linkedin?: string;
   latest?: NavProject;
@@ -584,8 +575,6 @@ function MobileMenu({
                 ))}
               </ul>
             )}
-            <StatusLight label={availability} />
-            <Clock />
             <a
               href={sectionHref("contact", onHome)}
               onClick={onClose}

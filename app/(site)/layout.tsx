@@ -9,7 +9,6 @@ import { getFeaturedProjects, getSiteSettings } from "@/lib/content";
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const [settings, featured] = await Promise.all([getSiteSettings(), getFeaturedProjects()]);
   const nav = {
-    availability: settings.availability,
     email: settings.email,
     linkedin: settings.linkedin,
     projects: toNavProjects(featured),

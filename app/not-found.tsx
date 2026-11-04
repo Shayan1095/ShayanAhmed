@@ -18,7 +18,6 @@ export default async function NotFound() {
   return (
     <SiteProviders>
       <Navbar
-        availability={settings.availability}
         onHome={false}
         place="Lost signal"
         email={settings.email}
