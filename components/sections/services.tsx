@@ -1,5 +1,5 @@
 import { ScrollFx } from "@/components/fx/scroll-fx";
-import { Band, Label, Panel, Screen, SectionHeader } from "@/components/system";
+import { Band, CoverGrid, Label, Panel, Screen, SectionHeader } from "@/components/system";
 import { ServicesFlow } from "./services-flow";
 
 const layers = [
@@ -30,7 +30,8 @@ const layers = [
 export function Services() {
   return (
     <Band tone="ink" id="services" aria-labelledby="services-title" className="section-pad">
-      <div className="wrap">
+      <CoverGrid strength={0.5} />
+      <div className="wrap relative">
         <SectionHeader
           index="02"
           label="Services"

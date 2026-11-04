@@ -50,12 +50,3 @@ export const GLOW: React.CSSProperties = {
   background:
     "radial-gradient(ellipse 52% 40% at 72% 30%, rgba(214,140,76,.24) 0%, rgba(184,112,58,.09) 45%, transparent 72%), radial-gradient(ellipse 40% 30% at 10% 100%, rgba(184,112,58,.10) 0%, transparent 70%)",
 };
-
-/** Cutting-mat grid: 24px fine lines and 120px major lines, fading out toward the edges. */
-export const GRID: React.CSSProperties = {
-  backgroundImage:
-    "linear-gradient(rgba(217,167,119,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(217,167,119,.06) 1px, transparent 1px), linear-gradient(rgba(217,167,119,.13) 1px, transparent 1px), linear-gradient(90deg, rgba(217,167,119,.13) 1px, transparent 1px)",
-  backgroundSize: "24px 24px, 24px 24px, 120px 120px, 120px 120px",
-  WebkitMaskImage: "radial-gradient(ellipse 85% 80% at 50% 50%, #000 40%, transparent 100%)",
-  maskImage: "radial-gradient(ellipse 85% 80% at 50% 50%, #000 40%, transparent 100%)",
-};

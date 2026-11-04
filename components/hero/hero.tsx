@@ -1,7 +1,8 @@
 import { cacheLife } from "next/cache";
 import { ArrowRight } from "lucide-react";
 import { BuiltInIndex } from "./built-in-index";
-import { COVER, FOIL, GLOW, GRID, HERO_COPY } from "./hero-data";
+import { CoverGrid } from "@/components/system/cover-grid";
+import { COVER, FOIL, GLOW, HERO_COPY } from "./hero-data";
 
 /** The cover's issue date, kept current (refreshed daily). */
 async function issueDate() {
@@ -25,7 +26,7 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
       style={{ backgroundColor: COVER.ink, color: COVER.paper }}
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={GLOW} />
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={GRID} />
+      <CoverGrid />
 
       {/* Top padding clears the floating navbar; svh keeps phone browser bars from cutting it off. */}
       <div className="relative mx-auto flex min-h-svh max-w-[1360px] flex-col px-4 pb-11 pt-[calc(env(safe-area-inset-top)+96px)] min-[560px]:px-8 min-[900px]:pt-[calc(env(safe-area-inset-top)+100px)]">

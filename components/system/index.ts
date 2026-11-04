@@ -16,3 +16,4 @@ export { StatusBadge, Tag, type ProjectStatus } from "./status-badge";
 export { StatusLight } from "./status-light";
 export { Switch } from "./switch";
 export { UiFragment } from "./ui-fragment";
+export { CoverGrid } from "./cover-grid";

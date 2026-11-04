@@ -1,6 +1,6 @@
 import type { SiteSettings } from "@/lib/content/types";
 import { Clock } from "@/components/site/clock";
-import { Band, Button, Label, Rise, SplitReveal, Typewriter } from "@/components/system";
+import { Band, CoverGrid, Button, Label, Rise, SplitReveal, Typewriter } from "@/components/system";
 import { ScrollFx } from "@/components/fx/scroll-fx";
 import { ContactForm } from "./contact-form";
 import { CopyButton } from "./copy-button";
@@ -26,7 +26,8 @@ export function Contact({ settings }: { settings: SiteSettings }) {
 
   return (
     <Band tone="ink" id="contact" aria-label="Contact" className="section-pad">
-      <div className="wrap grid grid-cols-1 items-start gap-14 min-[980px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+      <CoverGrid strength={0.5} />
+      <div className="wrap relative grid grid-cols-1 items-start gap-14 min-[980px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <div>
           <Label>
             <Typewriter text="08 · Contact" speed={38} />

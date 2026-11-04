@@ -1,5 +1,5 @@
 import { ProcessTrack } from "./process-track";
-import { Band, Label, SectionHeader, Screws } from "@/components/system";
+import { Band, CoverGrid, Label, SectionHeader, Screws } from "@/components/system";
 
 const steps = [
   {
@@ -32,7 +32,8 @@ const steps = [
 export function Process({ children }: { children?: React.ReactNode }) {
   return (
     <Band tone="ink" id="process" aria-label="Process" className="section-pad">
-      <div className="wrap">
+      <CoverGrid strength={0.5} />
+      <div className="wrap relative">
         <ProcessTrack>
           <SectionHeader
             index="04"
