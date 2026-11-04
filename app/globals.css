@@ -175,11 +175,6 @@
 body {
   background-image: var(--grain);
 }
-.hero-surface {
-  background:
-    var(--grain),
-    radial-gradient(110% 80% at 72% 60%, var(--color-paper-hi) 0%, var(--color-paper) 55%, var(--hero-edge, #ece1cd) 100%);
-}
 
 /* =========================================================================
    Layout
@@ -395,29 +390,6 @@ html[data-power="low"] .ink-screen {
   text-shadow: none;
 }
 
-/* Hero entrance, in CSS: the headline is painted on the first frame and rises
-   from part-way inside its mask, so it never waits for JavaScript. */
-@keyframes hero-rise {
-  from { transform: translateY(55%); }
-  to { transform: none; }
-}
-@keyframes hero-fade-up {
-  from { opacity: 0; transform: translateY(18px); }
-  to { opacity: 1; transform: none; }
-}
-/* Desktop only: on phones the headline and intro are the page's largest
-   content and appear in place, so the first paint is the final paint. */
-@media (min-width: 900px) {
-  .hero-line {
-    animation: hero-rise 0.9s var(--ease-out-expo) both;
-  }
-  .hero-in {
-    animation: hero-fade-up 0.8s var(--ease-out-expo) both;
-  }
-}
-.hero-slab-in {
-  animation: hero-fade-up 1.1s var(--ease-out-expo) 0.2s both;
-}
 @keyframes log-in {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }
@@ -781,7 +753,6 @@ html[data-theme="dark"]:not([data-admin-theme]) {
   --nav-glass-bg: rgb(27 24 21 / 0.72);
   --nav-glass-border: rgb(255 255 255 / 0.08);
   --nav-glass-solid: rgb(27 24 21 / 0.97);
-  --hero-edge: #0b0a09;
   /* "Ink" keys (primary buttons) become cream keys on the dark page, like the admin. */
   --ink-key-top: #fffaf1;
   --ink-key-bottom: #e4d8c3;
@@ -842,19 +813,4 @@ html[data-theme="dark"][data-power="low"]:not([data-admin-theme]) body {
 html[data-theme="dark"]:not([data-admin-theme]) :is([data-band="ink"], .ink-band) {
   background-color: #0b0a09;
   box-shadow: inset 0 1px 0 rgb(224 154 79 / 0.12), inset 0 -1px 0 rgb(224 154 79 / 0.08);
-}
-
-/* Mockups of client websites (e.g. the hero storefront) keep their real light
-   colours in the dark theme: they depict someone else's site, not this one. */
-html[data-theme="dark"]:not([data-admin-theme]) .keep-light {
-  color-scheme: light;
-  --color-paper: #f3eadb;
-  --color-paper-hi: #fbf6ec;
-  --color-paper-lo: #e4d8c3;
-  --color-paper-edge: #cdbfa6;
-  --color-ink: #111111;
-  --color-ink-2: #1e1c1a;
-  --color-ink-3: #2c2925;
-  --color-muted: #675e52;
-  --color-walnut: #6b4a2f;
 }

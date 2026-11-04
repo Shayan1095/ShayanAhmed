@@ -34,15 +34,10 @@ export default async function HomePage() {
     getFaqs(),
   ]);
   const flagship = featured.find((p) => p.hasCaseStudy);
-  const brandsAttire = featured.find((p) => p.slug === "brands-attire");
 
   return (
     <main id="main">
-      <Hero
-        settings={settings}
-        storefront={brandsAttire?.customerView ?? brandsAttire?.cover}
-        caseStudyHref={flagship ? `/work/${flagship.slug}` : undefined}
-      />
+      <Hero caseStudyHref={flagship ? `/work/${flagship.slug}` : undefined} />
       <VelocityMarquee items={["Websites", "Systems", "Automation", "Storefronts", "Admin panels", "Operations agents"]} />
       <Work projects={featured} />
       <Band aria-label="Talk about your project" className="pb-20 min-[900px]:pb-24">

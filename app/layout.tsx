@@ -49,18 +49,15 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F3EADB" },
-    { media: "(prefers-color-scheme: dark)", color: "#110F0D" },
-  ],
-  colorScheme: "light dark",
+  themeColor: "#120C08",
+  colorScheme: "dark",
   viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // suppressHydrationWarning: the theme scripts set data-theme / data-admin-theme on <html> before React loads (no flash).
+  // The site is dark-only (data-theme). suppressHydrationWarning: the admin sets data-admin-theme on <html> before React loads.
   return (
-    <html lang="en" className={fontVariables} suppressHydrationWarning>
+    <html lang="en" data-theme="dark" className={fontVariables} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: siteThemeScript }} />
       </head>

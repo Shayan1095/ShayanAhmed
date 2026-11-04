@@ -1,4 +1,4 @@
-import { Anybody, Hanken_Grotesk, Martian_Mono } from "next/font/google";
+import { Anybody, Archivo, Hanken_Grotesk, Instrument_Serif, Martian_Mono } from "next/font/google";
 
 /** Display: variable width + weight, roman and italic. */
 export const anybody = Anybody({
@@ -27,4 +27,21 @@ export const martian = Martian_Mono({
   preload: false,
 });
 
-export const fontVariables = `${anybody.variable} ${hanken.variable} ${martian.variable}`;
+/** Hero masthead ("THE BUILD"): heavy and condensed, so it needs the width axis. */
+export const archivo = Archivo({
+  subsets: ["latin"],
+  axes: ["wdth"],
+  variable: "--font-archivo",
+  display: "swap",
+});
+
+/** Hero headline and the Built-in index: editorial serif, roman and italic. */
+export const instrument = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-instrument",
+  display: "swap",
+});
+
+export const fontVariables = `${anybody.variable} ${hanken.variable} ${martian.variable} ${archivo.variable} ${instrument.variable}`;

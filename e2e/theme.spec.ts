@@ -3,39 +3,25 @@ import { expectNoA11yViolations } from "./helpers";
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
-test.describe("site theme", () => {
-  test("the switch turns the site dark, and the choice is remembered", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce", colorScheme: "light" });
-    await page.setViewportSize({ width: 1366, height: 860 });
-    await page.goto("/");
-    const html = page.locator("html");
-    await expect(html).toHaveAttribute("data-theme", "light");
-
-    await page.getByRole("button", { name: "Switch to dark theme" }).click();
-    await expect(html).toHaveAttribute("data-theme", "dark");
-    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(17, 15, 13)");
-
-    await page.reload();
-    await expect(html).toHaveAttribute("data-theme", "dark");
-    await expect(page.getByRole("button", { name: "Switch to light theme" })).toBeVisible();
-  });
-
-  test("first visit follows the system setting", async ({ page }) => {
-    await page.emulateMedia({ colorScheme: "dark" });
+test.describe("site theme (dark only)", () => {
+  test("the site is dark even with a light system setting or an old saved choice", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("sa-theme", "light"));
+    await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(17, 15, 13)");
+    // No theme switch any more.
+    await expect(page.getByRole("button", { name: /Switch to (light|dark) theme/ })).toHaveCount(0);
   });
 
-  test("dark theme passes contrast checks across the homepage", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce", colorScheme: "dark" });
+  test("passes contrast checks across the homepage", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     await expectNoA11yViolations(page);
   });
 
   test("the admin keeps its own theme", async ({ page }) => {
-    await page.emulateMedia({ colorScheme: "dark" });
     await page.goto("/admin/login");
-    // The site's dark palette doesn't leak into the admin (it has its own switch).
     await expect(page.locator("html")).toHaveAttribute("data-admin-theme", /light|dark/);
   });
 });

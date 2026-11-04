@@ -1,190 +1,116 @@
-"use client";
+import { cacheLife } from "next/cache";
+import { ArrowRight } from "lucide-react";
+import { BuiltInIndex } from "./built-in-index";
+import { COVER, FOIL, GLOW, GRID, HERO_COPY } from "./hero-data";
 
-import { motion, useMotionValue, useSpring } from "motion/react";
-import { useEffect, useRef, useState } from "react";
-import type { ImageRef, SiteSettings } from "@/lib/content/types";
-import { Button, Label, type ScreenHandle } from "@/components/system";
-import { useFinePointer, useReducedMotion } from "@/hooks/use-media-query";
-import { gsap, MQ, useGSAP } from "@/lib/gsap";
-import { cn } from "@/lib/utils";
-import { HeroSlab } from "./hero-slab";
-import { useOpsDemo } from "./use-ops-demo";
-
-type HeroProps = {
-  settings: SiteSettings;
-  /** Real Brands Attire storefront screenshot, when available. */
-  storefront?: ImageRef;
-  /** Case study the secondary call to action opens. */
-  caseStudyHref?: string;
-};
-
-const lines = ["Websites with", "the systems", "built in"] as const;
-const trust = ["Clients in Pakistan and abroad", "Calls in your time zone", "Reply within 24h"];
-const TILT = { x: 3, y: -7 };
+/** The cover's issue date, kept current (refreshed daily). */
+async function issueDate() {
+  "use cache";
+  cacheLife("days");
+  return new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "Asia/Karachi" }).toUpperCase();
+}
 
 /**
- * Hero (revised): magazine-cover headline plus an interactive proof. The slab
- * is a working demo of what Shayan builds: agents prepare decisions, the
- * visitor approves them. No scroll-jacking; the headline paints immediately.
+ * Hero "The Build" (HERO_BUILD_BRIEF.md, hero-reference.html): a magazine
+ * cover. Issue line, the "THE BUILD" masthead in copper foil, the cover
+ * story (the page's h1) and the Built-in index. Server-rendered; only the
+ * index is a client component. The site navbar floats above it unchanged.
  */
-export function Hero({ settings, storefront, caseStudyHref }: HeroProps) {
-  const root = useRef<HTMLElement>(null);
-  const screen = useRef<ScreenHandle>(null);
-  const reduce = useReducedMotion();
-  const fine = useFinePointer();
-
-  // The demo runs after the screen boots and only while the hero is on screen.
-  const [booted, setBooted] = useState(false);
-  const [inView, setInView] = useState(true);
-  const { state, decision, decide } = useOpsDemo(settings.heroDemo, booted && inView);
-
-  useEffect(() => {
-    const el = root.current;
-    if (!el) return;
-    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting));
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  // Screen boot after the CSS entrance has placed the slab.
-  useEffect(() => {
-    const id = window.setTimeout(
-      () => {
-        screen.current?.boot();
-        setBooted(true);
-      },
-      reduce ? 0 : 750,
-    );
-    return () => window.clearTimeout(id);
-  }, [reduce]);
-
-  // Slight turn toward the cursor (desktop). Motion owns the slab's rotation.
-  const rx = useSpring(useMotionValue(TILT.x), { stiffness: 50, damping: 18 });
-  const ry = useSpring(useMotionValue(TILT.y), { stiffness: 50, damping: 18 });
-  useEffect(() => {
-    if (!fine || reduce) return;
-    const onMove = (e: PointerEvent) => {
-      rx.set(TILT.x - (e.clientY / window.innerHeight - 0.5) * 4);
-      ry.set(TILT.y + (e.clientX / window.innerWidth - 0.5) * 7);
-    };
-    window.addEventListener("pointermove", onMove, { passive: true });
-    return () => window.removeEventListener("pointermove", onMove);
-  }, [fine, reduce, rx, ry]);
-
-  // Scroll-linked exit (desktop): headline lines drift apart, the demo floats up.
-  useGSAP(
-    () => {
-      gsap.matchMedia().add(MQ.desktop, () => {
-        const q = gsap.utils.selector(root);
-        const st = { trigger: root.current, start: "top top", end: "bottom top", scrub: 0.8 };
-        const dirs = [-1, 1, -1];
-        q("[data-hero-row]").forEach((row, i) =>
-          gsap.to(row, { xPercent: dirs[i] * 9, opacity: 0.35, ease: "none", scrollTrigger: st }),
-        );
-        gsap.to(q("[data-hero-float]"), { yPercent: -14, ease: "none", scrollTrigger: st });
-        gsap.to(q("[data-hero-copy]"), { y: -50, opacity: 0.5, ease: "none", scrollTrigger: st });
-      });
-    },
-    { scope: root },
-  );
-
+export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
+  const date = await issueDate();
   return (
     <section
-      ref={root}
-      id="hero"
       aria-labelledby="hero-title"
-      className="hero-surface relative overflow-clip pb-16 pt-[calc(env(safe-area-inset-top)+104px)] min-[900px]:pb-20 min-[900px]:pt-[calc(env(safe-area-inset-top)+112px)]"
+      className="relative overflow-hidden"
+      style={{ backgroundColor: COVER.ink, color: COVER.paper }}
     >
-      <div className="wrap [--hl:clamp(38px,10.4vw,64px)] min-[900px]:[--hl:min(8vw,13vh,132px)]">
-        <Label className="hero-in mb-5 block [animation-delay:.05s]">Full-stack developer · Pakistan</Label>
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={GLOW} />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={GRID} />
 
-        <h1
-          id="hero-title"
-          aria-label="Websites with the systems built in."
-          className="whitespace-nowrap font-display text-[length:var(--hl)] font-extrabold uppercase leading-[0.86] tracking-[-0.045em] [font-variation-settings:'wdth'_108]"
+      {/* Top padding clears the floating navbar; svh keeps phone browser bars from cutting it off. */}
+      <div className="relative mx-auto flex min-h-svh max-w-[1360px] flex-col px-4 pb-11 pt-[calc(env(safe-area-inset-top)+96px)] min-[560px]:px-8 min-[900px]:pt-[calc(env(safe-area-inset-top)+100px)]">
+        {/* Issue line */}
+        <p
+          className="m-0 flex flex-wrap justify-between gap-x-4 gap-y-1 pb-2.5 font-mono text-[11px] uppercase tracking-[0.14em]"
+          style={{ color: COVER.muted2, borderBottom: "1px solid rgba(232,178,122,.3)" }}
         >
-          {lines.map((l, i) => (
-            <span key={l} aria-hidden="true" data-hero-row className="block overflow-hidden pb-[0.04em]">
-              <span className="hero-line inline-block" style={{ animationDelay: `${0.06 + i * 0.07}s` }}>
-                {i === 2 ? (
-                  <>
-                    <em className="font-[750] italic text-walnut [font-variation-settings:'wdth'_92]">{l}</em>
-                    <i className="ml-[0.05em] inline-block size-[0.15em] rounded-full bg-copper shadow-[0_0_0.22em_rgb(201_133_63/.8)]" />
-                  </>
-                ) : (
-                  l
-                )}
-              </span>
-            </span>
-          ))}
-        </h1>
+          <span>No. 01 — {date}</span>
+          <span>{HERO_COPY.issueMiddle}</span>
+          <span>{HERO_COPY.issueRight}</span>
+        </p>
 
-        {/* Below the headline: copy on the left, the demo on the right rising beside "BUILT IN." */}
-        <div className="mt-8 grid grid-cols-1 gap-10 min-[1000px]:mt-0 min-[1000px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] min-[1000px]:items-start min-[1000px]:gap-14">
-          <div data-hero-copy className="flex flex-col gap-7 min-[1000px]:pt-9">
-            <p className="hero-in max-w-[30em] text-[17px] leading-[1.6] text-muted [animation-delay:.3s] min-[900px]:text-lg">
-              I&apos;m <strong className="font-semibold text-ink">Shayan Ahmed</strong>. I build the storefront your
-              customers use and the back office that runs it, with agents that take the routine work off your plate
-              while you approve every decision.
+        {/* Masthead: decorative; the h1 below carries the meaning. */}
+        <p
+          aria-hidden="true"
+          className="m-0 mt-2.5 whitespace-nowrap text-center font-[family-name:var(--font-archivo)] font-black uppercase"
+          style={{
+            ...FOIL,
+            fontStretch: "62%",
+            fontVariationSettings: "'wdth' 62",
+            fontSize: "clamp(88px, 23.5vw, 340px)",
+            lineHeight: 0.8,
+            letterSpacing: "-0.03em",
+          }}
+        >
+          {HERO_COPY.masthead}
+        </p>
+
+        {/* Credit line */}
+        <p className="m-0 mt-2.5 flex flex-wrap justify-between gap-x-4 gap-y-1 font-mono text-[11px] uppercase tracking-[0.14em]" style={{ color: COVER.copper }}>
+          <span>{HERO_COPY.creditLeft}</span>
+          <span>{HERO_COPY.creditRight}</span>
+        </p>
+
+        {/* Lower row: the cover story and the Built-in index */}
+        <div className="flex flex-1 flex-wrap items-end justify-between gap-12 pt-11">
+          <div className="flex min-w-0 flex-[999_1_600px] flex-col gap-[26px]">
+            <p className="m-0 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.16em]" style={{ color: COVER.copper }}>
+              <span aria-hidden="true" className="h-px w-7" style={{ background: COVER.copper }} />
+              {HERO_COPY.eyebrow}
             </p>
-            <div className="hero-in flex flex-wrap gap-3 [animation-delay:.38s] max-[520px]:[&>*]:flex-1">
-              <Button href="#contact" arrow size="lg" className="w-full">
-                Start a project
-              </Button>
-              {caseStudyHref && (
-                <Button href={caseStudyHref} variant="paper" size="lg" className="w-full">
-                  See a case study
-                </Button>
-              )}
-            </div>
-            <p
-              aria-live="polite"
-              className="hero-in hidden items-center gap-3 font-mono text-xs uppercase tracking-[0.1em] text-walnut [animation-delay:.46s] min-[1000px]:flex"
+            <h1
+              id="hero-title"
+              className="m-0 font-[family-name:var(--font-instrument)] font-normal"
+              // Normal wrapping (not the site-wide balance), so it breaks as in the reference: "…the systems / built in."
+              style={{ fontSize: "clamp(52px, 6.8vw, 104px)", lineHeight: 0.95, letterSpacing: "-0.02em", textWrap: "wrap" }}
             >
-              <span aria-hidden="true" className="inline-block h-px w-10 bg-walnut/60" />
-              {state.touched ? "Agents do the routine. You make the calls." : "Try it: make the call on the right."}
+              Websites with the systems{" "}
+              <em className="pr-[0.06em]" style={FOIL}>
+                built in.
+              </em>
+            </h1>
+            <p className="m-0 max-w-[560px] text-[17px] leading-[1.65]" style={{ color: COVER.muted }}>
+              I&apos;m{" "}
+              <strong className="font-semibold" style={{ color: COVER.paper }}>
+                Shayan Ahmed
+              </strong>
+              . I build the storefront your customers use and the back office that runs it, with agents that take the routine work off your plate while you
+              approve every decision.
             </p>
-            <ul className="hero-in hidden flex-wrap gap-x-6 gap-y-2 text-sm text-muted [animation-delay:.52s] min-[1000px]:flex">
-              {trust.map((t) => (
-                <li key={t} className="flex items-center gap-2">
-                  <span aria-hidden="true" className="size-1 rounded-full bg-walnut" />
-                  {t}
-                </li>
-              ))}
-            </ul>
+            <div className="flex flex-wrap gap-3">
+              <a
+                href="#contact"
+                className="group inline-flex min-h-[54px] items-center gap-2.5 rounded-[4px] px-[26px] text-[16px] font-bold transition-[transform,box-shadow] duration-150 hover:-translate-y-px active:translate-y-[3px] active:shadow-[inset_0_1px_0_rgba(255,255,255,.45),0_1px_0_#6B3F22]"
+                style={{
+                  color: COVER.onCopper,
+                  background: "linear-gradient(180deg, #F2CC9C 0%, #D49A62 55%, #B8763F 100%)",
+                  boxShadow: "inset 0 1px 0 rgba(255,255,255,.55), 0 4px 0 #6B3F22, 0 14px 30px rgba(214,140,76,.22)",
+                }}
+              >
+                {HERO_COPY.primaryCta}
+                <ArrowRight aria-hidden="true" className="size-[18px] transition-transform duration-300 group-hover:translate-x-0.5" />
+              </a>
+              <a
+                href={caseStudyHref ?? "#work"}
+                className="inline-flex min-h-[54px] items-center rounded-[4px] px-6 text-[16px] font-semibold transition-colors hover:text-[#E8B27A]"
+                style={{ color: COVER.paper, background: "rgba(18,12,8,.5)", boxShadow: "inset 0 0 0 1px rgba(243,234,219,.4)" }}
+              >
+                {HERO_COPY.secondaryCta}
+              </a>
+            </div>
           </div>
 
-          <div className="hero-slab-in relative min-[1000px]:-mt-[calc(var(--hl)*0.98)] min-[1000px]:justify-self-end">
-            <div data-hero-float>
-            <motion.div
-              style={{ rotateX: rx, rotateY: ry, transformPerspective: 1600 }}
-              className={cn("w-full min-[1000px]:w-[min(44vw,560px)]", !fine && "transform-none!")}
-            >
-              <HeroSlab
-                state={state}
-                decision={decision}
-                onDecide={decide}
-                source={settings.heroDemo.source}
-                storefront={storefront}
-                screenRef={screen}
-              />
-            </motion.div>
-            </div>
-            <div
-              aria-hidden="true"
-              className="mx-auto -mt-3 h-7 w-[84%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(17_17_17/.22),transparent)] blur-md"
-            />
-          </div>
-
-          {/* Trust facts on small screens sit under the demo. */}
-          <ul className="flex flex-col gap-2 text-sm text-muted min-[1000px]:hidden">
-            {trust.map((t) => (
-              <li key={t} className="flex items-center gap-2">
-                <span aria-hidden="true" className="size-1 rounded-full bg-walnut" />
-                {t}
-              </li>
-            ))}
-          </ul>
+          <BuiltInIndex />
         </div>
       </div>
     </section>

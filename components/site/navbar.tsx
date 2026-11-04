@@ -10,7 +10,6 @@ import { gsap, MQ, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { easeOutExpo, motionGrammar } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { Clock } from "./clock";
-import { ThemeToggle } from "./theme";
 import { chapters, navLinks, sectionHref, type ChapterId, type NavId, type NavProject } from "./nav-links";
 
 type NavbarProps = {
@@ -243,7 +242,6 @@ export function Navbar({ availability, onHome, onWork = false, place, email, lin
                 <StatusLight label={availability} className="text-[13px] font-semibold" />
                 <Clock className="font-mono text-[10px] tracking-[0.1em] text-muted" />
               </div>
-              <ThemeToggle className="raised-sm hidden size-[42px] rounded-control text-ink hover:text-copper min-[900px]:inline-flex" />
               <div className="hidden min-[900px]:inline-flex">
                 <a
                   href={sectionHref("contact", onHome)}
@@ -328,7 +326,7 @@ function LetterReveal({ text, delay = 0 }: { text: string; delay?: number }) {
 /** A project's screenshot, or its monitor label on an ink screen until screenshots are added. */
 function ProjectThumb({ project, className }: { project: NavProject; className?: string }) {
   return (
-    <span className={cn("relative block overflow-hidden rounded-lg bg-ink", className)}>
+    <span className={cn("tone-ink relative block overflow-hidden rounded-lg bg-ink", className)}>
       {project.image ? (
         // eslint-disable-next-line @next/next/no-img-element -- small preview; next/image adds nothing here
         <img
@@ -588,7 +586,6 @@ function MobileMenu({
             )}
             <StatusLight label={availability} />
             <Clock />
-            <ThemeToggle withLabel className="ink-inset min-h-12 rounded-control font-sans text-[15px] font-semibold tracking-normal text-paper" />
             <a
               href={sectionHref("contact", onHome)}
               onClick={onClose}
