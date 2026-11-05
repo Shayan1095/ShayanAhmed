@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Keycap } from "@/components/system";
+import { SALogo } from "@/components/brand/sa-logo";
 import { useSmoothScroll } from "@/components/providers/smooth-scroll";
 import { gsap, MQ, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { easeOutExpo, motionGrammar } from "@/lib/motion";
@@ -159,7 +159,7 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
             )}
           >
             <Link href="/" className="flex items-center gap-3">
-              <Keycap aria-hidden="true">SA</Keycap>
+              <SALogo size={38} aria-hidden="true" className="shrink-0" />
               <span className="flex flex-col leading-tight">
                 <span className="font-display text-[15px] font-bold [font-variation-settings:'wdth'_108]">Shayan Ahmed</span>
                 {/* Where you are on the page. Decorative: links carry aria-current. */}
@@ -492,9 +492,7 @@ function MobileMenu({
         >
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-3 font-display text-[15px] font-bold [font-variation-settings:'wdth'_108]">
-              <Keycap tone="paper" aria-hidden="true">
-                SA
-              </Keycap>
+              <SALogo size={38} aria-hidden="true" className="shrink-0" />
               Shayan Ahmed
             </span>
             <button

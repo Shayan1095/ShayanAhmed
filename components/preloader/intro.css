@@ -1,0 +1,26 @@
+/*
+ * Page-level rules for the intro (global: CSS modules need a local class).
+ * The hero marks elements with data-intro-rv and a --d delay; they rise
+ * as the overlay splits. The late variant is a failsafe if JS never runs.
+ */
+@keyframes sa-rv-in { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes sa-rv-late { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* The overlay (.sa-intro) is only shown while the intro runs. */
+.sa-intro { display: none; }
+html[data-intro="play"] .sa-intro,
+html[data-intro="split"] .sa-intro { display: block; }
+/* While playing, a click lands on the overlay (and skips) instead of the page. */
+html[data-intro="play"] .sa-intro { pointer-events: auto; cursor: default; }
+html[data-intro="play"] { overflow: hidden; }
+html[data-intro="play"] [data-intro-rv] {
+  animation: sa-rv-late 620ms cubic-bezier(0.2, 0.8, 0.2, 1) calc(4060ms + var(--d, 0ms)) both;
+}
+html[data-intro="split"] [data-intro-rv] {
+  animation: sa-rv-in 620ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--d, 0ms) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sa-intro { display: none !important; }
+  [data-intro-rv] { animation: none !important; opacity: 1 !important; }
+}

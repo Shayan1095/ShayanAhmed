@@ -1,15 +1,11 @@
-import { cacheLife } from "next/cache";
 import { ArrowRight } from "lucide-react";
 import { BuiltInIndex } from "./built-in-index";
 import { CoverGrid } from "@/components/system/cover-grid";
 import { COVER, FOIL, GLOW, HERO_COPY } from "./hero-data";
+import { issueDate } from "@/lib/issue-date";
 
-/** The cover's issue date, kept current (refreshed daily). */
-async function issueDate() {
-  "use cache";
-  cacheLife("days");
-  return new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "Asia/Karachi" }).toUpperCase();
-}
+/** Hero reveal after the intro's split (preloader/intro.css): delay per element. */
+const rv = (ms: number) => ({ "data-intro-rv": "", style: { "--d": `${ms}ms` } as React.CSSProperties });
 
 /**
  * Hero "The Build" (HERO_BUILD_BRIEF.md, hero-reference.html): a magazine
@@ -32,8 +28,9 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
       <div className="relative mx-auto flex min-h-svh max-w-[1360px] flex-col px-4 pb-11 pt-[calc(env(safe-area-inset-top)+96px)] min-[560px]:px-8 min-[900px]:pt-[calc(env(safe-area-inset-top)+100px)]">
         {/* Issue line */}
         <p
+          data-intro-rv=""
           className="m-0 flex flex-wrap justify-between gap-x-4 gap-y-1 pb-2.5 font-mono text-[11px] uppercase tracking-[0.14em]"
-          style={{ color: COVER.muted2, borderBottom: "1px solid rgba(232,178,122,.3)" }}
+          style={{ ...rv(100).style, color: COVER.muted2, borderBottom: "1px solid rgba(232,178,122,.3)" }}
         >
           <span>No. 01 — {date}</span>
           <span>{HERO_COPY.issueMiddle}</span>
@@ -43,8 +40,10 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
         {/* Masthead: decorative; the h1 below carries the meaning. */}
         <p
           aria-hidden="true"
+          data-intro-rv=""
           className="m-0 mt-2.5 whitespace-nowrap text-center font-[family-name:var(--font-archivo)] font-black uppercase"
           style={{
+            ...rv(60).style,
             ...FOIL,
             fontStretch: "62%",
             fontVariationSettings: "'wdth' 62",
@@ -57,14 +56,18 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
         </p>
 
         {/* Credit line */}
-        <p className="m-0 mt-2.5 flex flex-wrap justify-between gap-x-4 gap-y-1 font-mono text-[11px] uppercase tracking-[0.14em]" style={{ color: COVER.copper }}>
+        <p
+          data-intro-rv=""
+          className="m-0 mt-2.5 flex flex-wrap justify-between gap-x-4 gap-y-1 font-mono text-[11px] uppercase tracking-[0.14em]"
+          style={{ ...rv(100).style, color: COVER.copper }}
+        >
           <span>{HERO_COPY.creditLeft}</span>
           <span>{HERO_COPY.creditRight}</span>
         </p>
 
         {/* Lower row: the cover story and the Built-in index */}
         <div className="flex flex-1 flex-wrap items-end justify-between gap-12 pt-11">
-          <div className="flex min-w-0 flex-[999_1_600px] flex-col gap-[26px]">
+          <div {...rv(160)} className="flex min-w-0 flex-[999_1_600px] flex-col gap-[26px]">
             <p className="m-0 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.16em]" style={{ color: COVER.copper }}>
               <span aria-hidden="true" className="h-px w-7" style={{ background: COVER.copper }} />
               {HERO_COPY.eyebrow}
@@ -111,7 +114,9 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
             </div>
           </div>
 
-          <BuiltInIndex />
+          <div {...rv(220)} className="flex flex-[1_1_340px] max-w-[420px]">
+            <BuiltInIndex />
+          </div>
         </div>
       </div>
     </section>

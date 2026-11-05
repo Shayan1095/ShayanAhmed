@@ -4,10 +4,13 @@ import { MobileCta, RouteMobileCta } from "@/components/site/mobile-cta";
 import { toNavProjects } from "@/components/site/nav-links";
 import { Navbar, RouteNavbar } from "@/components/site/navbar";
 import { Suspense } from "react";
+import { Preloader } from "@/components/preloader/preloader";
+import { introGateScript } from "@/lib/intro-script";
+import { issueDate } from "@/lib/issue-date";
 import { getFeaturedProjects, getSiteSettings } from "@/lib/content";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [settings, featured] = await Promise.all([getSiteSettings(), getFeaturedProjects()]);
+  const [settings, featured, date] = await Promise.all([getSiteSettings(), getFeaturedProjects(), issueDate()]);
   const nav = {
     email: settings.email,
     linkedin: settings.linkedin,
@@ -15,6 +18,9 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   };
   return (
     <SiteProviders>
+      {/* The intro: the gate runs before the overlay is parsed, so a skipped intro never flashes. Public pages only. */}
+      <script dangerouslySetInnerHTML={{ __html: introGateScript }} />
+      <Preloader date={date} />
       {/* Without JS, collapsed drawers open so every answer stays readable. */}
       <noscript>
         <style>{`[data-drawer-body]{height:auto!important;opacity:1!important}`}</style>

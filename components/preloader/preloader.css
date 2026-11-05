@@ -1,0 +1,204 @@
+/*
+ * Intro preloader: "crop-mark entry + measured exit" (SA-Brand/preloader/
+ * preloader-reference.html). Keyframes, easings and delays are ported as-is
+ * (--t = 1). Two changes from the reference, both from the brief:
+ *  - fluid layout: split at 50svh, frame min(1000px, 100vw - 32px), name
+ *    clamp(48px, 13.8vw, 150px);
+ *  - the line is a real progress bar: it runs to 92% (140-900ms), then the
+ *    component finishes it (92-100% in 140ms) once fonts are ready.
+ * The overlay is shown only while html[data-intro] is "play" or "split" (set
+ * before first paint by the intro gate script); see intro.css.
+ */
+
+@property --n {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@keyframes sa-pl-mIn { from { transform: translate(var(--ox), var(--oy)); opacity: 0; } to { transform: translate(0, 0); opacity: 1; } }
+@keyframes sa-pl-show { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sa-pl-hide { from { opacity: 1; } to { opacity: 0; } }
+@keyframes sa-pl-up { to { transform: translateY(-100%); } }
+@keyframes sa-pl-down { to { transform: translateY(100%); } }
+@keyframes sa-pl-lift { from { clip-path: inset(0 0 100% 0); transform: translateY(24px); } to { clip-path: inset(0 0 0 0); transform: none; } }
+/* Progress, phase 1: 0 → 92%. */
+@keyframes sa-pl-grow92 { from { transform: scaleX(0); } to { transform: scaleX(0.92); } }
+@keyframes sa-pl-reveal92 { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 8% 0 0); } }
+@keyframes sa-pl-ride92 { from { transform: translateX(0); } to { transform: translateX(92vw); } }
+@keyframes sa-pl-count92 { from { --n: 0; } to { --n: 92; } }
+/* Progress, phase 2: 92 → 100%. */
+@keyframes sa-pl-growEnd { from { transform: scaleX(0.92); } to { transform: scaleX(1); } }
+@keyframes sa-pl-revealEnd { from { clip-path: inset(0 8% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes sa-pl-rideEnd { from { transform: translateX(92vw); } to { transform: translateX(100vw); } }
+@keyframes sa-pl-countEnd { from { --n: 92; } to { --n: 100; } }
+
+.sa-pl-overlay {
+  --frame-w: min(1000px, calc(100vw - 32px));
+  --frame-h: 380px;
+  --arm: 28px;
+  --split: 50svh;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  color: #f3eadb;
+}
+
+.sa-pl-half {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: var(--split);
+  overflow: hidden;
+  background-color: #120c08;
+  background-image:
+    linear-gradient(rgba(217, 167, 119, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 167, 119, 0.06) 1px, transparent 1px),
+    linear-gradient(rgba(217, 167, 119, 0.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 167, 119, 0.13) 1px, transparent 1px);
+  background-size: 24px 24px, 24px 24px, 120px 120px, 120px 120px;
+}
+.sa-pl-top { top: 0; }
+.sa-pl-bottom { top: var(--split); background-position: 0 calc(-1 * var(--split)); }
+/* Failsafe: if the script never runs, the intro still opens by itself at 4s. */
+@keyframes sa-pl-upLate { to { transform: translateY(-100%); } }
+@keyframes sa-pl-downLate { to { transform: translateY(100%); } }
+.sa-pl-top { animation: sa-pl-upLate 620ms cubic-bezier(0.76, 0, 0.24, 1) 4000ms forwards; }
+.sa-pl-bottom { animation: sa-pl-downLate 620ms cubic-bezier(0.76, 0, 0.24, 1) 4000ms forwards; }
+/* ...and stops covering the page once open (visibility also drops hit-testing). */
+@keyframes sa-pl-release { to { visibility: hidden; } }
+.sa-pl-overlay { animation: sa-pl-release 1ms linear 4640ms forwards; }
+.sa-pl-splitting.sa-pl-overlay { animation: none; }
+
+/* Crop marks: 10px outside the frame corners. */
+.sa-pl-mark {
+  position: absolute;
+  width: var(--arm);
+  height: var(--arm);
+  box-sizing: border-box;
+  animation: sa-pl-mIn 560ms cubic-bezier(0.2, 0.8, 0.2, 1) 40ms both;
+}
+.sa-pl-top .sa-pl-mark { top: calc(var(--split) - var(--frame-h) / 2 - 10px); }
+.sa-pl-bottom .sa-pl-mark { top: calc(var(--frame-h) / 2 + 10px - var(--arm)); }
+.sa-pl-markL { left: calc(50% - var(--frame-w) / 2 - 10px); }
+.sa-pl-markR { left: calc(50% + var(--frame-w) / 2 + 10px - var(--arm)); }
+.sa-pl-top .sa-pl-markL { border-top: 1.5px solid #e8b27a; border-left: 1.5px solid #e8b27a; --ox: -70px; --oy: -70px; }
+.sa-pl-top .sa-pl-markR { border-top: 1.5px solid #e8b27a; border-right: 1.5px solid #e8b27a; --ox: 70px; --oy: -70px; }
+.sa-pl-bottom .sa-pl-markL { border-bottom: 1.5px solid #e8b27a; border-left: 1.5px solid #e8b27a; --ox: -70px; --oy: 70px; }
+.sa-pl-bottom .sa-pl-markR { border-bottom: 1.5px solid #e8b27a; border-right: 1.5px solid #e8b27a; --ox: 70px; --oy: 70px; }
+
+/* Registration mark: centred, 51px above the frame. */
+.sa-pl-reg {
+  position: absolute;
+  left: calc(50% - 17px);
+  top: calc(var(--split) - var(--frame-h) / 2 - 51px - 17px);
+  overflow: visible;
+  animation: sa-pl-show 360ms ease 160ms both;
+}
+
+.sa-pl-caption {
+  position: absolute;
+  left: calc(50% - var(--frame-w) / 2 + 40px);
+  right: calc(50% - var(--frame-w) / 2 + 40px);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #b5a893;
+  font-family: var(--font-martian), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: sa-pl-show 380ms ease 560ms both;
+}
+.sa-pl-top .sa-pl-caption { top: calc(var(--split) - var(--frame-h) / 2 + 14px); }
+.sa-pl-bottom .sa-pl-caption { top: 26px; }
+.sa-pl-captionAccent { color: #e8b27a; }
+
+/* The name sits just above the line and is clipped at it. */
+.sa-pl-name {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  text-align: center;
+  clip-path: inset(-40px -40px 0 -40px);
+  font-family: var(--font-archivo), "Arial Narrow", sans-serif;
+  font-weight: 900;
+  font-stretch: 62%;
+  font-variation-settings: "wdth" 62;
+  font-size: clamp(48px, 13.8vw, 150px);
+  line-height: 0.8;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.sa-pl-foil {
+  background: linear-gradient(100deg, #8c5530 0%, #e8b27a 20%, #f7dcb5 30%, #c08048 46%, #7a4626 60%, #d9a06a 78%, #f2cc9c 88%, #9a5e33 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.sa-pl-nm1 { display: inline-block; animation: sa-pl-lift 620ms cubic-bezier(0.2, 0.8, 0.2, 1) 220ms both; }
+.sa-pl-nm2 { display: inline-block; animation: sa-pl-lift 620ms cubic-bezier(0.2, 0.8, 0.2, 1) 300ms both; }
+.sa-pl-gap { display: inline-block; width: 0.22em; }
+
+/* Ruler ticks: 24px minor, 120px major. */
+.sa-pl-ticks {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 15px;
+  animation: sa-pl-reveal92 760ms cubic-bezier(0.5, 0, 0.3, 1) 140ms both;
+}
+.sa-pl-minor { height: 7px; background: repeating-linear-gradient(90deg, rgba(232, 178, 122, 0.55) 0 1px, transparent 1px 24px); }
+.sa-pl-major { height: 15px; background: repeating-linear-gradient(90deg, rgba(242, 204, 156, 0.85) 0 1px, transparent 1px 120px); }
+
+/* Counter riding the line tip. */
+.sa-pl-rider {
+  position: absolute;
+  left: 0;
+  bottom: 22px;
+  animation: sa-pl-ride92 760ms cubic-bezier(0.5, 0, 0.3, 1) 140ms both;
+}
+.sa-pl-count {
+  display: block;
+  transform: translateX(calc(-100% - 10px));
+  color: #f2cc9c;
+  font-family: var(--font-martian), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  counter-reset: n var(--n);
+  animation: sa-pl-count92 760ms cubic-bezier(0.5, 0, 0.3, 1) 140ms both;
+}
+.sa-pl-count::after { content: counter(n); }
+
+.sa-pl-line {
+  position: absolute;
+  left: 0;
+  top: calc(var(--split) - 1px);
+  width: 100%;
+  height: 1.5px;
+  background: linear-gradient(90deg, #9e6034, #f2cc9c 70%, #fbe3c2);
+  transform-origin: 0 50%;
+  animation: sa-pl-grow92 760ms cubic-bezier(0.5, 0, 0.3, 1) 140ms both;
+}
+
+/* Phase 2: finish the line, 92 → 100%. */
+.sa-pl-finishing .sa-pl-ticks { animation: sa-pl-revealEnd 140ms cubic-bezier(0.5, 0, 0.3, 1) both; }
+.sa-pl-finishing .sa-pl-rider { animation: sa-pl-rideEnd 140ms cubic-bezier(0.5, 0, 0.3, 1) both; }
+.sa-pl-finishing .sa-pl-count { animation: sa-pl-countEnd 140ms cubic-bezier(0.5, 0, 0.3, 1) both; }
+.sa-pl-finishing .sa-pl-line { animation: sa-pl-growEnd 140ms cubic-bezier(0.5, 0, 0.3, 1) both; }
+
+/* Split: the halves part along the line (the line fades), from wherever the
+   intro is (a click skips straight here). */
+.sa-pl-splitting .sa-pl-top { animation: sa-pl-up 620ms cubic-bezier(0.76, 0, 0.24, 1) forwards; }
+.sa-pl-splitting .sa-pl-bottom { animation: sa-pl-down 620ms cubic-bezier(0.76, 0, 0.24, 1) forwards; }
+.sa-pl-splitting .sa-pl-line { animation: sa-pl-hide 160ms linear forwards; }
+
+@media (max-width: 639px) {
+  .sa-pl-overlay { --frame-h: 300px; --arm: 20px; }
+  .sa-pl-caption { font-size: 10px; }
+  .sa-pl-captionMiddle { display: none; }
+}
