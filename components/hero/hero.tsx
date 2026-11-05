@@ -65,8 +65,8 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
           <span>{HERO_COPY.creditRight}</span>
         </p>
 
-        {/* Lower row: the cover story and the Built-in index */}
-        <div className="flex flex-1 flex-wrap items-end justify-between gap-12 pt-11">
+        {/* Lower row: the cover story and the Built-in index. Side by side, the index's copper rule lines up with the top of the headline (44px = eyebrow + gap). */}
+        <div className="mt-auto flex flex-wrap items-start justify-between gap-12 pt-11">
           <div {...rv(160)} className="flex min-w-0 flex-[999_1_600px] flex-col gap-[26px]">
             <p className="m-0 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.16em]" style={{ color: COVER.copper }}>
               <span aria-hidden="true" className="h-px w-7" style={{ background: COVER.copper }} />
@@ -114,7 +114,7 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
             </div>
           </div>
 
-          <div {...rv(220)} className="flex flex-[1_1_340px] max-w-[420px]">
+          <div {...rv(220)} className="flex flex-[1_1_340px] max-w-[420px] min-[1056px]:mt-[44px]">
             <BuiltInIndex />
           </div>
         </div>
