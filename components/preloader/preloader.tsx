@@ -39,14 +39,20 @@ export function Preloader({ date }: { date: string }) {
       setPhase("splitting");
       later(() => setPhase("done"), SPLIT_MS + 20);
       // The hero's reveal ends by ~840ms after the split; then hand the page back.
-      later(() => delete html.dataset.intro, 900);
+      later(() => {
+        delete html.dataset.intro;
+        delete html.dataset.introFont;
+      }, 900);
     };
 
     // Phase 1 (0 → 92%) is the CSS animation already running since first paint.
-    const phase1 = lineRef.current?.getAnimations()[0]?.finished.catch(() => undefined) ?? Promise.resolve();
+    // The split also waits for the name to finish rising (it starts once its font is in).
+    const done = (els: Element[]) => Promise.all(els.flatMap((el) => el.getAnimations().map((a) => a.finished.catch(() => undefined))));
+    const phase1 = done(lineRef.current ? [lineRef.current] : []);
+    const name = done(Array.from(document.querySelectorAll(".sa-pl-nm1, .sa-pl-nm2")));
     const fonts = document.fonts?.ready ?? Promise.resolve();
     const cap = new Promise((r) => later(() => r(undefined), Math.max(0, CAP_MS - performance.now())));
-    Promise.all([phase1, Promise.race([fonts, cap])]).then(() => {
+    Promise.all([phase1, Promise.race([Promise.all([fonts, name]), cap])]).then(() => {
       if (split || cancelled) return;
       setPhase("finishing");
       later(doSplit, FINISH_MS);
