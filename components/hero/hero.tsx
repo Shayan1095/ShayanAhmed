@@ -74,16 +74,23 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
             </p>
             <h1
               id="hero-title"
-              className="m-0 font-[family-name:var(--font-instrument)] font-normal"
-              // Normal wrapping (not the site-wide balance), so it breaks as in the reference: "…the systems / built in."
-              style={{ fontSize: "clamp(52px, 6.8vw, 104px)", lineHeight: 0.95, letterSpacing: "-0.02em", textWrap: "wrap" }}
+              className="m-0 font-[family-name:var(--font-archivo)] font-extrabold"
+              // Heavy and a touch condensed; normal wrapping (not the site-wide balance), so it breaks "…the systems / built in."
+              style={{
+                fontSize: "clamp(46px, 6vw, 92px)",
+                fontStretch: "75%",
+                fontVariationSettings: "'wdth' 75",
+                lineHeight: 0.94,
+                letterSpacing: "-0.025em",
+                textWrap: "wrap",
+              }}
             >
               Websites with the systems{" "}
-              <em className="pr-[0.06em]" style={FOIL}>
+              <em className="not-italic" style={FOIL}>
                 built in.
               </em>
             </h1>
-            <p className="m-0 max-w-[560px] text-[17px] leading-[1.65]" style={{ color: COVER.muted }}>
+            <p className="m-0 max-w-[58ch] text-[17px] leading-[1.65] min-[900px]:text-[18px]" style={{ color: COVER.muted }}>
               I&apos;m{" "}
               <strong className="font-semibold" style={{ color: COVER.paper }}>
                 Shayan Ahmed

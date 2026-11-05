@@ -35,7 +35,7 @@ export function About({ settings }: { settings: SiteSettings }) {
                 // No photo yet: an embossed monogram, not placeholder text.
                 <span
                   aria-hidden="true"
-                  className="absolute inset-0 grid place-items-center font-display text-[clamp(96px,14vw,168px)] font-black text-paper-lo [font-variation-settings:'wdth'_120] [text-shadow:0_1px_0_rgb(255_255_255/.8),0_-1px_0_rgb(17_17_17/.12)]"
+                  className="absolute inset-0 grid place-items-center font-display text-[clamp(96px,14vw,168px)] font-black text-paper-lo [text-shadow:0_1px_0_rgb(255_255_255/.8),0_-1px_0_rgb(17_17_17/.12)]"
                 >
                   SA
                 </span>
@@ -47,7 +47,7 @@ export function About({ settings }: { settings: SiteSettings }) {
           <Label>
             <Typewriter text="05 · About" speed={38} />
           </Label>
-          <SplitReveal className="mb-[22px] mt-4 font-display text-[clamp(34px,4.4vw,60px)] font-extrabold uppercase leading-[0.94] tracking-[-0.035em] [font-variation-settings:'wdth'_116] [&_em]:font-bold [&_em]:italic [&_em]:text-walnut [&_em]:[font-variation-settings:'wdth'_95]">
+          <SplitReveal className="mb-[22px] mt-4 font-display text-[clamp(34px,4.4vw,60px)] font-extrabold uppercase leading-[0.94] tracking-[-0.035em] [&_em]:font-bold [&_em]:text-walnut">
             I build the part of the website <em>that does the work.</em>
           </SplitReveal>
           <p data-fx="item" className="max-w-[34em] text-[17px] leading-[1.7] text-muted">

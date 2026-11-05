@@ -32,7 +32,7 @@ export function Contact({ settings }: { settings: SiteSettings }) {
           <Label>
             <Typewriter text="08 · Contact" speed={38} />
           </Label>
-          <SplitReveal className="mb-6 mt-4 font-display text-[clamp(40px,5vw,72px)] font-extrabold leading-[0.95] tracking-[-0.03em] [font-variation-settings:'wdth'_104] [&_em]:font-bold [&_em]:italic [&_em]:text-copper [&_em]:[font-variation-settings:'wdth'_94]">
+          <SplitReveal className="mb-6 mt-4 font-display text-[clamp(40px,5vw,72px)] font-extrabold leading-[0.95] tracking-[-0.03em] [&_em]:font-bold [&_em]:text-copper">
             Let&apos;s build <em>your system.</em>
           </SplitReveal>
           <Rise as="p" className="max-w-[28em] text-[17px] text-muted-ink">

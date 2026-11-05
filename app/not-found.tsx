@@ -28,8 +28,8 @@ export default async function NotFound() {
         <div className="wrap grid grid-cols-1 items-center gap-12 min-[980px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] min-[980px]:gap-16">
           <div>
             <Label>Error 404 · Page not found</Label>
-            <h1 className="mb-6 mt-4 font-display text-[clamp(44px,6.4vw,92px)] font-extrabold leading-[0.95] tracking-[-0.03em] [font-variation-settings:'wdth'_104]">
-              This page <em className="font-bold italic text-walnut [font-variation-settings:'wdth'_94]">lost its signal.</em>
+            <h1 className="mb-6 mt-4 font-display text-[clamp(44px,6.4vw,92px)] font-extrabold leading-[0.95] tracking-[-0.03em]">
+              This page <em className="font-bold text-walnut">lost its signal.</em>
             </h1>
             <p className="max-w-[30em] text-[17px] text-muted">
               The link may be old, or the address has a typo. Everything else is still running: the work, the

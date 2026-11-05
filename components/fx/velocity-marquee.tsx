@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { gsap, MQ, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { isLowPowerDevice } from "@/lib/device-power";
 import { cn } from "@/lib/utils";
 
 type VelocityMarqueeProps = {
@@ -26,6 +27,8 @@ export function VelocityMarquee({ items, tone = "paper", className }: VelocityMa
       gsap.matchMedia().add(MQ.motion, () => {
         // The track holds two identical runs; moving it by half its width loops seamlessly.
         const loop = gsap.to(el, { xPercent: -50, ease: "none", duration: 38, repeat: -1 });
+        // Low-power devices: just the idle drift, no scroll-reactive speed or lean.
+        if (isLowPowerDevice()) return;
         const setSkew = gsap.quickSetter(el, "skewX", "deg");
         let direction = 1;
         let lean = 0;
@@ -81,7 +84,7 @@ export function VelocityMarquee({ items, tone = "paper", className }: VelocityMa
       <div
         ref={track}
         aria-hidden="true"
-        className="flex w-max font-display text-[clamp(22px,3vw,42px)] font-extrabold uppercase leading-none tracking-[-0.035em] will-change-transform [font-variation-settings:'wdth'_112]"
+        className="flex w-max font-display text-[clamp(22px,3vw,42px)] font-extrabold uppercase leading-none tracking-[-0.035em] will-change-transform"
       >
         {run(0)}
         {run(1)}

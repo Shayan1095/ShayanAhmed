@@ -2,7 +2,7 @@
 
 import Lenis from "lenis";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from "react";
-import { isLowPowerDevice } from "@/lib/device-power";
+import { isLowPowerDevice, markLowPower } from "@/lib/device-power";
 import { gsap, refreshScrollTriggers, ScrollTrigger } from "@/lib/gsap";
 import { useReducedMotion } from "@/hooks/use-media-query";
 
@@ -35,24 +35,58 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
   }, []);
 
   useEffect(() => {
-    // Power tier: "lite" on devices without GPU acceleration (cheaper surfaces,
-    // see [data-power="low"] in globals.css); motion and smooth scroll stay on.
-    document.documentElement.dataset.power = isLowPowerDevice() ? "low" : "full";
-    if (reduce) return;
+    // Power tier: "low" on devices without GPU acceleration or that can't hold
+    // the frame rate (cheaper surfaces, see [data-power="low"] in globals.css,
+    // and native scrolling: inertia that lags behind the wheel feels worse
+    // than none).
+    const html = document.documentElement;
+    let low = isLowPowerDevice();
+    html.dataset.power = low ? "low" : "full";
+    if (reduce || low) return;
 
     // Inertia scrolling: the page glides slightly behind the wheel for a weighted,
     // premium feel. anchors: plain <a href="#id"> links scroll smoothly too.
-    const lenis = new Lenis({ lerp: 0.075, wheelMultiplier: 0.95, smoothWheel: true, anchors: true });
+    const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true, anchors: true });
     lenisRef.current = lenis;
     lenis.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
-
-    return () => {
+    const off = () => {
       gsap.ticker.remove(tick);
       lenis.destroy();
       lenisRef.current = null;
+    };
+
+    // Frame-rate check once the page settles: if this machine can't hold ~45fps,
+    // drop to the low tier for the rest of the visit.
+    let probe = 0;
+    const start = window.setTimeout(() => {
+      const times: number[] = [];
+      let last = performance.now();
+      const frame = (now: number) => {
+        times.push(now - last);
+        last = now;
+        if (times.length < 60) {
+          probe = requestAnimationFrame(frame);
+          return;
+        }
+        const sorted = times.slice(5).sort((a, b) => a - b);
+        const median = sorted[Math.floor(sorted.length / 2)];
+        if (median > 22 && !low) {
+          low = true;
+          markLowPower();
+          html.dataset.power = "low";
+          off();
+        }
+      };
+      probe = requestAnimationFrame(frame);
+    }, 2500);
+
+    return () => {
+      window.clearTimeout(start);
+      cancelAnimationFrame(probe);
+      if (!low) off();
     };
   }, [reduce]);
 

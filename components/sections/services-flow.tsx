@@ -48,7 +48,7 @@ export function ServicesFlow() {
             <Screen className="w-full flex-1 px-[18px] pb-[18px] pt-4">
               <div className="relative z-[3]">
                 <span className="type-label text-[10px] text-muted-ink">{s.layer}</span>
-                <h3 className="mb-1.5 mt-2 font-display text-[21px] font-extrabold leading-[1.05] [font-variation-settings:'wdth'_104]">
+                <h3 className="mb-1.5 mt-2 font-display text-[21px] font-extrabold leading-[1.05]">
                   {s.title}
                 </h3>
                 <p className="text-sm text-muted-ink">{s.text}</p>

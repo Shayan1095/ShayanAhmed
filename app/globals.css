@@ -15,13 +15,13 @@
   --color-ink-2: #1e1c1a;
   --color-ink-3: #2c2925;
   --color-muted: #675e52;
-  --color-muted-ink: #a89d8b;
+  --color-muted-ink: #c4b9a7;
   --color-walnut: #6b4a2f;
   --color-copper: #c9853f;
   --color-danger: #b23a12;
 
-  --font-display: var(--font-anybody), "Arial Narrow", system-ui, sans-serif;
-  --font-sans: var(--font-hanken), system-ui, sans-serif;
+  --font-display: var(--font-archivo), "Arial Narrow", system-ui, sans-serif;
+  --font-sans: var(--font-geist), system-ui, sans-serif;
   --font-mono: var(--font-martian), ui-monospace, monospace;
 
   --radius-panel: 22px;
@@ -204,7 +204,6 @@ body {
 @utility type-hero {
   font-family: var(--font-display);
   font-weight: 800;
-  font-variation-settings: "wdth" 120;
   text-transform: uppercase;
   font-size: clamp(56px, 10.4vw, 160px);
   line-height: 0.88;
@@ -214,7 +213,6 @@ body {
 @utility type-section {
   font-family: var(--font-display);
   font-weight: 800;
-  font-variation-settings: "wdth" 116;
   text-transform: uppercase;
   font-size: clamp(36px, 5vw, 72px);
   line-height: 0.92;
@@ -224,7 +222,6 @@ body {
 @utility type-card {
   font-family: var(--font-display);
   font-weight: 800;
-  font-variation-settings: "wdth" 104;
   font-size: clamp(24px, 2.4vw, 32px);
   line-height: 1;
   letter-spacing: -0.02em;
@@ -245,11 +242,14 @@ body {
   max-width: 65ch;
 }
 
-/* Italic emphasis words inside display type. */
+/* Emphasis words inside display type: upright, in the accent colour
+   (Archivo is loaded roman only, so no faux italics anywhere in headings). */
+:where(h1, h2, h3, h4, blockquote, .font-display) em {
+  font-style: normal;
+}
 :where(.type-hero, .type-section, .type-card) em {
-  font-style: italic;
+  font-style: normal;
   font-weight: 700;
-  font-variation-settings: "wdth" 95;
   color: var(--tone-accent);
 }
 
@@ -738,7 +738,8 @@ html[data-theme="dark"]:not([data-admin-theme]) {
   --color-ink: #f3eadb;
   --color-ink-2: #e4d8c3;
   --color-ink-3: #cdbfa6;
-  --color-muted: #ab9f8c;
+  /* Reading text on the dark site: brighter, so paragraphs read easily. */
+  --color-muted: #cbc1b0;
   --color-walnut: #d4a373;
   --color-danger: #f0846a;
   --tone-accent: #e2a566;

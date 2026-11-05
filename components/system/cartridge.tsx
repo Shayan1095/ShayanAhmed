@@ -74,7 +74,7 @@ export function Cartridge({ title, kind, status, summary, fact, shot, href, clas
           <Label>{kind}</Label>
           <StatusBadge status={status} />
         </div>
-        <h3 className="font-display text-xl font-extrabold leading-[1.1] tracking-[-0.01em] [font-variation-settings:'wdth'_104]">
+        <h3 className="font-display text-xl font-extrabold leading-[1.1] tracking-[-0.01em]">
           {href ? (
             <Link href={href} className="after:absolute after:inset-0 after:content-['']">
               {title}

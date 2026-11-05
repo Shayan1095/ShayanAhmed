@@ -25,7 +25,7 @@ export function CtaStrip({ title, note = "Reply within 24h · Milestones you app
       )}
     >
       <div>
-        <p className="font-display text-[clamp(22px,2.4vw,30px)] font-extrabold leading-tight tracking-[-0.02em] [font-variation-settings:'wdth'_112]">
+        <p className="font-display text-[clamp(22px,2.4vw,30px)] font-extrabold leading-tight tracking-[-0.02em]">
           {title}
         </p>
         <p className={cn("mt-1.5 text-[15px]", ink ? "text-muted-ink" : "text-muted")}>{note}</p>

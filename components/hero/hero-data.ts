@@ -29,8 +29,8 @@ export const HERO_COPY = {
 export const COVER = {
   ink: "#120C08",
   paper: "#F3EADB",
-  muted: "#CFC3B2",
-  muted2: "#B5A893",
+  muted: "#DDD3C3",
+  muted2: "#C4B8A4",
   muted3: "#8F8170",
   copper: "#E8B27A",
   onCopper: "#140D08",

@@ -32,7 +32,7 @@ export function NoSignal() {
           </div>
           <p
             aria-hidden="true"
-            className="font-display text-[clamp(88px,18cqw,200px)] font-black leading-[0.8] tracking-[-0.05em] text-paper/90 [font-variation-settings:'wdth'_125] [text-shadow:0_0_24px_rgb(243_234_219/.25)]"
+            className="font-display text-[clamp(88px,18cqw,200px)] font-black leading-[0.8] tracking-[-0.05em] text-paper/90 [text-shadow:0_0_24px_rgb(243_234_219/.25)]"
           >
             404
           </p>

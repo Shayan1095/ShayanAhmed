@@ -126,7 +126,7 @@ export function Work({ projects }: { projects: Project[] }) {
             </div>
             <div className="flex items-center gap-3.5" aria-hidden="true">
               <b
-                className="font-display text-[40px] font-extrabold leading-none tabular-nums [font-variation-settings:'wdth'_120]"
+                className="font-display text-[40px] font-extrabold leading-none tabular-nums"
               >
                 <RollingNumber value={String(current).padStart(2, "0")} />
               </b>

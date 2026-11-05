@@ -60,7 +60,7 @@ export function Services() {
                     className="size-2 rounded-full bg-ink-3 shadow-[inset_0_1px_2px_rgb(0_0_0/.8)] transition-[background-color,box-shadow] duration-300 group-hover/layer:bg-copper group-hover/layer:shadow-glow"
                   />
                 </div>
-                <h3 className="font-display text-[clamp(26px,2.5vw,32px)] font-extrabold leading-none tracking-[-0.02em] [font-variation-settings:'wdth'_104]">
+                <h3 className="font-display text-[clamp(26px,2.5vw,32px)] font-extrabold leading-none tracking-[-0.02em]">
                   {l.title}
                 </h3>
                 <p className="text-[15.5px] text-muted-ink">{l.promise}</p>

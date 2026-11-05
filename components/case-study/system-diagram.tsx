@@ -54,7 +54,7 @@ export function SystemDiagram({ project }: { project: Project }) {
                   <Label>
                     Layer {l.n} · {l.part}
                   </Label>
-                  <h3 className="mt-2 font-display text-[clamp(26px,2.6vw,34px)] font-extrabold leading-none tracking-[-0.02em] [font-variation-settings:'wdth'_104]">
+                  <h3 className="mt-2 font-display text-[clamp(26px,2.6vw,34px)] font-extrabold leading-none tracking-[-0.02em]">
                     {l.title}
                   </h3>
                   <p className="mt-2 text-sm text-muted-ink">{l.line}</p>

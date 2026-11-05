@@ -31,7 +31,7 @@ export function Testimonials({ items }: { items: Testimonial[] }) {
                 <Label>
             <Typewriter text="06 · Client words" speed={38} />
           </Label>
-                <blockquote className="mx-auto mb-[22px] mt-[18px] max-w-[24em] font-display text-[clamp(24px,3vw,38px)] font-semibold italic leading-[1.25] tracking-[-0.01em] [font-variation-settings:'wdth'_92]">
+                <blockquote className="mx-auto mb-[22px] mt-[18px] max-w-[24em] font-display text-[clamp(24px,3vw,38px)] font-semibold leading-[1.25] tracking-[-0.01em]">
                   &ldquo;{t.quote}&rdquo;
                 </blockquote>
                 <figcaption>

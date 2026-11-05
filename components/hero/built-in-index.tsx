@@ -43,11 +43,14 @@ export function BuiltInIndex() {
   }, []);
 
   const item = BUILT_IN[index];
+  // The server renders the roll's start state, so reduced motion still needs an
+  // (instant) move to the end state, or the text would stay hidden.
   const roll = reduce
-    ? {}
+    ? { animate: { y: 0, opacity: 1 }, transition: { duration: 0 } }
     : {
-        initial: { y: "100%", opacity: 0, filter: "blur(8px)" },
-        animate: { y: 0, opacity: 1, filter: "blur(0px)" },
+        // Transform and opacity only (a blur filter on gradient text is costly on modest machines).
+        initial: { y: "100%", opacity: 0 },
+        animate: { y: 0, opacity: 1 },
         transition: { duration: 0.9, ease: EASE },
       };
 
@@ -71,13 +74,13 @@ export function BuiltInIndex() {
 
       <div className="flex h-[150px] items-start gap-5 overflow-hidden">
         <Mask className="flex-none">
-          <motion.span key={`n${index}`} {...roll} className="inline-block font-[family-name:var(--font-instrument)] text-[112px] leading-[0.82] tracking-[-0.03em]" style={FOIL}>
+          <motion.span key={`n${index}`} {...roll} className="inline-block font-[family-name:var(--font-archivo)] text-[112px] font-black leading-[0.82] tracking-[-0.02em]" style={{ ...FOIL, fontStretch: "62%", fontVariationSettings: "'wdth' 62" }}>
             {pad(index + 1)}
           </motion.span>
         </Mask>
         <div className="flex min-w-0 flex-col gap-2.5 pt-1.5">
           <Mask>
-            <motion.span key={`t${index}`} {...roll} className="inline-block font-[family-name:var(--font-instrument)] text-[34px] italic leading-[1.05]" style={{ color: COVER.paper }}>
+            <motion.span key={`t${index}`} {...roll} className="inline-block font-[family-name:var(--font-archivo)] text-[28px] font-bold leading-[1.05] tracking-[-0.01em]" style={{ color: COVER.paper }}>
               {item.title}
             </motion.span>
           </Mask>
@@ -118,7 +121,7 @@ export function BuiltInIndex() {
   );
 }
 
-/** Clips the roll-in; a little bottom padding keeps italic descenders whole. */
+/** Clips the roll-in; a little bottom padding keeps descenders whole. */
 function Mask({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <span className={`inline-block overflow-hidden align-bottom ${className ?? ""}`} style={{ padding: "0 .08em .14em", margin: "0 -.08em -.14em" }}>

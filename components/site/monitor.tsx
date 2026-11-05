@@ -56,7 +56,7 @@ export function MonitorStandby({ project }: { project: Project }) {
     <div className="absolute inset-0 grid place-items-center bg-[radial-gradient(80%_70%_at_50%_40%,#23201c,#0e0d0c)] p-6 text-center">
       <div className="relative z-[3]">
         <p className="type-label text-[10px] text-copper">{project.kind}</p>
-        <p className="mt-3 font-display text-[clamp(28px,4vw,52px)] font-extrabold leading-[0.9] tracking-[-0.03em] text-paper/90 [font-variation-settings:'wdth'_104]">
+        <p className="mt-3 font-display text-[clamp(28px,4vw,52px)] font-extrabold leading-[0.9] tracking-[-0.03em] text-paper/90">
           {project.title}
         </p>
       </div>
@@ -69,7 +69,7 @@ export function AgentsDashboard({ agents }: { agents: NonNullable<Project["agent
   return (
     <div className="absolute inset-0 grid grid-rows-[auto_1fr] gap-3 p-4 text-[12.5px]">
       <div className="relative z-[3] flex items-center justify-between">
-        <b className="font-display text-[15px] [font-variation-settings:'wdth'_110]">Agents</b>
+        <b className="font-display text-[15px]">Agents</b>
         <span className="type-label text-[10px] text-muted-ink">Example data · owner panel</span>
       </div>
       <ul className="relative z-[3] grid content-start gap-2 min-[900px]:grid-cols-2">

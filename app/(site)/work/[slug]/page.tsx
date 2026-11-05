@@ -153,7 +153,7 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
                           className={a.needsYou ? "size-2 rounded-full bg-walnut" : "size-2 rounded-full bg-paper-edge"}
                         />
                       </div>
-                      <h3 className="font-display text-lg font-extrabold leading-tight [font-variation-settings:'wdth'_104]">
+                      <h3 className="font-display text-lg font-extrabold leading-tight">
                         {a.name}
                       </h3>
                       <p className="mt-auto font-mono text-[11px] uppercase tracking-[0.08em] text-muted">
@@ -190,7 +190,7 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
               {project.decisions.map((d, i) => (
                 <li key={d.title} data-fx="item">
                   <Panel className="flex h-full gap-5 p-7">
-                    <span className="font-display text-[32px] font-extrabold leading-none text-walnut [font-variation-settings:'wdth'_110]">
+                    <span className="font-display text-[32px] font-extrabold leading-none text-walnut">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <div>
@@ -215,7 +215,7 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
                   <dt>
                     <Label>{r.label}</Label>
                   </dt>
-                  <dd className="mt-3 font-display text-[clamp(40px,5vw,64px)] font-extrabold leading-none text-copper [font-variation-settings:'wdth'_118]">
+                  <dd className="mt-3 font-display text-[clamp(40px,5vw,64px)] font-extrabold leading-none text-copper">
                     <RollingNumber value={r.value} />
                   </dd>
                 </Panel>
@@ -234,7 +234,7 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
               <Label>Next project</Label>
               <SplitReveal
                 as="p"
-                className="mt-4 font-display text-[clamp(48px,9vw,140px)] font-extrabold leading-[0.95] tracking-[-0.035em] transition-colors [font-variation-settings:'wdth'_104] group-hover:text-walnut"
+                className="mt-4 font-display text-[clamp(48px,9vw,140px)] font-extrabold leading-[0.95] tracking-[-0.035em] transition-colors group-hover:text-walnut"
               >
                 {next.title} →
               </SplitReveal>
@@ -248,8 +248,8 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
         <div className="wrap flex flex-col items-start gap-8 min-[900px]:flex-row min-[900px]:items-end min-[900px]:justify-between">
           <div>
             <Label>Your project</Label>
-            <p className="mt-4 max-w-[14em] font-display text-[clamp(34px,4.6vw,64px)] font-extrabold leading-[0.92] tracking-[-0.035em] [font-variation-settings:'wdth'_104]">
-              Want this for <em className="font-bold italic text-copper [font-variation-settings:'wdth'_94]">your business?</em>
+            <p className="mt-4 max-w-[14em] font-display text-[clamp(34px,4.6vw,64px)] font-extrabold leading-[0.92] tracking-[-0.035em]">
+              Want this for <em className="font-bold text-copper">your business?</em>
             </p>
           </div>
           <Button href="/#contact" variant="paper" size="lg" arrow>

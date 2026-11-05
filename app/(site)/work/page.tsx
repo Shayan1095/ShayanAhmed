@@ -24,9 +24,9 @@ export default async function WorkIndexPage() {
           <SplitReveal
             as="h1"
             start="top bottom"
-            className="mt-4 max-w-[14em] font-display text-[clamp(44px,6.4vw,96px)] font-extrabold uppercase leading-[0.88] tracking-[-0.04em] [font-variation-settings:'wdth'_116]"
+            className="mt-4 max-w-[14em] font-display text-[clamp(44px,6.4vw,96px)] font-extrabold uppercase leading-[0.88] tracking-[-0.04em]"
           >
-            Builds that <em className="font-bold italic text-walnut [font-variation-settings:'wdth'_94]">run businesses.</em>
+            Builds that <em className="font-bold text-walnut">run businesses.</em>
           </SplitReveal>
           <p className="mt-6 max-w-[34em] text-lg text-muted">
             Storefronts, management systems and automations. Case studies first, then everything else.
@@ -43,7 +43,7 @@ export default async function WorkIndexPage() {
                         <StatusBadge status={p.status}>{p.statusLabel}</StatusBadge>
                         <Tag>{p.kind}</Tag>
                       </div>
-                      <h2 className="font-display text-[clamp(28px,3vw,40px)] font-extrabold leading-none tracking-[-0.03em] [font-variation-settings:'wdth'_116]">
+                      <h2 className="font-display text-[clamp(28px,3vw,40px)] font-extrabold leading-none tracking-[-0.03em]">
                         {p.title}
                       </h2>
                       <p className="text-[15.5px] text-muted">{p.summary}</p>

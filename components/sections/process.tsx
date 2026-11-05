@@ -66,7 +66,7 @@ export function Process({ children }: { children?: React.ReactNode }) {
                   className="group/step relative flex flex-col gap-2.5 min-[900px]:border-l min-[900px]:border-ink-3 min-[900px]:pl-6 min-[900px]:first:border-0 min-[900px]:first:pl-0"
                 >
                   <span className="flex items-center gap-3">
-                    <span className="font-display text-[34px] font-extrabold leading-none text-ink-3 transition-[color,text-shadow] duration-500 [font-variation-settings:'wdth'_110] group-data-on/step:text-copper group-data-on/step:[text-shadow:0_0_18px_rgb(201_133_63/.45)]">
+                    <span className="font-display text-[34px] font-extrabold leading-none text-ink-3 transition-[color,text-shadow] duration-500 group-data-on/step:text-copper group-data-on/step:[text-shadow:0_0_18px_rgb(201_133_63/.45)]">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     {/* status lamp: off until the step is reached */}
@@ -75,7 +75,7 @@ export function Process({ children }: { children?: React.ReactNode }) {
                       className="size-2 rounded-full bg-ink-3 transition-[background-color,box-shadow] duration-500 group-data-on/step:bg-copper group-data-on/step:shadow-glow"
                     />
                   </span>
-                  <h3 className="mt-2 font-display text-[21px] font-extrabold leading-[1.1] [font-variation-settings:'wdth'_104]">
+                  <h3 className="mt-2 font-display text-[21px] font-extrabold leading-[1.1]">
                     {s.title}
                   </h3>
                   <p className="text-[14.5px] text-muted-ink">{s.text}</p>

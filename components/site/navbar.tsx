@@ -161,7 +161,7 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
             <Link href="/" className="flex items-center gap-3">
               <SALogo size={38} aria-hidden="true" className="shrink-0" />
               <span className="flex flex-col leading-tight">
-                <span className="font-display text-[15px] font-bold [font-variation-settings:'wdth'_108]">Shayan Ahmed</span>
+                <span className="font-display text-[15px] font-bold">Shayan Ahmed</span>
                 {/* Where you are on the page. Decorative: links carry aria-current. */}
                 <span
                   ref={readout}
@@ -367,7 +367,7 @@ function WorkPreview({ open, projects }: { open: boolean; projects: NavProject[]
                   <Link href={p.href} className="group/card flex h-full flex-col gap-2.5 rounded-[12px] p-2 transition-colors hover:bg-paper-edge/25 focus-visible:bg-paper-edge/25">
                     <ProjectThumb project={p} className="aspect-[16/10] w-full" />
                     <span className="px-0.5">
-                      <span className="block font-display text-[15px] font-extrabold leading-tight [font-variation-settings:'wdth'_104]">
+                      <span className="block font-display text-[15px] font-extrabold leading-tight">
                         {p.title}
                       </span>
                       <span className="mt-0.5 line-clamp-2 block text-[12.5px] leading-snug text-muted">{p.line}</span>
@@ -491,7 +491,7 @@ function MobileMenu({
           className="tone-ink fixed inset-0 z-75 flex flex-col gap-7 overflow-y-auto bg-ink px-[max(20px,env(safe-area-inset-right))] pb-[calc(env(safe-area-inset-bottom)+28px)] pt-[calc(env(safe-area-inset-top)+24px)] text-paper"
         >
           <div className="flex items-center justify-between">
-            <span className="flex items-center gap-3 font-display text-[15px] font-bold [font-variation-settings:'wdth'_108]">
+            <span className="flex items-center gap-3 font-display text-[15px] font-bold">
               <SALogo size={38} aria-hidden="true" className="shrink-0" />
               Shayan Ahmed
             </span>
@@ -522,7 +522,7 @@ function MobileMenu({
                     >
                       <span
                         className={cn(
-                          "font-display text-[44px] font-extrabold uppercase leading-[1.05] tracking-[-0.03em] [font-variation-settings:'wdth'_118]",
+                          "font-display text-[44px] font-extrabold uppercase leading-[1.05] tracking-[-0.03em]",
                           current && "text-copper",
                         )}
                       >
@@ -551,7 +551,7 @@ function MobileMenu({
               <ProjectThumb project={latest} className="aspect-[16/10] w-24 shrink-0" />
               <span className="min-w-0">
                 <span className="block font-mono text-[10px] uppercase tracking-[0.12em] text-muted-ink">Latest project</span>
-                <span className="block truncate font-display text-[17px] font-extrabold [font-variation-settings:'wdth'_104]">{latest.title}</span>
+                <span className="block truncate font-display text-[17px] font-extrabold">{latest.title}</span>
                 <span className="block truncate text-[13px] text-muted-ink">{latest.line}</span>
               </span>
               <span aria-hidden="true" className="ml-auto text-copper transition-transform duration-300 ease-out-expo group-hover/card:translate-x-1">

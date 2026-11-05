@@ -11,8 +11,8 @@ import { gsap, MQ, useGSAP } from "@/lib/gsap";
 import { motionGrammar } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
-const MIN_WDTH = 80;
-const MAX_WDTH = 150;
+const MIN_WDTH = 75;
+const MAX_WDTH = 125; // Archivo's widest
 const RADIUS = 320;
 
 const LIT: React.CSSProperties = {
@@ -102,7 +102,7 @@ export function Wordmark({ text, className }: { text: string; className?: string
           key={i}
           data-letter
           aria-hidden="true"
-          className="inline-block transition-[font-variation-settings] duration-200 ease-out [font-variation-settings:'wdth'_100] forced-colors:text-[CanvasText]"
+          className="inline-block transition-[font-variation-settings] duration-200 ease-out forced-colors:text-[CanvasText]"
           // Each letter carries the full copper gradient, so it survives the per-letter rise and width animation.
           style={LIT}
         >

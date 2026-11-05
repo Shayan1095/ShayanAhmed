@@ -44,3 +44,12 @@ export function isLowPowerDevice(): boolean {
   }
   return low;
 }
+
+/** Remembers for this tab that the device is low power (set by the frame-rate check). */
+export function markLowPower() {
+  try {
+    sessionStorage.setItem("sa-power", "low");
+  } catch {
+    /* ignore */
+  }
+}
