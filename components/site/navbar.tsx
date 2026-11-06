@@ -147,7 +147,8 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
       </a>
       <header
         className={cn(
-          "fixed inset-x-0 top-[env(safe-area-inset-top)] z-70 transition-[transform,padding] duration-500 ease-out-expo",
+          // Own layer: the page scrolls under it without repainting it.
+          "fixed inset-x-0 top-[env(safe-area-inset-top)] z-70 transition-[transform,padding] duration-500 ease-out-expo will-change-transform",
           compact ? "py-2" : "py-3.5",
         )}
       >
@@ -270,7 +271,7 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
 
             {/* Progress line, clipped to the bar's rounded corners. */}
             <span aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden rounded-card">
-              <span ref={progress} className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-copper shadow-glow" />
+              <span ref={progress} className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-copper shadow-glow will-change-transform" />
             </span>
           </div>
         </div>

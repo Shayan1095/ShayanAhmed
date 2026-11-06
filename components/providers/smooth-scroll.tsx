@@ -56,32 +56,28 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     // Power tier: "low" on devices without GPU acceleration or that can't hold
-    // the frame rate (cheaper surfaces, see [data-power="low"] in globals.css,
-    // and native scrolling: inertia that lags behind the wheel feels worse
-    // than none).
+    // the frame rate. They get cheaper surfaces ([data-power="low"] in
+    // globals.css) but keep smooth scrolling and the scroll effects.
     const html = document.documentElement;
-    let low = isLowPowerDevice();
+    const low = isLowPowerDevice();
     html.dataset.power = low ? "low" : "full";
-    if (reduce || low) return;
+    if (reduce) return;
 
     // Inertia scrolling: the page glides slightly behind the wheel for a weighted,
     // premium feel. anchors: plain <a href="#id"> links scroll smoothly too.
-    const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true, anchors: true });
+    // Low power: a snappier glide, so it never trails far behind the wheel.
+    const lenis = new Lenis({ lerp: low ? 0.12 : 0.1, wheelMultiplier: 1, smoothWheel: true, anchors: true });
     lenisRef.current = lenis;
     lenis.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
-    const off = () => {
-      gsap.ticker.remove(tick);
-      lenis.destroy();
-      lenisRef.current = null;
-    };
 
-    // Frame-rate check once the page settles: if this machine can't hold ~45fps,
-    // drop to the low tier for the rest of the visit.
+    // Frame-rate check once the page settles: a machine that can't hold ~45fps
+    // gets the cheaper surfaces and the snappier glide for the rest of the visit.
     let probe = 0;
     const start = window.setTimeout(() => {
+      if (low) return;
       const times: number[] = [];
       let last = performance.now();
       const frame = (now: number) => {
@@ -92,12 +88,10 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
           return;
         }
         const sorted = times.slice(5).sort((a, b) => a - b);
-        const median = sorted[Math.floor(sorted.length / 2)];
-        if (median > 22 && !low) {
-          low = true;
+        if (sorted[Math.floor(sorted.length / 2)] > 22) {
           markLowPower();
           html.dataset.power = "low";
-          off();
+          lenis.options.lerp = 0.12;
         }
       };
       probe = requestAnimationFrame(frame);
@@ -106,7 +100,9 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     return () => {
       window.clearTimeout(start);
       cancelAnimationFrame(probe);
-      if (!low) off();
+      gsap.ticker.remove(tick);
+      lenis.destroy();
+      lenisRef.current = null;
     };
   }, [reduce]);
 

@@ -753,7 +753,7 @@ html[data-theme="dark"]:not([data-admin-theme]) {
   --nav-glow-ink: #e2a566;
   --nav-glass-bg: rgb(27 24 21 / 0.72);
   --nav-glass-border: rgb(255 255 255 / 0.08);
-  --nav-glass-solid: rgb(27 24 21 / 0.97);
+  --nav-glass-solid: rgb(27 24 21); /* opaque: nothing to blend while the page scrolls under it */
   /* "Ink" keys (primary buttons) become cream keys on the dark page, like the admin. */
   --ink-key-top: #fffaf1;
   --ink-key-bottom: #e4d8c3;
@@ -794,22 +794,42 @@ html[data-theme="dark"]:not([data-admin-theme]) .screw {
 [data-band="ink"],
 .ink-band {
   background-color: #110f0d;
+  isolation: isolate;
+}
+/* The copper glow is its own layer (drawn once, then moved by scrolling),
+   not a background that's redrawn as the band scrolls into view. */
+[data-band="ink"]::before,
+.ink-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background-image:
     radial-gradient(55% 45% at 6% 0%, rgb(201 133 63 / 0.16), transparent 70%),
     radial-gradient(45% 40% at 100% 28%, rgb(140 80 36 / 0.2), transparent 70%),
     radial-gradient(60% 50% at 62% 112%, rgb(201 133 63 / 0.13), transparent 70%);
+  will-change: transform;
 }
-/* Dark site: the page itself gets the admin's warm glow; bands sit a step deeper. */
+/* Dark site: the page itself gets the admin's warm glow; bands sit a step deeper.
+   The glow lives on its own fixed layer (body::before), drawn once and reused
+   while scrolling. (A fixed background-attachment would repaint the whole
+   screen on every scroll frame, which is what made scrolling lag without a GPU.) */
 html[data-theme="dark"]:not([data-admin-theme]) body {
   background-color: #110f0d;
+  background-image: none;
+}
+html[data-theme="dark"]:not([data-admin-theme]) body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background-image:
     radial-gradient(60% 50% at 8% 0%, rgb(201 133 63 / 0.14), transparent 70%),
     radial-gradient(50% 45% at 100% 30%, rgb(140 80 36 / 0.18), transparent 70%),
     radial-gradient(55% 50% at 60% 110%, rgb(201 133 63 / 0.1), transparent 70%);
-  background-attachment: fixed;
-}
-html[data-theme="dark"][data-power="low"]:not([data-admin-theme]) body {
-  background-attachment: scroll;
+  will-change: transform;
 }
 html[data-theme="dark"]:not([data-admin-theme]) :is([data-band="ink"], .ink-band) {
   background-color: #0b0a09;

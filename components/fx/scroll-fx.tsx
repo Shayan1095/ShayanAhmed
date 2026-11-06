@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import { gsap, MQ, useGSAP } from "@/lib/gsap";
-import { isLowPowerDevice } from "@/lib/device-power";
 import { motionGrammar } from "@/lib/motion";
 
 /**
@@ -18,7 +17,8 @@ import { motionGrammar } from "@/lib/motion";
  *  tilt      [data-fx="tilt"]     straightens from a slight rotateX and rises
  *  progress  [data-fx-step]       steps gain data-on as scroll passes them
  *
- * Transform and opacity only. Skipped on low-power devices (except progress). Off with reduced motion, where content simply sits in place.
+ * Transform and opacity only, so they stay smooth even without GPU
+ * acceleration. Off with reduced motion, where content simply sits in place.
  */
 export type FxName = "rise" | "fan" | "draw" | "stroke" | "parallax" | "tilt" | "progress";
 
@@ -39,11 +39,8 @@ export function ScrollFx({ effects, as = "div", children, ...props }: ScrollFxPr
         const q = gsap.utils.selector(el);
         const scrub = motionGrammar.scrub;
         const items = q('[data-fx="item"]');
-        // Low-power devices: content simply sits in place (no per-frame scroll
-        // work); the progress steps still light up.
-        const lite = isLowPowerDevice();
 
-        if (!lite && effects.includes("rise") && items.length) {
+        if (effects.includes("rise") && items.length) {
           gsap.fromTo(
             items,
             { y: 70, opacity: 0.2 },
@@ -57,7 +54,7 @@ export function ScrollFx({ effects, as = "div", children, ...props }: ScrollFxPr
           );
         }
 
-        if (!lite && effects.includes("fan") && items.length) {
+        if (effects.includes("fan") && items.length) {
           const mid = (items.length - 1) / 2;
           items.forEach((it, i) => {
             const side = i - mid;
@@ -76,7 +73,7 @@ export function ScrollFx({ effects, as = "div", children, ...props }: ScrollFxPr
           });
         }
 
-        if (!lite && effects.includes("draw")) {
+        if (effects.includes("draw")) {
           q('[data-fx="line"]').forEach((line) => {
             const y = line.dataset.fxAxis === "y";
             gsap.fromTo(
@@ -92,7 +89,7 @@ export function ScrollFx({ effects, as = "div", children, ...props }: ScrollFxPr
           });
         }
 
-        if (!lite && effects.includes("stroke")) {
+        if (effects.includes("stroke")) {
           q('[data-fx="stroke"]').forEach((path) => {
             gsap.fromTo(
               path,
@@ -106,7 +103,7 @@ export function ScrollFx({ effects, as = "div", children, ...props }: ScrollFxPr
           });
         }
 
-        if (!lite && effects.includes("parallax")) {
+        if (effects.includes("parallax")) {
           q("[data-fx-speed]").forEach((it) => {
             const speed = Number(it.dataset.fxSpeed) || 0;
             const rot = Number(it.dataset.fxRotate) || 0;
@@ -123,7 +120,7 @@ export function ScrollFx({ effects, as = "div", children, ...props }: ScrollFxPr
           });
         }
 
-        if (!lite && effects.includes("tilt")) {
+        if (effects.includes("tilt")) {
           q('[data-fx="tilt"]').forEach((it) => {
             gsap.fromTo(
               it,
