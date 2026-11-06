@@ -100,7 +100,8 @@ export function BuiltInIndex() {
             aria-label={it.title}
             aria-pressed={k === index}
             onClick={() => pick(k)}
-            className="flex h-7 cursor-pointer items-center bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-2"
+            // 44px tall to tap (the -my keeps the row 28px high visually).
+            className="-my-2 flex h-11 cursor-pointer items-center bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-2"
             style={{ outlineColor: COVER.copper }}
           >
             <span

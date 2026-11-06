@@ -31,8 +31,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       </Suspense>
       {children}
       <Footer />
-      <Suspense fallback={<MobileCta availability={settings.availability} onHome={false} />}>
-        <RouteMobileCta availability={settings.availability} />
+      <Suspense fallback={<MobileCta onHome={false} />}>
+        <RouteMobileCta />
       </Suspense>
     </SiteProviders>
   );

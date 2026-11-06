@@ -2,18 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { StatusLight } from "@/components/system";
 import { cn } from "@/lib/utils";
 
 /**
  * Sticky "Start a project" bar on phones. Appears once the hero is out of view
  * and steps aside while the contact form or footer is on screen.
  */
-export function RouteMobileCta({ availability }: { availability: string }) {
-  return <MobileCta availability={availability} onHome={usePathname() === "/"} />;
+export function RouteMobileCta() {
+  return <MobileCta onHome={usePathname() === "/"} />;
 }
 
-export function MobileCta({ availability, onHome }: { availability: string; onHome: boolean }) {
+export function MobileCta({ onHome }: { onHome: boolean }) {
   const [heroGone, setHeroGone] = useState(!onHome);
   const [contactInView, setContactInView] = useState(false);
 
@@ -53,11 +52,8 @@ export function MobileCta({ availability, onHome }: { availability: string; onHo
         href={onHome ? "#contact" : "/#contact"}
         className="flex min-h-14 items-center justify-between gap-3 rounded-card bg-[linear-gradient(180deg,var(--ink-key-top,#2a2826),var(--ink-key-bottom,var(--color-ink)))] px-5 text-paper shadow-[inset_0_1px_0_rgb(255_255_255/.14),0_14px_28px_-12px_rgb(17_17_17/.7)]"
       >
-        <span className="flex min-w-0 items-center gap-2.5 font-mono text-[10.5px] uppercase tracking-[0.08em] text-muted-ink">
-          <StatusLight size="sm" pulse={false} />
-          <span className="truncate">{availability}</span>
-        </span>
-        <span className="shrink-0 whitespace-nowrap text-[15px] font-semibold">Start a project →</span>
+        <span className="min-w-0 truncate font-mono text-[11px] uppercase tracking-[0.1em] opacity-75">Reply within a day</span>
+        <span className="shrink-0 whitespace-nowrap text-[16px] font-semibold">Start a project →</span>
       </a>
     </div>
   );

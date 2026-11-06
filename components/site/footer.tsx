@@ -61,10 +61,10 @@ export async function Footer() {
         <div className="mt-8 flex flex-col gap-5 border-t border-ink-3 pt-6 font-mono text-[11px] tracking-[0.08em] text-muted-ink min-[900px]:flex-row min-[900px]:items-center min-[900px]:justify-between">
           <span className="whitespace-nowrap">© {year} Shayan Ahmed</span>
           <nav aria-label="Footer">
-            <ul className="flex flex-wrap gap-x-5 gap-y-2">
+            <ul className="flex flex-wrap gap-x-5 max-[899px]:-my-3">
               {links.map((l) => (
                 <li key={l.id}>
-                  <Link href={`/#${l.id}`} className="transition-colors hover:text-copper">
+                  <Link href={`/#${l.id}`} className="inline-flex min-h-11 items-center transition-colors hover:text-copper">
                     {l.label}
                   </Link>
                 </li>
@@ -74,7 +74,7 @@ export async function Footer() {
           <Clock className="whitespace-nowrap" />
           <a
             href="#main"
-            className="group inline-flex w-fit shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-ink-3 px-3.5 py-2 text-paper transition-colors hover:border-copper hover:text-copper"
+            className="group inline-flex w-fit shrink-0 items-center gap-2 whitespace-nowrap min-h-11 rounded-full border border-ink-3 px-4 text-paper transition-colors hover:border-copper hover:text-copper"
           >
             Back to top
             <ArrowUp aria-hidden="true" className="size-3.5 transition-transform duration-300 group-hover:-translate-y-0.5" />

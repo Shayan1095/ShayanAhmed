@@ -17,6 +17,7 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
   const date = await issueDate();
   return (
     <section
+      id="hero"
       aria-labelledby="hero-title"
       className="relative overflow-hidden"
       style={{ backgroundColor: COVER.ink, color: COVER.paper }}
@@ -33,8 +34,9 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
           style={{ ...rv(100).style, color: COVER.muted2, borderBottom: "1px solid rgba(232,178,122,.3)" }}
         >
           <span>No. 01 — {date}</span>
-          <span>{HERO_COPY.issueMiddle}</span>
-          <span>{HERO_COPY.issueRight}</span>
+          {/* Phones: just the issue number and date, on one line. */}
+          <span className="max-[699px]:hidden">{HERO_COPY.issueMiddle}</span>
+          <span className="max-[699px]:hidden">{HERO_COPY.issueRight}</span>
         </p>
 
         {/* Masthead: decorative; the h1 below carries the meaning. */}
@@ -61,8 +63,9 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
           className="m-0 mt-2.5 flex flex-wrap justify-between gap-x-4 gap-y-1 font-mono text-[11px] uppercase tracking-[0.14em]"
           style={{ ...rv(100).style, color: COVER.copper }}
         >
-          <span>{HERO_COPY.creditLeft}</span>
-          <span>{HERO_COPY.creditRight}</span>
+          {/* Phones: just what's built (the name is in the bar and the copy). */}
+          <span className="max-[699px]:hidden">{HERO_COPY.creditLeft}</span>
+          <span className="max-[699px]:tracking-[0.1em]">{HERO_COPY.creditRight}</span>
         </p>
 
         {/* Lower row: the cover story and the Built-in index. Side by side, the index's copper rule lines up with the top of the headline (44px = eyebrow + gap). */}
