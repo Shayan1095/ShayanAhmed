@@ -34,6 +34,26 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     };
   }, []);
 
+  // Off-screen sections render lazily (content-visibility in globals.css), so
+  // the page's height changes as they come into view: re-measure triggers then.
+  useEffect(() => {
+    const main = document.getElementById("main");
+    if (!main) return;
+    let t = 0;
+    let last = main.offsetHeight;
+    const ro = new ResizeObserver(() => {
+      if (main.offsetHeight === last) return;
+      last = main.offsetHeight;
+      window.clearTimeout(t);
+      t = window.setTimeout(refreshScrollTriggers, 150);
+    });
+    ro.observe(main);
+    return () => {
+      ro.disconnect();
+      window.clearTimeout(t);
+    };
+  }, []);
+
   useEffect(() => {
     // Power tier: "low" on devices without GPU acceleration or that can't hold
     // the frame rate (cheaper surfaces, see [data-power="low"] in globals.css,

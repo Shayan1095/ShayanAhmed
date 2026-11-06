@@ -815,3 +815,13 @@ html[data-theme="dark"]:not([data-admin-theme]) :is([data-band="ink"], .ink-band
   background-color: #0b0a09;
   box-shadow: inset 0 1px 0 rgb(224 154 79 / 0.12), inset 0 -1px 0 rgb(224 154 79 / 0.08);
 }
+
+/* Below-the-fold sections: the browser skips their layout and painting until
+   they come near the screen, so the first paint is faster on every device.
+   Not on sections with pinned (position: fixed) scroll scenes, which
+   containment would break (#process, #work). Scroll-linked effects
+   re-measure when the real sizes arrive (SmoothScrollProvider). */
+main#main > :is(#services, #archive, #about, #faq, #contact) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1000px;
+}
