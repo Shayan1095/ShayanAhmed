@@ -1,4 +1,5 @@
 import type { SiteSettings } from "@/lib/content/types";
+import { whatsappHref } from "@/lib/content/socials";
 import { Clock } from "@/components/site/clock";
 import { Band, CoverGrid, Button, Label, Rise, SplitReveal, Typewriter } from "@/components/system";
 import { ScrollFx } from "@/components/fx/scroll-fx";
@@ -16,6 +17,12 @@ const promises = [
 export function Contact({ settings, index = "08" }: { settings: SiteSettings; index?: string }) {
   const rows = [
     settings.email && { id: "contact-email", label: "Email", value: settings.email, href: `mailto:${settings.email}` },
+    settings.whatsapp && {
+      id: "contact-whatsapp",
+      label: "WhatsApp",
+      value: settings.whatsapp,
+      href: whatsappHref(settings.whatsapp)!,
+    },
     settings.linkedin && {
       id: "contact-linkedin",
       label: "LinkedIn",
@@ -39,8 +46,13 @@ export function Contact({ settings, index = "08" }: { settings: SiteSettings; in
             Tell me what you&apos;re building and what&apos;s slowing you down. I reply within one working day with next
             steps.
           </Rise>
-          {(settings.bookingUrl || settings.startingPrice) && (
+          {(settings.bookingUrl || settings.startingPrice || settings.whatsapp) && (
             <Rise className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
+              {settings.whatsapp && (
+                <Button href={whatsappHref(settings.whatsapp)!} variant="copper" arrow target="_blank" rel="noopener noreferrer">
+                  WhatsApp me
+                </Button>
+              )}
               {settings.bookingUrl && (
                 <Button href={settings.bookingUrl} variant="paper" arrow target="_blank" rel="noopener">
                   Book a call

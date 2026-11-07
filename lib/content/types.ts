@@ -104,6 +104,10 @@ export type SiteSettings = {
   availability: string;
   email?: string;
   linkedin?: string;
+  /** extension: WhatsApp number in any format, e.g. "+92 300 1234567" (footer, contact). */
+  whatsapp?: string;
+  /** extension: profile URLs shown as footer keycaps (see lib/content/socials.ts). */
+  socials?: Partial<Record<"github" | "instagram" | "x" | "facebook" | "youtube" | "tiktok" | "behance" | "dribbble" | "upwork" | "fiverr", string>>;
   /** About section spec sheet. Only true values. */
   specSheet: { label: string; value: string }[];
   /** extension: the hero's operations demo (labelled as a demo of the Brands Attire build). */
@@ -122,6 +126,8 @@ export type SiteSettings = {
   budgetRanges: string[];
   /** extension: contact form project types. */
   projectTypes: string[];
+  /** extension: the talking-head intro for "Meet the builder" (mp4 + poster, optional captions .vtt). */
+  introVideo?: { src: string; poster?: string; captions?: string };
   /** extension: portrait for About and the hero chip. */
   portrait?: ImageRef;
 };

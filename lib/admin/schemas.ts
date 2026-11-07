@@ -21,6 +21,7 @@ export const imageRefSchema = z.object({
   height: z.number("Add the height").int().min(1, "Add the height").max(10000),
 });
 const optImage = imageRefSchema.nullish().transform((v) => v ?? undefined);
+const optUrl = opt(300).pipe(z.url("Enter a full URL, starting with https://").optional());
 
 export const projectSchema = z.object({
   slug: z
@@ -97,6 +98,26 @@ export const settingsSchema = z.object({
   availability: text(60).min(1, "Add an availability line"),
   email: opt(120).pipe(z.email("Enter a valid email address").optional()),
   linkedin: opt(300).pipe(z.url("Enter a full URL, starting with https://").optional()),
+  whatsapp: opt(30).pipe(
+    z
+      .string()
+      .regex(/^\+?[\d\s()-]{7,20}$/, "Enter the number with country code, e.g. +92 300 1234567")
+      .optional(),
+  ),
+  socials: z
+    .object({
+      github: optUrl,
+      instagram: optUrl,
+      x: optUrl,
+      facebook: optUrl,
+      youtube: optUrl,
+      tiktok: optUrl,
+      behance: optUrl,
+      dribbble: optUrl,
+      upwork: optUrl,
+      fiverr: optUrl,
+    })
+    .optional(),
   bookingUrl: opt(300).pipe(z.url("Enter a full URL, starting with https://").optional()),
   startingPrice: opt(30),
   budgetRanges: lines,

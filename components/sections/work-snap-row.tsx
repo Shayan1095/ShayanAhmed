@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, ViewTransition } from "react";
 import type { Project } from "@/lib/content/types";
 import { ProjectTile } from "@/components/site/project-tile";
 import { Tag } from "@/components/system";
@@ -48,7 +48,10 @@ export function WorkSnapRow({ projects }: { projects: Project[] }) {
           return (
             <li key={p.slug} className="w-[88vw] max-w-[420px] shrink-0 snap-start">
               <article className="press relative flex h-full flex-col overflow-hidden rounded-[22px] bg-paper-hi shadow-raised">
-                <ProjectTile project={p} className="aspect-[16/10] w-full" />
+                {/* Morphs into the case study's main screen when opened (same name as its monitor). */}
+                <ViewTransition name={`monitor-${p.slug}`} share="morph" default="none">
+                  <ProjectTile project={p} className="aspect-[16/10] w-full" />
+                </ViewTransition>
                 <div className="flex flex-1 flex-col gap-3 p-5">
                   <div className="flex flex-wrap gap-2">
                     <Tag>{p.statusLabel ?? p.kind}</Tag>

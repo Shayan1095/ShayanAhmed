@@ -1051,3 +1051,54 @@ html[data-power="low"] .hero-glow {
 @media (prefers-reduced-motion: reduce) {
   .process-stamp { animation: none; }
 }
+
+/* Footer social keycaps: each floats on its own slow path (desktop), or bobs
+   very slightly (phones). Transform only; still with reduced motion or on
+   low-power devices. */
+@keyframes social-key-float {
+  0% { transform: translate3d(0, 0, 0) rotate(-1.5deg); }
+  50% { transform: translate3d(3px, -9px, 0) rotate(1.5deg); }
+  100% { transform: translate3d(0, 0, 0) rotate(-1.5deg); }
+}
+@keyframes social-key-bob {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -3px, 0); }
+}
+.social-key-float {
+  animation: social-key-float var(--float-dur, 7s) var(--ease-inout) var(--float-delay, 0s) infinite;
+}
+.social-key-float.social-key-bob {
+  animation-name: social-key-bob;
+}
+html[data-power="low"] .social-key-float,
+html[data-power="low"] .social-key-bob {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .social-key-float, .social-key-bob { animation: none; }
+}
+
+/* "Meet the builder": the agent alerts arrive 400ms apart once in view.
+   Hidden only after JS marks the list as able to play (.alerts-play is
+   added by the component; before that, everything is simply shown). */
+@keyframes alert-in {
+  from { opacity: 0; transform: translate3d(0, 14px, 0) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .alerts-armed:not(.alerts-play) .alert-in {
+    opacity: 0;
+  }
+  .alerts-play .alert-in {
+    animation: alert-in var(--dur-reveal) var(--ease-out) calc(var(--i) * 400ms) both;
+  }
+}
+
+/* WipeReveal: hidden only once armed by JS, then wiped open from the bottom. */
+.wipe-reveal[data-wipe="armed"] {
+  clip-path: inset(100% 0 0 0);
+}
+.wipe-reveal[data-wipe="shown"] {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1s var(--ease-inout);
+}

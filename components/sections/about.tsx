@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { SiteSettings } from "@/lib/content/types";
 import { ScrollFx } from "@/components/fx/scroll-fx";
-import { Band, Button, Label, SplitReveal, Typewriter } from "@/components/system";
+import { Band, Button, Label, SplitReveal, Typewriter, WipeReveal } from "@/components/system";
 import { SpecSheet } from "./spec-sheet";
 
 /**
@@ -17,18 +17,19 @@ export function About({ settings }: { settings: SiteSettings }) {
         className="wrap grid grid-cols-1 items-center gap-12 min-[980px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] min-[980px]:gap-[72px]"
       >
         <div data-fx-speed="0.45" data-fx-rotate="-5">
-          <figure className="relative mx-auto aspect-[4/5] w-full max-w-[420px] -rotate-2 rounded-3xl bg-[linear-gradient(160deg,var(--color-paper-hi),var(--color-paper-lo))] p-4 shadow-raised">
+          <figure className="relative mx-auto aspect-[4/5] w-full max-w-[260px] -rotate-2 rounded-3xl min-[640px]:max-w-[420px] bg-[linear-gradient(160deg,var(--color-paper-hi),var(--color-paper-lo))] p-4 shadow-raised">
             <span
               aria-hidden="true"
               className="absolute -top-3.5 left-1/2 h-[30px] w-[120px] -ml-[60px] rotate-3 bg-paper/80 shadow-[0_1px_3px_rgb(17_17_17/.2)]"
             />
-            <div className="inset-track relative size-full overflow-hidden rounded-xl">
+            {/* The photo is revealed by a wipe the first time it scrolls in. */}
+            <WipeReveal className="inset-track relative size-full overflow-hidden rounded-xl">
               {portrait ? (
                 <Image
                   src={portrait.src}
                   alt={portrait.alt}
                   fill
-                  sizes="(min-width: 980px) 420px, 90vw"
+                  sizes="(min-width: 980px) 420px, (min-width: 640px) 420px, 260px"
                   className="object-cover"
                 />
               ) : (
@@ -40,7 +41,7 @@ export function About({ settings }: { settings: SiteSettings }) {
                   SA
                 </span>
               )}
-            </div>
+            </WipeReveal>
           </figure>
         </div>
         <div>

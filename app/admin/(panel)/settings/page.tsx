@@ -31,6 +31,8 @@ export default async function SettingsPage() {
           availability: s.availability,
           email: s.email,
           linkedin: s.linkedin,
+          whatsapp: s.whatsapp,
+          socials: s.socials ?? {},
           bookingUrl: s.bookingUrl,
           startingPrice: s.startingPrice,
           budgetRanges: s.budgetRanges,

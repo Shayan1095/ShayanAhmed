@@ -9,7 +9,12 @@ import { cn } from "@/lib/utils";
 type Line = { text: string; key: number };
 
 const field =
-  "ink-inset w-full rounded-[11px] border-0 px-[15px] py-3.5 text-[16px] text-paper placeholder:text-[#6f675c] transition-shadow focus:outline-none focus:shadow-[var(--shadow-ink-inset),0_0_0_2px_var(--color-copper)] aria-invalid:shadow-[var(--shadow-ink-inset),0_0_0_2px_#e7a27f]";
+  "ink-inset w-full rounded-[11px] border-0 px-[15px] py-3.5 text-[16px] text-paper placeholder:text-[#6f675c] focus:outline-none " +
+  // Focus: a copper underline draws across the field, over a softened ring.
+  // (marked important: the ink-inset background shorthand would otherwise reset them)
+  "bg-[linear-gradient(var(--color-copper),var(--color-copper))]! bg-no-repeat! bg-[length:0%_2px]! bg-[position:left_bottom]! " +
+  "transition-[background-size,box-shadow] duration-[260ms] ease-out-expo focus:bg-[length:100%_2px]! " +
+  "focus:shadow-[var(--shadow-ink-inset),0_0_0_2px_rgb(201_133_63/.45)] aria-invalid:shadow-[var(--shadow-ink-inset),0_0_0_2px_#e7a27f]";
 const labelCls = "type-label text-[10.5px] text-muted-ink";
 
 /** True on phones (under 768px); false on the server, so desktop markup renders first. */
@@ -212,8 +217,9 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
             "data-pressed:translate-y-[5px] data-pressed:shadow-[inset_0_1px_0_#fff,inset_0_-3px_0_var(--color-paper-edge),0_1px_0_#0a0a0a,0_4px_10px_-6px_rgb(0_0_0/.8)]",
           )}
         >
-          <StatusLight on={sent} pulse={false} />
-          {pending ? "Sending…" : "Send message"}
+          <StatusLight on={sent || pending} pulse={pending} />
+          {/* idle → transmitting → transmitted (only after the server confirms). */}
+          <span aria-live="polite">{pending ? "Transmitting…" : sent ? "› Transmitted" : "Send message"}</span>
         </button>
       </form>
     </div>

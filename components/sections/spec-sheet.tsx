@@ -46,7 +46,7 @@ export function SpecSheet({ rows }: { rows: { label: string; value: string }[] }
                 as="dd"
                 text={r.value}
                 trigger={trigger}
-                delay={i * 160}
+                delay={i * 60}
                 caret={false}
                 className={`min-w-0 py-[11px] text-[15px] font-medium [overflow-wrap:anywhere] ${rule}`}
               />

@@ -1,4 +1,5 @@
 import { Hero } from "@/components/hero/hero";
+import { MeetBuilder } from "@/components/sections/meet-builder";
 import { About } from "@/components/sections/about";
 import { Archive } from "@/components/sections/archive";
 import { Contact } from "@/components/sections/contact";
@@ -41,6 +42,11 @@ export default async function HomePage() {
   return (
     <main id="main">
       <Hero caseStudyHref={flagship ? `/work/${flagship.slug}` : undefined} />
+      <MeetBuilder
+        video={settings.introVideo}
+        alerts={flagship?.uiFragments ?? []}
+        caseHref={flagship ? `/work/${flagship.slug}` : undefined}
+      />
       <VelocityMarquee items={["Websites", "Systems", "Automation", "Storefronts", "Admin panels", "Operations agents"]} />
       <Work projects={featured} totalBuilds={featured.length + archive.length} />
       <Band aria-label="Talk about your project" className="pb-20 max-[767px]:hidden min-[900px]:pb-24">

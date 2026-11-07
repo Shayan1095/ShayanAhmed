@@ -16,6 +16,7 @@ import {
 } from "@/components/admin/form";
 import { Button } from "@/components/ui/button";
 import { settingsSchema, type SettingsInput } from "@/lib/admin/schemas";
+import { SOCIAL_PLATFORMS } from "@/lib/content/socials";
 import { saveSettings } from "../content-actions";
 
 type Output = z.output<typeof settingsSchema>;
@@ -61,6 +62,13 @@ export function SettingsForm({ initial, canUpload }: { initial: SettingsInput; c
             <FormText<SettingsInput> name="email" label="Email" type="email" />
             <FormText<SettingsInput> name="linkedin" label="LinkedIn URL" type="url" placeholder="https://linkedin.com/in/…" />
             <FormText<SettingsInput>
+              name="whatsapp"
+              label="WhatsApp number"
+              type="tel"
+              placeholder="+92 300 1234567"
+              hint="Adds WhatsApp buttons to the contact section and footer."
+            />
+            <FormText<SettingsInput>
               name="bookingUrl"
               label="Booking link"
               type="url"
@@ -72,6 +80,14 @@ export function SettingsForm({ initial, canUpload }: { initial: SettingsInput; c
               hint='Shows "Projects usually start from …".'
               placeholder="e.g. $1,500"
             />
+          </div>
+        </FormSection>
+
+        <FormSection title="Social links" description="Each one you fill in becomes a keycap in the footer. Leave the rest empty.">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {SOCIAL_PLATFORMS.map((p) => (
+              <FormText<SettingsInput> key={p.key} name={`socials.${p.key}`} label={p.label} type="url" placeholder={p.placeholder} />
+            ))}
           </div>
         </FormSection>
 

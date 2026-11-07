@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ViewTransition } from "react";
+import { ProjectTile } from "@/components/site/project-tile";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CaseHero } from "@/components/case-study/case-hero";
@@ -8,7 +10,7 @@ import { ScrollFx } from "@/components/fx/scroll-fx";
 import { Monitor } from "@/components/site/monitor";
 import { SystemDiagram } from "@/components/case-study/system-diagram";
 import { Testimonials } from "@/components/sections/testimonials";
-import { Band, Button, Label, Panel, Rise, RollingNumber, SectionHeader, SplitReveal, UiFragment } from "@/components/system";
+import { Band, Button, Label, Panel, Rise, RollingNumber, SectionHeader, UiFragment } from "@/components/system";
 import { getProjects, getTestimonials } from "@/lib/content";
 import { site } from "@/lib/site";
 
@@ -208,7 +210,7 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
       {project.results && project.results.length > 0 && (
         <Band tone="ink" aria-label="Results" className="section-pad">
           <div className="wrap">
-            <SectionHeader label="Results" title={<>What <em>changed</em></>} />
+            <SectionHeader label="Results" title={<>What it <em>changed</em></>} />
             <dl className="grid grid-cols-1 gap-5 min-[640px]:grid-cols-2 min-[1000px]:grid-cols-3">
               {project.results.map((r) => (
                 <Panel key={r.label} tone="ink" className="p-7">
@@ -230,15 +232,22 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
       {next && next.slug !== project.slug && (
         <Band aria-label="Next project" className="section-pad border-t border-paper-edge">
           <div className="wrap">
-            <Link href={`/work/${next.slug}`} className="group block">
-              <Label>Next project</Label>
-              <SplitReveal
-                as="p"
-                className="mt-4 font-display text-[clamp(48px,9vw,140px)] font-extrabold leading-[0.95] tracking-[-0.035em] transition-colors group-hover:text-walnut"
-              >
-                {next.title} →
-              </SplitReveal>
-              <p className="mt-5 max-w-[36em] text-muted">{next.summary}</p>
+            <Label>Next case</Label>
+            {/* The next case as a card; its picture morphs into that page's main screen. */}
+            <Link
+              href={`/work/${next.slug}`}
+              className="press group mt-5 grid grid-cols-1 items-center gap-6 overflow-hidden rounded-[24px] bg-paper-hi p-3 shadow-raised min-[768px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] min-[768px]:gap-10 min-[768px]:p-4"
+            >
+              <ViewTransition name={`monitor-${next.slug}`} share="morph" default="none">
+                <ProjectTile project={next} sizes="(min-width: 768px) 45vw, 92vw" className="aspect-[16/10] w-full rounded-[16px]" />
+              </ViewTransition>
+              <span className="flex flex-col gap-3 px-3 pb-4 min-[768px]:px-0 min-[768px]:pb-0 min-[768px]:pr-6">
+                <span className="type-label text-muted">{next.kind}</span>
+                <span className="font-display text-[clamp(32px,4.6vw,64px)] font-extrabold leading-[0.95] tracking-[-0.03em] transition-colors group-hover:text-walnut">
+                  {next.title} <span aria-hidden="true">→</span>
+                </span>
+                <span className="line-clamp-3 max-w-[36em] text-muted">{next.outcome ?? next.summary}</span>
+              </span>
             </Link>
           </div>
         </Band>

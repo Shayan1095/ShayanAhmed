@@ -3,8 +3,10 @@ import Link from "next/link";
 import { ArrowUp } from "lucide-react";
 import { Button, Label } from "@/components/system";
 import { getSiteSettings } from "@/lib/content";
+import { socialLinks, whatsappHref } from "@/lib/content/socials";
 import { Clock } from "./clock";
-import { FooterSlab } from "./footer-slab";
+import { FooterReveal } from "./footer-reveal";
+import { SocialKeys } from "./social-keys";
 import { navLinks } from "./nav-links";
 import { Wordmark } from "./wordmark";
 
@@ -27,6 +29,8 @@ async function currentYear() {
 export async function Footer() {
   const [year, settings] = await Promise.all([currentYear(), getSiteSettings()]);
   const links = [...navLinks, { id: "contact", label: "Contact" }];
+  const socials = socialLinks(settings);
+  const whatsapp = whatsappHref(settings.whatsapp);
 
   return (
     <footer
@@ -35,7 +39,7 @@ export async function Footer() {
     >
       {/* Copper hairline catching the light along the top edge. */}
       <span aria-hidden="true" className="absolute inset-x-[8%] top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgb(224 154 79 / 0.55), transparent)" }} />
-      <div className="wrap relative">
+      <div data-footer-inner className="wrap relative">
         <div className="grid grid-cols-1 items-center gap-12 min-[900px]:grid-cols-[minmax(0,1fr)_auto]">
           <div>
             <Label accent>End of transmission</Label>
@@ -46,6 +50,11 @@ export async function Footer() {
               <Button href="/#contact" variant="copper" arrow>
                 Start a project
               </Button>
+              {whatsapp && (
+                <Button href={whatsapp} variant="paper" target="_blank" rel="noopener noreferrer">
+                  WhatsApp
+                </Button>
+              )}
               {settings.bookingUrl && (
                 <Button href={settings.bookingUrl} variant="paper">
                   Book a call
@@ -53,10 +62,13 @@ export async function Footer() {
               )}
             </div>
           </div>
-          {/* Phones: the card adds little at that size, so it stays a desktop detail. */}
-          <div className="max-[767px]:hidden">
-            <FooterSlab />
-          </div>
+          {/* Every way to reach me, as floating copper keycaps (they replace the old device card). */}
+          {socials.length > 0 && (
+            <div className="flex flex-col gap-5 min-[900px]:items-end">
+              <Label accent>Find me elsewhere</Label>
+              <SocialKeys links={socials} />
+            </div>
+          )}
         </div>
 
         <Wordmark text="Shayan Ahmed" className="mt-20" />
@@ -84,6 +96,7 @@ export async function Footer() {
           </a>
         </div>
       </div>
+      <FooterReveal />
     </footer>
   );
 }

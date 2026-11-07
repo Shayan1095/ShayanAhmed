@@ -69,16 +69,22 @@ export function CaseHero({ project, index, total }: { project: Project; index: n
               />
             )}
 
-            <dl className="grid grid-cols-[auto_minmax(0,1fr)] border-t border-paper-edge">
+            {/* Facts: a two-column grid of cells on phones, label/value rows on larger screens. */}
+            <dl className="grid grid-cols-2 gap-x-5 border-t border-paper-edge min-[768px]:grid-cols-1">
               {meta.map((m) => (
-                <div key={m.label} className="contents">
-                  <dt className="type-label border-b border-paper-edge py-3 pr-6 text-[10.5px] text-muted">{m.label}</dt>
-                  <dd className="border-b border-paper-edge py-3 text-[15px] font-medium">{m.value}</dd>
+                <div
+                  key={m.label}
+                  className={`flex flex-col gap-1 border-b border-paper-edge py-3 min-[768px]:flex-row min-[768px]:items-baseline min-[768px]:gap-6 ${
+                    m.label === "Stack" || m.label === "Outcome" ? "col-span-2 min-[768px]:col-span-1" : ""
+                  }`}
+                >
+                  <dt className="type-label shrink-0 text-[10.5px] text-muted min-[768px]:w-[96px]">{m.label}</dt>
+                  <dd className="text-[15px] font-medium">{m.value}</dd>
                 </div>
               ))}
-              <div className="contents">
-                <dt className="type-label border-b border-paper-edge py-3 pr-6 text-[10.5px] text-muted">Live</dt>
-                <dd className="border-b border-paper-edge py-3 text-[15px] font-medium">
+              <div className="col-span-2 flex flex-col gap-1 border-b border-paper-edge py-3 min-[768px]:col-span-1 min-[768px]:flex-row min-[768px]:items-baseline min-[768px]:gap-6">
+                <dt className="type-label shrink-0 text-[10.5px] text-muted min-[768px]:w-[96px]">Live</dt>
+                <dd className="text-[15px] font-medium">
                   {project.liveUrl ? (
                     <a href={project.liveUrl} target="_blank" rel="noopener" className="underline decoration-paper-edge underline-offset-4 hover:decoration-walnut">
                       {project.liveUrl.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")} ↗
