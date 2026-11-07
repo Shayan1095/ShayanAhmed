@@ -53,7 +53,10 @@ export async function Footer() {
               )}
             </div>
           </div>
-          <FooterSlab />
+          {/* Phones: the card adds little at that size, so it stays a desktop detail. */}
+          <div className="max-[767px]:hidden">
+            <FooterSlab />
+          </div>
         </div>
 
         <Wordmark text="Shayan Ahmed" className="mt-20" />

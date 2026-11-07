@@ -34,6 +34,9 @@ export default async function HomePage() {
     getFaqs(),
   ]);
   const flagship = featured.find((p) => p.hasCaseStudy);
+  // Chapter numbers run without gaps: Testimonials (06) only shows once there are some.
+  const hasTestimonials = testimonials.length > 0;
+  const n = (k: number) => String(hasTestimonials ? k : k - 1).padStart(2, "0");
 
   return (
     <main id="main">
@@ -52,9 +55,10 @@ export default async function HomePage() {
       </Process>
       <VelocityMarquee items={["Milestones you approve", "A live link every week", "A clean handover"]} />
       <About settings={settings} />
+      {/* 06 · Testimonials: renders nothing until the first one is added in the admin. */}
       <Testimonials items={testimonials} />
-      <FaqSection items={faqs} />
-      <Contact settings={settings} />
+      <FaqSection items={faqs} index={n(7)} />
+      <Contact settings={settings} index={n(8)} />
       <JsonLd data={homeJsonLd(settings, featured)} />
       <BandTransitions />
     </main>

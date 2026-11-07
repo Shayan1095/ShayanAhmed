@@ -13,7 +13,7 @@ const promises = [
 ];
 
 /** 08 Contact (ink). The primary call to action. */
-export function Contact({ settings }: { settings: SiteSettings }) {
+export function Contact({ settings, index = "08" }: { settings: SiteSettings; index?: string }) {
   const rows = [
     settings.email && { id: "contact-email", label: "Email", value: settings.email, href: `mailto:${settings.email}` },
     settings.linkedin && {
@@ -30,7 +30,7 @@ export function Contact({ settings }: { settings: SiteSettings }) {
       <div className="wrap relative grid grid-cols-1 items-start gap-14 min-[980px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <div>
           <Label>
-            <Typewriter text="08 · Contact" speed={38} />
+            <Typewriter text={`${index} · Contact`} speed={38} />
           </Label>
           <SplitReveal className="mb-6 mt-4 font-display text-[clamp(40px,5vw,72px)] font-extrabold leading-[0.95] tracking-[-0.03em] [&_em]:font-bold [&_em]:text-copper">
             Let&apos;s build <em>your system.</em>

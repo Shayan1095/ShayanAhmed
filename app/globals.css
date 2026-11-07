@@ -845,3 +845,23 @@ main#main > :is(#services, #archive, #about, #faq, #contact) {
   content-visibility: auto;
   contain-intrinsic-size: auto 1000px;
 }
+
+/* =========================================================================
+   Touch basics (motion & mobile spec, phase 0)
+   ========================================================================= */
+html {
+  /* No grey flash on tap; press states give the feedback instead. */
+  -webkit-tap-highlight-color: transparent;
+}
+/* Anchor links land below the fixed header, not under it. */
+:where(main [id], footer[id]) {
+  scroll-margin-top: 80px;
+}
+/* 16px fields: iPhone Safari zooms the page into anything smaller on focus. */
+@media (max-width: 767px) {
+  input:not([type="checkbox"], [type="radio"], [type="range"]),
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+}

@@ -48,7 +48,7 @@ export function SpecSheet({ rows }: { rows: { label: string; value: string }[] }
                 trigger={trigger}
                 delay={i * 160}
                 caret={false}
-                className={`py-[11px] text-[15px] font-medium ${rule}`}
+                className={`min-w-0 py-[11px] text-[15px] font-medium [overflow-wrap:anywhere] ${rule}`}
               />
             </div>
           );

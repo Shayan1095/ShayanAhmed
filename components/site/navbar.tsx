@@ -159,7 +159,7 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
               compact ? "nav-glass max-w-[1120px] py-1.5" : "raised max-w-[1600px] py-2",
             )}
           >
-            <Link href="/" className="flex items-center gap-3">
+            <Link href="/" className="flex min-h-11 items-center gap-3">
               <SALogo size={38} aria-hidden="true" className="shrink-0" />
               <span className="flex flex-col leading-tight">
                 <span className="font-display text-[15px] font-bold">Shayan Ahmed</span>

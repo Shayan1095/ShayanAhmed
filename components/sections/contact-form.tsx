@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 type Line = { text: string; key: number };
 
 const field =
-  "ink-inset w-full rounded-[11px] border-0 px-[15px] py-3.5 text-[15.5px] text-paper placeholder:text-[#6f675c] transition-shadow focus:outline-none focus:shadow-[var(--shadow-ink-inset),0_0_0_2px_var(--color-copper)] aria-invalid:shadow-[var(--shadow-ink-inset),0_0_0_2px_#e7a27f]";
+  "ink-inset w-full rounded-[11px] border-0 px-[15px] py-3.5 text-[16px] text-paper placeholder:text-[#6f675c] transition-shadow focus:outline-none focus:shadow-[var(--shadow-ink-inset),0_0_0_2px_var(--color-copper)] aria-invalid:shadow-[var(--shadow-ink-inset),0_0_0_2px_#e7a27f]";
 const labelCls = "type-label text-[10.5px] text-muted-ink";
 
 /**
@@ -87,7 +87,7 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
             <label htmlFor="f-name" className={labelCls}>
               Name
             </label>
-            <input id="f-name" name="name" type="text" autoComplete="name" required aria-invalid={invalid("name")} className={field} />
+            <input id="f-name" name="name" type="text" autoComplete="name" autoCapitalize="words" enterKeyHint="next" required aria-invalid={invalid("name")} className={field} />
           </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="f-email" className={labelCls}>
@@ -99,6 +99,9 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
               type="email"
               autoComplete="email"
               inputMode="email"
+              autoCapitalize="none"
+              spellCheck={false}
+              enterKeyHint="next"
               required
               aria-invalid={invalid("email")}
               className={field}

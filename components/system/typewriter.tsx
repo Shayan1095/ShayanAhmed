@@ -94,9 +94,9 @@ export function Typewriter({
   return (
     <Tag ref={root as React.Ref<never>} className={cn(Tag === "span" ? "inline-grid" : "grid", className)}>
       <span className="sr-only">{text}</span>
-      <span aria-hidden="true" className="invisible [grid-area:1/1]">
-        {text}
-      </span>
+      {/* Reserves the final size via CSS generated text, so the words exist
+          once for readers (above) and once on screen, never a third time. */}
+      <span aria-hidden="true" data-text={text} className="invisible [grid-area:1/1] before:content-[attr(data-text)]" />
       <span aria-hidden="true" className="[grid-area:1/1]">
         {typing ? text.slice(0, shown) : text}
         {showCaret && (

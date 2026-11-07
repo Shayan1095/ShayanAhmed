@@ -3,7 +3,7 @@ import { ScrollFx } from "@/components/fx/scroll-fx";
 import { Band, Drawer, SectionHeader } from "@/components/system";
 
 /** 07 FAQ (cream). First drawer open. Also emits FAQPage structured data. */
-export function FaqSection({ items }: { items: Faq[] }) {
+export function FaqSection({ items, index = "07" }: { items: Faq[]; index?: string }) {
   if (items.length === 0) return null;
 
   const jsonLd = {
@@ -20,7 +20,7 @@ export function FaqSection({ items }: { items: Faq[] }) {
     <Band id="faq" aria-label="Questions" className="pb-20 min-[900px]:pb-[120px]">
       <div className="wrap">
         <SectionHeader
-          index="07"
+          index={index}
           label="Questions"
           title={
             <>
