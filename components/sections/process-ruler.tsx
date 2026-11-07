@@ -55,7 +55,7 @@ export function ProcessRuler({ steps }: { steps: ProcessStep[] }) {
   const fill = steps.length ? (reached + 1) / steps.length : 0;
 
   return (
-    <ol ref={list} className="relative flex flex-col gap-5 pl-12 min-[900px]:gap-10 min-[900px]:pl-0">
+    <ol ref={list} className="relative flex flex-col gap-3 pl-12 min-[900px]:gap-10 min-[900px]:pl-0">
       {/* The ruler: track, ticks every 40px, and the copper ink that fills it. */}
       <li
         aria-hidden="true"
@@ -87,7 +87,7 @@ export function ProcessRuler({ steps }: { steps: ProcessStep[] }) {
             <span
               aria-hidden="true"
               className={cn(
-                "absolute -left-[30px] top-7 size-3 rounded-full border-[1.5px] transition-[background-color,border-color,box-shadow] duration-500",
+                "absolute -left-[30px] top-6 size-3 rounded-full border-[1.5px] transition-[background-color,border-color,box-shadow] duration-500",
                 "min-[900px]:top-8",
                 i % 2 === 0 ? "min-[900px]:-right-[62px] min-[900px]:left-auto" : "min-[900px]:-left-[62px]",
                 inked ? "border-copper bg-copper shadow-glow" : "border-paper-edge bg-paper",
@@ -95,7 +95,7 @@ export function ProcessRuler({ steps }: { steps: ProcessStep[] }) {
             />
             <article
               className={cn(
-                "relative flex flex-col gap-2.5 rounded-[20px] border-[1.5px] p-6 transition-[background-color,border-color,box-shadow] duration-500 min-[900px]:p-7",
+                "relative flex flex-col gap-2 rounded-[20px] border-[1.5px] p-5 transition-[background-color,border-color,box-shadow] duration-500 min-[900px]:p-7",
                 inked ? "border-solid border-copper/55 bg-paper-hi shadow-raised" : "border-dashed border-copper/35 bg-paper",
               )}
             >
@@ -107,11 +107,13 @@ export function ProcessRuler({ steps }: { steps: ProcessStep[] }) {
                   className={cn("absolute size-3 border-copper/60 transition-opacity duration-500", pos, inked ? "opacity-0" : "opacity-100")}
                 />
               ))}
+              {/* Phones: number beside the title (saves a line); desktop: stacked. */}
+              <div className="flex items-center gap-3 min-[900px]:flex-col min-[900px]:items-start min-[900px]:gap-2.5">
               <span
                 key={inked ? "on" : "off"}
                 className={cn(
                   // self-start: the box hugs the digits, so the stamp's scale never spills past the edge.
-                  "self-start font-display text-[34px] font-extrabold leading-none",
+                  "shrink-0 self-start font-display text-[28px] font-extrabold leading-none max-[899px]:self-center min-[900px]:text-[34px]",
                   inked ? "text-copper [text-shadow:0_0_18px_rgb(201_133_63/.4)]" : "text-copper/35",
                   // Stamp only when a step inks in as you scroll, not on the first paint.
                   inked && armed && "process-stamp",
@@ -119,11 +121,12 @@ export function ProcessRuler({ steps }: { steps: ProcessStep[] }) {
               >
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <h3 className={cn("mt-1 font-display text-[22px] font-extrabold leading-[1.1] transition-colors duration-500", !inked && "text-ink/60")}>
+              <h3 className={cn("font-display text-[20px] font-extrabold leading-[1.1] transition-colors duration-500 min-[900px]:mt-1 min-[900px]:text-[22px]", !inked && "text-ink/60")}>
                 {s.title}
               </h3>
+              </div>
               <p className={cn("text-[16px] transition-colors duration-500", inked ? "text-muted" : "text-muted/70")}>{s.text}</p>
-              <p className="mt-2 border-t border-dashed border-paper-edge pt-3 text-[15px]">
+              <p className="mt-1 border-t border-dashed border-paper-edge pt-2.5 text-[15px] min-[900px]:mt-2 min-[900px]:pt-3">
                 <Label className="mb-1 block">You get</Label>
                 <TypeText as="span" text={s.get} trigger={armed && inked ? 1 : 0} speed={26} caret={false} className="font-mono text-[13.5px]" />
               </p>

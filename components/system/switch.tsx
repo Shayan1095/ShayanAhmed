@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import * as m from "motion/react-m";
 import { useId } from "react";
 import { pressSpring } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -29,7 +29,7 @@ export function Switch({ checked, onCheckedChange, label, light = true, classNam
         onClick={() => onCheckedChange(!checked)}
         className="inset-track relative flex h-8 w-[58px] shrink-0 cursor-pointer items-center rounded-full p-[3px]"
       >
-        <motion.span
+        <m.span
           aria-hidden="true"
           animate={{ x: checked ? 26 : 0 }}
           transition={pressSpring}
@@ -40,7 +40,7 @@ export function Switch({ checked, onCheckedChange, label, light = true, classNam
             <i className="block h-2.5 w-px bg-paper-edge" />
             <i className="block h-2.5 w-px bg-paper-edge" />
           </span>
-        </motion.span>
+        </m.span>
       </button>
       <label htmlFor={id} className="type-label flex cursor-pointer items-center gap-2 text-tone-fg">
         {light && <StatusLight on={checked} size="sm" pulse={false} />}

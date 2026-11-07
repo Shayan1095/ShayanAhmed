@@ -25,7 +25,7 @@ const steps = [
 ];
 
 /**
- * 04 Process (espresso surface). Signature: the ruler (ProcessRuler). Copper
+ * 03 Process (espresso surface). Signature: the ruler (ProcessRuler). Copper
  * ink fills a ruler as you reach each step, and each step inks in from a
  * blueprint. Cards stack as they pass; no pinning.
  */
@@ -35,7 +35,7 @@ export function Process({ children }: { children?: React.ReactNode }) {
       <CoverGrid strength={0.35} />
       <div className="wrap relative">
         <SectionHeader
-          index="04"
+          index="03"
           label="Process"
           title={
             <>
@@ -45,7 +45,8 @@ export function Process({ children }: { children?: React.ReactNode }) {
           intro="Milestones you approve, a live link every week, and a clean handover at the end."
         />
         <ProcessRuler steps={steps} />
-        {children && <div className="mt-12">{children}</div>}
+        {/* Phones: the call to action lives in the dock, so no empty gap here. */}
+        {children && <div className="mt-12 max-[767px]:hidden">{children}</div>}
       </div>
     </Band>
   );

@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Project, ProjectCategory } from "@/lib/content/types";
 import { ScrollFx } from "@/components/fx/scroll-fx";
 import { Band, Cartridge, InsetToggle, Rise, SectionHeader } from "@/components/system";
-import { Flip, gsap, MQ, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { type FlipState, gsap, lazyFlip, MQ, ScrollTrigger, useGSAP, whenIdle } from "@/lib/gsap";
 import { motionGrammar } from "@/lib/motion";
 import { ArchiveRows } from "./archive-rows";
 
@@ -49,14 +49,17 @@ export function Archive({ projects, limit, seeAllHref, index = "03", className, 
   const filterable = !limit;
   const [filter, setFilter] = useState<Filter>("all");
   const grid = useRef<HTMLUListElement>(null);
-  const flipState = useRef<ReturnType<typeof Flip.getState> | null>(null);
+  const flipState = useRef<FlipState | null>(null);
+  // Flip is only needed once the filter is used; fetch it while the page is idle.
+  useEffect(() => (filterable ? whenIdle(() => void lazyFlip.load()) : undefined), [filterable]);
   const available = filters.filter((f) => f.value === "all" || projects.some((p) => matches[f.value](p.category)));
   const list = limit ? projects.slice(0, limit) : projects;
   const shown = filterable ? projects.filter((p) => matches[filter](p.category)) : list;
 
   const changeFilter = (next: Filter) => {
     // Record where every card is now, then let React apply the filter.
-    if (grid.current && !window.matchMedia(MQ.reduce).matches) {
+    const Flip = lazyFlip.get();
+    if (Flip && grid.current && !window.matchMedia(MQ.reduce).matches) {
       flipState.current = Flip.getState(grid.current.querySelectorAll("[data-flip]"));
     }
     setFilter(next);
@@ -66,7 +69,8 @@ export function Archive({ projects, limit, seeAllHref, index = "03", className, 
   useGSAP(
     () => {
       const state = flipState.current;
-      if (!state) return;
+      const Flip = lazyFlip.get();
+      if (!state || !Flip) return;
       flipState.current = null;
       Flip.from(state, {
         duration: 0.75,

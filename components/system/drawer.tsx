@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import * as m from "motion/react-m";
 import { useId, useState } from "react";
 import { easeOutExpo } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -45,7 +45,7 @@ export function Drawer({ question, children, defaultOpen = false, headingLevel: 
             className="inset-track relative hidden h-3.5 w-[54px] shrink-0 rounded-[7px] sm:block"
           >
             {/* the handle slides along its track as the drawer is pulled open */}
-            <motion.span
+            <m.span
               initial={false}
               animate={{ x: open ? 12 : -8, scaleX: open ? 0.7 : 1 }}
               transition={{ type: "spring", stiffness: 380, damping: 28 }}
@@ -54,17 +54,17 @@ export function Drawer({ question, children, defaultOpen = false, headingLevel: 
             />
           </span>
           <span className="flex-1">{question}</span>
-          <motion.span
+          <m.span
             aria-hidden="true"
             animate={{ rotate: open ? 45 : 0 }}
             transition={{ duration: 0.35, ease: easeOutExpo }}
             className="ml-auto font-mono text-xl text-muted"
           >
             +
-          </motion.span>
+          </m.span>
         </button>
       </H>
-      <motion.div
+      <m.div
         id={bodyId}
         role="region"
         aria-labelledby={btnId}
@@ -78,7 +78,7 @@ export function Drawer({ question, children, defaultOpen = false, headingLevel: 
         <div className="max-w-[46em] px-[22px] pb-6 text-[15.5px] leading-relaxed text-muted sm:pl-[94px]">
           {children}
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

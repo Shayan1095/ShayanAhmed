@@ -35,7 +35,8 @@ export default async function HomePage() {
     getFaqs(),
   ]);
   const flagship = featured.find((p) => p.hasCaseStudy);
-  // Chapter numbers run without gaps: Testimonials (06) only shows once there are some.
+  // Chapter numbers run without gaps: Testimonials (05) only shows once there are some.
+  // The archive shares chapter 01 with Selected work (on phones it is merged into it).
   const hasTestimonials = testimonials.length > 0;
   const n = (k: number) => String(hasTestimonials ? k : k - 1).padStart(2, "0");
 
@@ -48,14 +49,20 @@ export default async function HomePage() {
         caseHref={flagship ? `/work/${flagship.slug}` : undefined}
       />
       <VelocityMarquee items={["Websites", "Systems", "Automation", "Storefronts", "Admin panels", "Operations agents"]} />
-      <Work projects={featured} totalBuilds={featured.length + archive.length} />
+      <Work
+        projects={featured}
+        more={archive.slice(0, 3)}
+        codeStart={featured.length + 1}
+        totalBuilds={featured.length + archive.length}
+      />
       <Band aria-label="Talk about your project" className="pb-20 max-[767px]:hidden min-[900px]:pb-24">
         <div className="wrap">
           <CtaStrip title="Want a system like this for your business?" />
         </div>
       </Band>
       <Services />
-      <Archive projects={archive} limit={3} seeAllHref="/work" codeStart={featured.length + 1} />
+      {/* Phones: the archive is merged into the work row above. */}
+      <Archive projects={archive} limit={3} seeAllHref="/work" index="01" codeStart={featured.length + 1} className="section-pad max-[767px]:hidden" />
       <Process>
         <CtaStrip
           tone="ink"
@@ -66,10 +73,10 @@ export default async function HomePage() {
       </Process>
       <VelocityMarquee items={["Milestones you approve", "A live link every week", "A clean handover"]} />
       <About settings={settings} />
-      {/* 06 · Testimonials: renders nothing until the first one is added in the admin. */}
+      {/* 05 · Testimonials: renders nothing until the first one is added in the admin. */}
       <Testimonials items={testimonials} />
-      <FaqSection items={faqs} index={n(7)} />
-      <Contact settings={settings} index={n(8)} />
+      <FaqSection items={faqs} index={n(6)} />
+      <Contact settings={settings} index={n(7)} />
       <JsonLd data={homeJsonLd(settings, featured)} />
       <BandTransitions />
     </main>

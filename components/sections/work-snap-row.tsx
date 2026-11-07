@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, ViewTransition } from "react";
+import { useCallback, useEffect, useRef, useState, ViewTransition } from "react";
 import type { Project } from "@/lib/content/types";
 import { ProjectTile } from "@/components/site/project-tile";
-import { Tag } from "@/components/system";
+import { Label, Tag } from "@/components/system";
+import { code, ProjectSheet } from "./archive-rows";
 import { cn } from "@/lib/utils";
 
 /**
@@ -12,10 +13,27 @@ import { cn } from "@/lib/utils";
  * cards, 88% of the screen wide with the next one peeking. Native scrolling
  * with snap points (no JS scrolling); dots under the row show where you are
  * and jump to a card.
+ *
+ * The archive is merged in on phones (motion spec, Phase 3): after the case
+ * studies come the other builds as smaller cards (tap opens their details in
+ * a sheet), then a last card for the full list.
  */
-export function WorkSnapRow({ projects }: { projects: Project[] }) {
+export function WorkSnapRow({
+  projects,
+  more = [],
+  codeStart = 1,
+  total,
+}: {
+  projects: Project[];
+  more?: Project[];
+  codeStart?: number;
+  total?: number;
+}) {
   const row = useRef<HTMLUListElement>(null);
   const [active, setActive] = useState(0);
+  const [open, setOpen] = useState<Project | null>(null);
+  const close = useCallback(() => setOpen(null), []);
+  const count = projects.length + more.length + (more.length ? 1 : 0);
 
   useEffect(() => {
     const el = row.current;
@@ -29,7 +47,10 @@ export function WorkSnapRow({ projects }: { projects: Project[] }) {
     );
     cards.forEach((c) => io.observe(c));
     return () => io.disconnect();
-  }, [projects.length]);
+  }, [count]);
+
+  const all = [...projects, ...more];
+  const dotLabel = (i: number) => all[i]?.title ?? "See all builds";
 
   const go = (i: number) => {
     const card = row.current?.children[i] as HTMLElement | undefined;
@@ -72,14 +93,51 @@ export function WorkSnapRow({ projects }: { projects: Project[] }) {
             </li>
           );
         })}
-      </ul>
-      {projects.length > 1 && (
-        <div className="mt-4 flex justify-center gap-1" role="group" aria-label="Choose a case study">
-          {projects.map((p, i) => (
+        {more.map((p, i) => (
+          <li key={p.slug} className="w-[72vw] max-w-[320px] shrink-0 snap-start">
             <button
-              key={p.slug}
               type="button"
-              aria-label={`${p.title}, ${i + 1} of ${projects.length}`}
+              onClick={() => setOpen(p)}
+              aria-haspopup="dialog"
+              className="press flex h-full w-full flex-col overflow-hidden rounded-[22px] bg-paper-hi text-left shadow-raised"
+            >
+              <ProjectTile project={p} label={false} sizes="72vw" className="aspect-[16/10] w-full" />
+              <span className="flex flex-1 flex-col gap-2 p-5">
+                <span className="flex items-center gap-2.5">
+                  <Label accent>{code(codeStart + i)}</Label>
+                  <Label className="truncate">{p.kind}</Label>
+                </span>
+                <span className="font-display text-[22px] font-extrabold leading-[1.05] tracking-[-0.01em]">{p.title}</span>
+                <span className="mt-auto pt-1 text-[15px] font-semibold text-copper">
+                  Details <span aria-hidden="true">↑</span>
+                </span>
+              </span>
+            </button>
+          </li>
+        ))}
+        {more.length > 0 && (
+          <li className="w-[60vw] max-w-[260px] shrink-0 snap-start">
+            <Link
+              href="/work"
+              className="press flex h-full flex-col justify-end gap-2 rounded-[22px] p-5 shadow-[inset_0_0_0_1.5px_var(--color-paper-edge)]"
+            >
+              <span className="font-display text-[56px] font-extrabold leading-none text-copper">{total ? String(total).padStart(2, "0") : ""}</span>
+              <span className="font-display text-[22px] font-extrabold leading-[1.05]">See all builds</span>
+              <span aria-hidden="true" className="text-[20px] text-copper">
+                →
+              </span>
+            </Link>
+          </li>
+        )}
+      </ul>
+      <ProjectSheet project={open} code={open ? code(codeStart + more.indexOf(open)) : ""} onClose={close} />
+      {count > 1 && (
+        <div className="mt-4 flex justify-center gap-1" role="group" aria-label="Choose a case study">
+          {Array.from({ length: count }, (_, i) => (
+            <button
+              key={i}
+              type="button"
+              aria-label={`${dotLabel(i)}, ${i + 1} of ${count}`}
               aria-current={i === active ? "true" : undefined}
               onClick={() => go(i)}
               className="grid size-11 place-items-center"

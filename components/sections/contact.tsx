@@ -66,7 +66,7 @@ export function Contact({ settings, index = "08" }: { settings: SiteSettings; in
             </Rise>
           )}
           {/* What working together looks like, from the Process and FAQ. */}
-          <ScrollFx as="ul" effects={["rise"]} className="mt-8 grid grid-cols-1 gap-3 min-[560px]:grid-cols-2">
+          <ScrollFx as="ul" effects={["rise"]} className="mt-8 grid grid-cols-2 gap-3 max-[559px]:hidden">
             {promises.map((p) => (
               <li key={p} data-fx="item" className="flex items-start gap-3 text-[14.5px] leading-snug text-[#d9cfc0]">
                 <span aria-hidden="true" className="mt-0.5 text-copper">
@@ -77,7 +77,7 @@ export function Contact({ settings, index = "08" }: { settings: SiteSettings; in
             ))}
           </ScrollFx>
           <Rise>
-          <dl className="mt-[34px] flex flex-col gap-3">
+          <dl className="mt-6 flex flex-col gap-3 empty:hidden min-[560px]:mt-[34px]">
             {rows.map((r) => (
               <div key={r.id} className="flex flex-wrap items-center gap-3">
                 <dt className="min-w-[84px]">
@@ -91,7 +91,8 @@ export function Contact({ settings, index = "08" }: { settings: SiteSettings; in
                 </dd>
               </div>
             ))}
-            <div className="flex flex-wrap items-center gap-3">
+            {/* Phones show the clock in the menu and footer already. */}
+            <div className="flex flex-wrap items-center gap-3 max-[559px]:hidden">
               <dt className="min-w-[84px]">
                 <Label>Time</Label>
               </dt>

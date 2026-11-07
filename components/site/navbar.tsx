@@ -1,12 +1,13 @@
 "use client";
 
-import { AnimatePresence, motion, useDragControls } from "motion/react";
+import * as m from "motion/react-m";
+import { AnimatePresence, useDragControls } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SALogo } from "@/components/brand/sa-logo";
 import { useSmoothScroll } from "@/components/providers/smooth-scroll";
-import { gsap, MQ, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { gsap, lazyMorphSVG, lazyScrambleText, MQ, ScrollTrigger, useGSAP, whenIdle } from "@/lib/gsap";
 import { easeOutExpo, motionGrammar } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { Clock } from "./clock";
@@ -147,11 +148,21 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
     const t = window.setTimeout(() => setReadoutText(target), 150);
     return () => window.clearTimeout(t);
   }, [target]);
+  // The readout's scramble and the menu icon's morph load while the page is idle.
+  useEffect(
+    () =>
+      whenIdle(() => {
+        void lazyScrambleText.load();
+        void lazyMorphSVG.load();
+      }),
+    [],
+  );
   useGSAP(
     () => {
       const el = readout.current;
       if (!el) return;
-      if (window.matchMedia(MQ.reduce).matches || el.textContent === readoutText) {
+      // Until the scramble plugin has arrived, the text just changes.
+      if (window.matchMedia(MQ.reduce).matches || el.textContent === readoutText || !lazyScrambleText.get()) {
         el.textContent = readoutText;
         return;
       }
@@ -250,7 +261,7 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
                         )}
                         {/* Where you are: a copper dot that springs from link to link. */}
                         {current && (
-                          <motion.span
+                          <m.span
                             layoutId="nav-dot"
                             aria-hidden="true"
                             className="absolute bottom-0 left-1/2 size-[5px] -translate-x-1/2 rounded-full bg-copper shadow-glow"
@@ -360,14 +371,14 @@ function LetterReveal({ text, delay = 0 }: { text: string; delay?: number }) {
       <span className="sr-only">{text}</span>
       {Array.from(text).map((ch, i) => (
         <span key={i} aria-hidden="true" className="inline-block overflow-hidden pb-[0.06em] align-bottom">
-          <motion.span
+          <m.span
             className="inline-block"
             initial={{ y: "105%" }}
             animate={{ y: "0%" }}
             transition={{ delay: delay + i * 0.028, duration: 0.65, ease: easeOutExpo }}
           >
             {ch === " " ? " " : ch}
-          </motion.span>
+          </m.span>
         </span>
       ))}
     </span>
@@ -411,7 +422,7 @@ function WorkPreview({ open, projects }: { open: boolean; projects: NavProject[]
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           id="work-preview"
           role="region"
           aria-label="Featured work"
@@ -425,7 +436,7 @@ function WorkPreview({ open, projects }: { open: boolean; projects: NavProject[]
           <div className="nav-glass rounded-card p-2.5">
             <ul className="grid grid-cols-2 gap-2.5">
               {projects.map((p, i) => (
-                <motion.li
+                <m.li
                   key={p.slug}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -440,7 +451,7 @@ function WorkPreview({ open, projects }: { open: boolean; projects: NavProject[]
                       <span className="mt-0.5 line-clamp-2 block text-[12.5px] leading-snug text-muted">{p.line}</span>
                     </span>
                   </Link>
-                </motion.li>
+                </m.li>
               ))}
             </ul>
             <Link
@@ -453,7 +464,7 @@ function WorkPreview({ open, projects }: { open: boolean; projects: NavProject[]
               </span>
             </Link>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );
@@ -527,7 +538,7 @@ function MobileMenu({
   // The close icon arrives as the menu's two bars and melts into a cross.
   useGSAP(
     () => {
-      if (!open || !icon.current || window.matchMedia(MQ.reduce).matches) return;
+      if (!open || !icon.current || !lazyMorphSVG.get() || window.matchMedia(MQ.reduce).matches) return;
       gsap.fromTo(
         icon.current,
         { morphSVG: MENU_PATH },
@@ -546,7 +557,7 @@ function MobileMenu({
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           key="menu-backdrop"
           aria-hidden="true"
           onClick={onClose}
@@ -558,7 +569,7 @@ function MobileMenu({
         />
       )}
       {open && (
-        <motion.div
+        <m.div
           key="menu-sheet"
           ref={dialog}
           id="mobile-menu"
@@ -635,7 +646,7 @@ function MobileMenu({
             </ul>
           </nav>
           {latest && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.6, ease: easeOutExpo }}
@@ -655,7 +666,7 @@ function MobileMenu({
                 →
               </span>
             </Link>
-            </motion.div>
+            </m.div>
           )}
           <div className="mt-auto flex flex-col gap-3.5 font-mono text-xs tracking-[0.08em] text-muted-ink">
             <Clock className="whitespace-nowrap text-[12px]" />
@@ -679,7 +690,7 @@ function MobileMenu({
               Start a project →
             </a>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

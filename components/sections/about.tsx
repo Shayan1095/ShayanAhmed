@@ -17,7 +17,7 @@ export function About({ settings }: { settings: SiteSettings }) {
         className="wrap grid grid-cols-1 items-center gap-12 min-[980px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] min-[980px]:gap-[72px]"
       >
         <div data-fx-speed="0.45" data-fx-rotate="-5">
-          <figure className="relative mx-auto aspect-[4/5] w-full max-w-[260px] -rotate-2 rounded-3xl min-[640px]:max-w-[420px] bg-[linear-gradient(160deg,var(--color-paper-hi),var(--color-paper-lo))] p-4 shadow-raised">
+          <figure className="relative mx-auto aspect-[4/5] w-full max-w-[180px] -rotate-2 rounded-3xl min-[640px]:max-w-[420px] bg-[linear-gradient(160deg,var(--color-paper-hi),var(--color-paper-lo))] p-4 shadow-raised">
             <span
               aria-hidden="true"
               className="absolute -top-3.5 left-1/2 h-[30px] w-[120px] -ml-[60px] rotate-3 bg-paper/80 shadow-[0_1px_3px_rgb(17_17_17/.2)]"
@@ -46,7 +46,7 @@ export function About({ settings }: { settings: SiteSettings }) {
         </div>
         <div>
           <Label>
-            <Typewriter text="05 · About" speed={38} />
+            <Typewriter text="04 · About" speed={38} />
           </Label>
           <SplitReveal className="mb-[22px] mt-4 font-display text-[clamp(34px,4.4vw,60px)] font-extrabold uppercase leading-[0.94] tracking-[-0.035em] [&_em]:font-bold [&_em]:text-walnut">
             I build the part of the website <em>that does the work.</em>
@@ -58,7 +58,8 @@ export function About({ settings }: { settings: SiteSettings }) {
           <div data-fx="item" className="mb-[30px] mt-7">
             <SpecSheet rows={settings.specSheet} />
           </div>
-          <div data-fx="item">
+          {/* Phones: the dock's Start button is always in reach. */}
+          <div data-fx="item" className="max-[767px]:hidden">
             <Button href="#contact" variant="paper" arrow>
               Work with me
             </Button>

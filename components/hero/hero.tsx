@@ -80,7 +80,7 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
         </p>
 
         {/* Lower row: the cover story and the Built-in index. Side by side, the index's copper rule lines up with the top of the headline (44px = eyebrow + gap). */}
-        <div className="mt-auto flex flex-wrap items-start justify-between gap-12 pt-11">
+        <div className="mt-auto flex flex-wrap items-start justify-between gap-9 pt-8 min-[900px]:gap-12 min-[900px]:pt-11">
           <div className="flex min-w-0 flex-[999_1_600px] flex-col gap-[26px]">
             <p
               {...rv(140)}

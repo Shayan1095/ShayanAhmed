@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import * as m from "motion/react-m";
+import { useMotionValue, useReducedMotion, useSpring } from "motion/react";
 import type { SocialLink } from "@/lib/content/socials";
 import { cn } from "@/lib/utils";
 
@@ -69,7 +70,7 @@ function Key({ link, index, magnetic = false }: { link: SocialLink; index: numbe
       className={cn("social-key-float block", magnetic ? "" : "social-key-bob")}
       style={{ "--float-dur": `${6 + (index % 4) * 0.9}s`, "--float-delay": `${-index * 0.7}s` } as React.CSSProperties}
     >
-      <motion.a
+      <m.a
         href={link.href}
         {...(link.external ? { target: "_blank", rel: "noopener noreferrer me" } : {})}
         aria-label={link.external ? `${link.label} (opens in a new tab)` : link.label}
@@ -91,7 +92,7 @@ function Key({ link, index, magnetic = false }: { link: SocialLink; index: numbe
         >
           {link.label} ↗
         </span>
-      </motion.a>
+      </m.a>
     </span>
   );
 }

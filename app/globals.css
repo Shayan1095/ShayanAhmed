@@ -191,8 +191,20 @@ body {
   }
 }
 
+/* Home page on phones: the footer's sign-off repeats the contact form above it. */
+@media (width < 768px) {
+  body:has(#contact) [data-footer-signoff],
+  body:has(#contact) [data-footer-top]:not(:has(nav)) {
+    display: none;
+  }
+}
+
 @utility section-pad {
-  padding-block: 80px;
+  /* Phones: tighter chapters (the page was too long to scroll comfortably). */
+  padding-block: 60px;
+  @media (width >= 640px) {
+    padding-block: 80px;
+  }
   @media (width >= 900px) {
     padding-block: 120px;
   }

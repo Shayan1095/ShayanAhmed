@@ -40,8 +40,9 @@ export async function Footer() {
       {/* Copper hairline catching the light along the top edge. */}
       <span aria-hidden="true" className="absolute inset-x-[8%] top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgb(224 154 79 / 0.55), transparent)" }} />
       <div data-footer-inner className="wrap relative">
-        <div className="grid grid-cols-1 items-center gap-12 min-[900px]:grid-cols-[minmax(0,1fr)_auto]">
-          <div>
+        <div data-footer-top className="grid grid-cols-1 items-center gap-12 min-[900px]:grid-cols-[minmax(0,1fr)_auto]">
+          {/* Hidden on the home page on phones: the contact form right above asks the same. */}
+          <div data-footer-signoff>
             <Label accent>End of transmission</Label>
             <p className="mt-4 max-w-[13em] font-display text-[clamp(30px,3.6vw,48px)] font-extrabold leading-[0.95] tracking-[-0.03em]">
               Have a business that should run itself?
@@ -71,9 +72,9 @@ export async function Footer() {
           )}
         </div>
 
-        <Wordmark text="Shayan Ahmed" className="mt-20" />
+        <Wordmark text="Shayan Ahmed" className="mt-12 min-[900px]:mt-20" />
 
-        <div className="mt-8 flex flex-col gap-5 border-t border-ink-3 pt-6 font-mono text-[11px] tracking-[0.08em] text-muted-ink min-[900px]:flex-row min-[900px]:items-center min-[900px]:justify-between">
+        <div className="mt-8 flex flex-col gap-4 border-t border-ink-3 pt-6 font-mono min-[900px]:gap-5 text-[11px] tracking-[0.08em] text-muted-ink min-[900px]:flex-row min-[900px]:items-center min-[900px]:justify-between">
           <span className="whitespace-nowrap">© {year} Shayan Ahmed</span>
           <nav aria-label="Footer">
             <ul className="flex flex-wrap gap-x-5 max-[899px]:-my-3">
@@ -86,14 +87,18 @@ export async function Footer() {
               ))}
             </ul>
           </nav>
+          {/* Phones: clock and back-to-top share a line. */}
+          <div className="flex items-center justify-between gap-4 min-[900px]:contents">
           <Clock className="whitespace-nowrap" />
           <a
             href="#main"
-            className="group inline-flex w-fit shrink-0 items-center gap-2 whitespace-nowrap min-h-11 rounded-full border border-ink-3 px-4 text-paper transition-colors hover:border-copper hover:text-copper"
+            aria-label="Back to top"
+            className="group inline-flex w-fit shrink-0 items-center justify-center gap-2 whitespace-nowrap min-h-11 rounded-full border border-ink-3 text-paper max-[899px]:size-11 min-[900px]:px-4 transition-colors hover:border-copper hover:text-copper"
           >
-            Back to top
+            <span className="max-[899px]:hidden">Back to top</span>
             <ArrowUp aria-hidden="true" className="size-3.5 transition-transform duration-300 group-hover:-translate-y-0.5" />
           </a>
+          </div>
         </div>
       </div>
       <FooterReveal />

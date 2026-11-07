@@ -182,7 +182,7 @@ test.describe("motion components", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     await scrollToSection(page, "process");
-    const label = page.locator("#process header [aria-hidden='true']").filter({ hasText: "04 · Process" }).last();
-    await expect(label).toHaveText("04 · Process");
+    const label = page.locator("#process header [aria-hidden='true']").filter({ hasText: "03 · Process" }).last();
+    await expect(label).toHaveText("03 · Process");
   });
 });

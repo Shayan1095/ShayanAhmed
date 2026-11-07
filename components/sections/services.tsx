@@ -85,7 +85,7 @@ export function Services() {
             <details name>, so the browser keeps one open; no JS needed). */}
         <div className="flex flex-col gap-3 min-[768px]:hidden">
           {layers.map((l, i) => (
-            <details key={l.title} name="service-layers" open={i === 0} className="layer-acc group/acc rounded-[18px] bg-ink-2 shadow-ink-raised">
+            <details key={l.title} name="service-layers" className="layer-acc group/acc rounded-[18px] bg-ink-2 shadow-ink-raised">
               <summary className="flex min-h-16 cursor-pointer list-none items-center gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
                 <span className="min-w-0 flex-1">
                   <Label className="block">

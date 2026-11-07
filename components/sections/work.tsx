@@ -13,7 +13,18 @@ import { WorkSnapRow } from "./work-snap-row";
  * 01 Selected work (cream), straight after the hero: proof first. Desktop: the band pins and the rail slides
  * sideways, fragments drift at their own speeds. Mobile / reduced motion: stacked.
  */
-export function Work({ projects, totalBuilds }: { projects: Project[]; totalBuilds?: number }) {
+export function Work({
+  projects,
+  more,
+  codeStart,
+  totalBuilds,
+}: {
+  projects: Project[];
+  /** Other builds, merged into the phone row (the archive section is hidden there). */
+  more?: Project[];
+  codeStart?: number;
+  totalBuilds?: number;
+}) {
   const root = useRef<HTMLElement>(null);
   const pin = useRef<HTMLDivElement>(null);
   const rail = useRef<HTMLDivElement>(null);
@@ -144,7 +155,7 @@ export function Work({ projects, totalBuilds }: { projects: Project[]; totalBuil
         <div className="wrap">
           {/* Phones: a swipeable row of case cards instead of the stacked slides. */}
           <div className="min-[768px]:hidden">
-            <WorkSnapRow projects={projects} />
+            <WorkSnapRow projects={projects} more={more} codeStart={codeStart} total={totalBuilds} />
           </div>
           <div ref={rail} className="flex flex-col gap-16 will-change-transform max-[767px]:hidden min-[900px]:flex-row min-[900px]:gap-10">
             {projects.map((p, i) => (

@@ -54,6 +54,15 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
     screen.current?.boot();
   };
 
+  // "› Transmitted" shows briefly, then the button reads "Send message" again
+  // (the screen above keeps "Message received"), so another message can follow.
+  const [justSent, setJustSent] = useState(false);
+  useEffect(() => {
+    if (!justSent) return;
+    const id = window.setTimeout(() => setJustSent(false), 2600);
+    return () => window.clearTimeout(id);
+  }, [justSent]);
+
   // Print the server's answer once it arrives.
   const lastState = useRef(state);
   useEffect(() => {
@@ -62,6 +71,7 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
     const id = window.setTimeout(() => {
       if (state.status === "ok") {
         print(["Message received", "Reply within 24h"]);
+        setJustSent(true);
         form.current?.reset();
         setProjectType(projectTypes[0] ?? "");
       } else if (state.status === "error") {
@@ -86,7 +96,7 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
 
   const error = clientError ?? (state.status === "error" && state.field ? state : null);
   const invalid = (name: ContactField) => error?.field === name || undefined;
-  const sent = state.status === "ok";
+  const sent = justSent;
 
   return (
     <div className="tone-ink relative rounded-[28px] bg-[linear-gradient(165deg,#2a231c,var(--color-ink-2)_55%,#14110e)] p-[22px] shadow-ink-raised min-[560px]:p-[30px]">
@@ -105,7 +115,7 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
         </div>
       </Screen>
 
-      <form ref={form} action={action} onSubmit={onSubmit} noValidate className="flex flex-col gap-[18px]">
+      <form ref={form} action={action} onSubmit={onSubmit} onInput={() => setJustSent(false)} noValidate className="flex flex-col gap-[18px]">
         <div className="grid grid-cols-1 gap-4 min-[560px]:grid-cols-2">
           <div className="flex flex-col gap-2">
             <label htmlFor="f-name" className={labelCls}>
@@ -151,11 +161,12 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
                 <option key={t}>{t}</option>
               ))}
             </select>
-            <div role="radiogroup" aria-label="Project" className="flex flex-wrap gap-2 min-[768px]:hidden">
+            {/* One swipeable line of chips (the last one peeks), not three wrapped rows. */}
+            <div role="radiogroup" aria-label="Project" className="-mr-[22px] flex gap-2 overflow-x-auto overscroll-x-contain pr-[22px] [scrollbar-width:none] min-[768px]:hidden [&::-webkit-scrollbar]:hidden">
               {projectTypes.map((t) => (
                 <label
                   key={t}
-                  className="inline-flex min-h-11 cursor-pointer items-center rounded-full px-4 text-[15px] shadow-[inset_0_0_0_1px_var(--color-ink-3)] transition-[background-color,color,box-shadow,scale] duration-[150ms] active:scale-[0.97] has-[:checked]:bg-copper has-[:checked]:font-semibold has-[:checked]:text-[#140d08] has-[:checked]:shadow-none has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-copper"
+                  className="inline-flex min-h-11 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-full px-4 text-[15px] shadow-[inset_0_0_0_1px_var(--color-ink-3)] transition-[background-color,color,box-shadow,scale] duration-[150ms] active:scale-[0.97] has-[:checked]:bg-copper has-[:checked]:font-semibold has-[:checked]:text-[#140d08] has-[:checked]:shadow-none has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-copper"
                 >
                   <input
                     type="radio"
@@ -190,11 +201,11 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
           <textarea
             id="f-msg"
             name="message"
-            rows={5}
+            rows={4}
             required
             aria-invalid={invalid("message")}
             placeholder="We run a clothing brand and spend hours checking orders by hand…"
-            className={cn(field, "min-h-[120px] resize-y")}
+            className={cn(field, "min-h-[100px] resize-y min-[560px]:min-h-[120px]")}
           />
         </div>
         {/* Honeypot */}

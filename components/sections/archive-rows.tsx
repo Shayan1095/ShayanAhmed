@@ -6,7 +6,7 @@ import type { Project } from "@/lib/content/types";
 import { ProjectTile } from "@/components/site/project-tile";
 import { BottomSheet, Label, Tag } from "@/components/system";
 
-const code = (n: number) => `SA–${String(n).padStart(2, "0")}`;
+export const code = (n: number) => `SA–${String(n).padStart(2, "0")}`;
 
 /**
  * The archive on phones (motion spec, Phase 4): compact index rows (code,
@@ -42,12 +42,21 @@ export function ArchiveRows({ projects, codeStart = 1 }: { projects: Project[]; 
         ))}
       </ul>
 
-      <BottomSheet open={open !== null} onClose={close} label={open?.title ?? "Project"}>
+      <ProjectSheet project={open} code={code(codeStart + openIndex)} onClose={close} />
+    </>
+  );
+}
+
+/** A project's details in a bottom sheet (archive rows and the phone work row). */
+export function ProjectSheet({ project, code, onClose }: { project: Project | null; code: string; onClose: () => void }) {
+  const open = project;
+  return (
+    <BottomSheet open={project !== null} onClose={onClose} label={project?.title ?? "Project"}>
         {open && (
           <div className="flex flex-col gap-4 pt-1">
             <ProjectTile project={open} sizes="100vw" className="aspect-[16/10] w-full rounded-[16px]" />
             <div className="flex flex-wrap items-center gap-2">
-              <Label accent>{code(codeStart + openIndex)}</Label>
+              <Label accent>{code}</Label>
               <Tag>{open.kind}</Tag>
             </div>
             <h3 className="font-display text-[30px] font-extrabold leading-[1.02] tracking-[-0.02em]">{open.title}</h3>
@@ -88,13 +97,12 @@ export function ArchiveRows({ projects, codeStart = 1 }: { projects: Project[]; 
                   Visit the site <span aria-hidden="true">↗</span>
                 </a>
               )}
-              <button type="button" onClick={close} className="inline-flex min-h-12 items-center px-3 text-[16px] font-semibold text-muted">
+              <button type="button" onClick={onClose} className="inline-flex min-h-12 items-center px-3 text-[16px] font-semibold text-muted">
                 Close
               </button>
             </div>
           </div>
         )}
       </BottomSheet>
-    </>
   );
 }

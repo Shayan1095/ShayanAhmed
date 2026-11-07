@@ -1,6 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion, useDragControls } from "motion/react";
+import * as m from "motion/react-m";
+import { AnimatePresence, useDragControls } from "motion/react";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useSmoothScroll } from "@/components/providers/smooth-scroll";
@@ -69,7 +70,7 @@ export function BottomSheet({
   return createPortal(
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           key="sheet-backdrop"
           aria-hidden="true"
           onClick={onClose}
@@ -81,7 +82,7 @@ export function BottomSheet({
         />
       )}
       {open && (
-        <motion.div
+        <m.div
           key="sheet-panel"
           ref={panel}
           role="dialog"
@@ -112,7 +113,7 @@ export function BottomSheet({
             <span aria-hidden="true" className="h-1.5 w-11 rounded-full bg-ink/25" />
           </div>
           {children}
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>,
     document.body,

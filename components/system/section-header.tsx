@@ -23,12 +23,12 @@ export function SectionHeader({ index, label, title, intro, as = "h2", aside, cl
   return (
     <header
       className={cn(
-        "mb-10 grid grid-cols-1 items-end gap-[18px] min-[900px]:mb-14 min-[900px]:grid-cols-[minmax(0,1fr)_minmax(0,0.62fr)] min-[900px]:gap-9",
+        "mb-8 grid grid-cols-1 items-end gap-4 min-[640px]:mb-10 min-[640px]:gap-[18px] min-[900px]:mb-14 min-[900px]:grid-cols-[minmax(0,1fr)_minmax(0,0.62fr)] min-[900px]:gap-9",
         className,
       )}
     >
       <div>
-        <Label className="mb-[18px] block">
+        <Label className="mb-3.5 block min-[640px]:mb-[18px]">
           <Typewriter text={index ? `${index} · ${label}` : label} speed={38} />
         </Label>
         <SplitReveal as={as} className="type-section">

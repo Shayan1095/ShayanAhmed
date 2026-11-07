@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
+import { useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BUILT_IN, BUILT_IN_INTERVAL_MS, COVER, FOIL } from "./hero-data";
 
@@ -58,7 +59,7 @@ export function BuiltInIndex() {
   return (
     <aside
       ref={panel}
-      aria-label="What's built in"
+      aria-labelledby="built-in-title"
       onMouseEnter={() => setHeld(true)}
       onMouseLeave={() => setHeld(false)}
       onFocus={() => setHeld(true)}
@@ -67,7 +68,7 @@ export function BuiltInIndex() {
       style={{ borderTop: `1.5px solid ${COVER.copper}` }}
     >
       <p className="m-0 flex justify-between font-mono text-[11px] uppercase tracking-[0.16em]">
-        <span style={{ color: COVER.copper }}>What&apos;s built in</span>
+        <span id="built-in-title" style={{ color: COVER.copper }}>What&apos;s built in</span>
         <span style={{ color: COVER.muted3 }} aria-hidden="true">
           {pad(index + 1)} / {pad(BUILT_IN.length)}
         </span>
@@ -93,27 +94,27 @@ export function BuiltInIndex() {
         <span className="flex flex-none">
           {Array.from(pad(index + 1)).map((d, i) => (
             <Mask key={i}>
-              <motion.span
+              <m.span
                 key={`n${i}-${d}`}
                 {...roll}
                 className="inline-block font-[family-name:var(--font-archivo)] text-[112px] font-black leading-[0.82] tracking-[-0.02em]"
                 style={{ ...FOIL, fontStretch: "62%", fontVariationSettings: "'wdth' 62" }}
               >
                 {d}
-              </motion.span>
+              </m.span>
             </Mask>
           ))}
         </span>
         <div className="flex min-w-0 flex-col gap-2.5 pt-1.5">
           <Mask>
-            <motion.span key={`t${index}`} {...roll} className="inline-block font-[family-name:var(--font-archivo)] text-[28px] font-bold leading-[1.05] tracking-[-0.01em]" style={{ color: COVER.paper }}>
+            <m.span key={`t${index}`} {...roll} className="inline-block font-[family-name:var(--font-archivo)] text-[28px] font-bold leading-[1.05] tracking-[-0.01em]" style={{ color: COVER.paper }}>
               {item.title}
-            </motion.span>
+            </m.span>
           </Mask>
           <Mask>
-            <motion.span key={`d${index}`} {...roll} className="inline-block text-[15px] leading-[1.55]" style={{ color: COVER.muted }}>
+            <m.span key={`d${index}`} {...roll} className="inline-block text-[15px] leading-[1.55]" style={{ color: COVER.muted }}>
               {item.desc}
-            </motion.span>
+            </m.span>
           </Mask>
         </div>
       </div>

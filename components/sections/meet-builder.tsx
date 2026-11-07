@@ -96,6 +96,7 @@ export function MeetBuilder({
             </span>
           }
           intro="A short look at how I work, and what an agent hands you each morning."
+          className="max-[767px]:[&>p]:hidden"
         />
 
         <div className="grid grid-cols-1 items-start gap-8 min-[980px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
@@ -142,7 +143,7 @@ export function MeetBuilder({
             <Label accent>This morning, from the agents</Label>
             <ul ref={list} className={cn("flex flex-col gap-3", armed && "alerts-armed", played && "alerts-play")}>
               {alerts.slice(0, 3).map((a, i) => (
-                <li key={a.text} className="alert-in" style={{ "--i": i } as React.CSSProperties}>
+                <li key={a.text} className={cn("alert-in", i === 2 && "max-[979px]:hidden")} style={{ "--i": i } as React.CSSProperties}>
                   <UiFragment tag={a.tag} text={a.text} actions={a.actions} live={i === 0} className="w-full" />
                 </li>
               ))}

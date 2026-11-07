@@ -183,18 +183,18 @@ export function OrderTicket() {
       </div>
 
       {/* Phones and tablets: stations down a rail. */}
-      <ol className="relative flex flex-col gap-4 min-[900px]:hidden">
-        <li aria-hidden="true" className="pointer-events-none absolute bottom-6 left-[27px] top-6 w-px bg-ink-3">
+      <ol className="relative flex flex-col gap-3 min-[900px]:hidden">
+        <li aria-hidden="true" className="pointer-events-none absolute bottom-6 left-[22px] top-6 w-px bg-ink-3">
           <span
             className="absolute inset-x-0 top-0 bg-copper shadow-glow transition-[height] duration-700 ease-out-expo"
             style={{ height: `${((approved ? 3 : stage) / 3) * 100}%` }}
           />
         </li>
         {stations.map((s, i) => (
-          <li key={s.title} data-station className="relative z-[1] flex gap-4">
+          <li key={s.title} data-station className="relative z-[1] flex gap-3">
             <span
               className={cn(
-                "grid size-14 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(180deg,#2a2724,var(--color-ink-2))] font-mono text-sm shadow-ink-raised transition-colors duration-500",
+                "grid size-11 shrink-0 place-items-center rounded-xl bg-[linear-gradient(180deg,#2a2724,var(--color-ink-2))] font-mono text-sm shadow-ink-raised transition-colors duration-500",
                 lit(i) ? "text-copper" : "text-muted-ink",
               )}
             >
@@ -203,12 +203,12 @@ export function OrderTicket() {
             <div
               className={cn(
                 // overflow-hidden: the stamp waits enlarged before it lands; keep it inside the card.
-                "flex-1 overflow-hidden rounded-[16px] bg-ink-2 px-[18px] py-4 shadow-ink-raised transition-opacity duration-500",
+                "flex-1 overflow-hidden rounded-[16px] bg-ink-2 px-4 py-3.5 shadow-ink-raised transition-opacity duration-500",
                 lit(i) ? "opacity-100" : "opacity-60",
               )}
             >
               <span className="type-label text-[10.5px] text-muted-ink">{s.layer}</span>
-              <h3 className="mb-1.5 mt-2 font-display text-[21px] font-extrabold leading-[1.05]">{s.title}</h3>
+              <h3 className="mb-1 mt-1.5 font-display text-[20px] font-extrabold leading-[1.05]">{s.title}</h3>
               <p className="text-[15px] text-muted-ink">{s.text}</p>
               {i === 1 && <Stamp kind="flag" show={stage >= 1} className="mt-3" />}
               {i === 2 &&
@@ -229,7 +229,7 @@ export function OrderTicket() {
         ))}
       </ol>
 
-      <p className="mt-7 text-[14.5px] text-muted-ink">
+      <p className="mt-7 text-[14.5px] text-muted-ink max-[899px]:hidden">
         A real flow from the Brands Attire build. Every system I deliver follows this shape: agents prepare, you decide.
       </p>
     </div>

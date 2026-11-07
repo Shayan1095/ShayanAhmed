@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import * as m from "motion/react-m";
 import { useId } from "react";
 import { cn } from "@/lib/utils";
 
@@ -41,7 +41,7 @@ export function InsetToggle<T extends string>({ options, value, onChange, label,
             )}
           >
             {active && (
-              <motion.span
+              <m.span
                 layoutId={keyId}
                 aria-hidden="true"
                 className="raised-sm absolute inset-0 rounded-[9px]"

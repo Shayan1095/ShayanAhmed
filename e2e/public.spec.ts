@@ -1,3 +1,4 @@
+import { gzipSync } from "node:zlib";
 import { expect, test } from "@playwright/test";
 import { expectNoA11yViolations } from "./helpers";
 
@@ -32,12 +33,16 @@ test.describe("public site", () => {
         .filter((e) => (e as PerformanceResourceTiming).initiatorType === "script")
         .map((e) => ({ url: e.name, size: (e as PerformanceResourceTiming).decodedBodySize })),
     );
-    const kb = Math.round(scripts.reduce((a, s) => a + s.size, 0) / 1024);
-    // 871 KB before the motion upgrade; GSAP Flip, DrawSVG, MorphSVG, ScrambleText,
-    // Observer and CustomEase add about 41 KB. Phase 4 set pieces (order ticket,
-    // process ruler, bottom sheets, hero entrance) add ~10 KB net: 950 until the
-    // Phase 5 split loads heavy code only where it is used. Anything beyond needs a reason.
-    expect(kb).toBeLessThanOrEqual(950);
+    // Budget: the compressed scripts the HTML asks for up front (what blocks a
+    // visitor's first interaction). Code loaded later on demand (Motion's
+    // animation engine, GSAP Flip/MorphSVG/ScrambleText) is not counted.
+    // 333 KB before the Phase 5 split, 281 KB after it; React and Next.js
+    // themselves are about 113 KB of that. Anything beyond needs a reason.
+    const html = await (await page.request.get("/")).text();
+    const initial = [...html.matchAll(/<script src="([^"]+\.js)" async/g)].map((m) => m[1]);
+    let gz = 0;
+    for (const src of initial) gz += gzipSync(await (await page.request.get(src)).body()).length;
+    expect(Math.round(gz / 1024)).toBeLessThanOrEqual(300);
 
     // React Hook Form and TanStack Table are admin-only: none of their code ships here.
     for (const { url } of scripts) {

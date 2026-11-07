@@ -13,7 +13,6 @@ import { motionGrammar } from "@/lib/motion";
  *  plates    [data-fx="item"]     items start tilted back and stacked in depth,
  *                                 then separate and settle flat (desktop only)
  *  draw      [data-fx="line"]     scaleX (or scaleY with data-fx-axis="y") 0 → 1
- *  stroke    [data-fx="stroke"]   an SVG path draws itself along its length (DrawSVG)
  *  parallax  [data-fx-speed="n"]  moves at its own speed through the section;
  *                                 data-fx-rotate="deg" also turns it to 0 at centre
  *  tilt      [data-fx="tilt"]     straightens from a slight rotateX and rises
@@ -22,7 +21,7 @@ import { motionGrammar } from "@/lib/motion";
  * Transform and opacity only, so they stay smooth even without GPU
  * acceleration. Off with reduced motion, where content simply sits in place.
  */
-export type FxName = "rise" | "fan" | "plates" | "draw" | "stroke" | "parallax" | "tilt" | "progress";
+export type FxName = "rise" | "fan" | "plates" | "draw" | "parallax" | "tilt" | "progress";
 
 type ScrollFxProps = Omit<React.ComponentProps<"div">, "ref"> & {
   effects: FxName[];
@@ -103,20 +102,6 @@ export function ScrollFx({ effects, as = "div", children, ...props }: ScrollFxPr
                 [y ? "scaleY" : "scaleX"]: 1,
                 ease: "none",
                 transformOrigin: y ? "50% 0%" : "0% 50%",
-                scrollTrigger: { trigger: el, start: "top 80%", end: "bottom 65%", scrub },
-              },
-            );
-          });
-        }
-
-        if (effects.includes("stroke")) {
-          q('[data-fx="stroke"]').forEach((path) => {
-            gsap.fromTo(
-              path,
-              { drawSVG: "0%" },
-              {
-                drawSVG: "100%",
-                ease: "none",
                 scrollTrigger: { trigger: el, start: "top 80%", end: "bottom 65%", scrub },
               },
             );
