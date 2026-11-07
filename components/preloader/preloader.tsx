@@ -6,9 +6,11 @@ import "./intro.css";
 
 type Phase = "playing" | "finishing" | "splitting" | "done";
 
+// Desktop timings; phones run the same timeline faster (--t in preloader.css).
+const LINE_MS = 900; // the line reaches 92%
 const FINISH_MS = 140; // 92 → 100%
 const SPLIT_MS = 620; // halves part
-const CAP_MS = 3000; // never wait on fonts longer than this
+const FONT_GRACE_MS = 150; // after 92%, wait at most this long for fonts (total cap ~1.6s / ~1.0s)
 
 /**
  * The intro (SA-Brand preloader brief): crop marks, the name, a measured line
@@ -22,6 +24,7 @@ const CAP_MS = 3000; // never wait on fonts longer than this
 export function Preloader({ date }: { date: string }) {
   const [phase, setPhase] = useState<Phase>("playing");
   const lineRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -32,17 +35,39 @@ export function Preloader({ date }: { date: string }) {
     const timers: number[] = [];
     const later = (fn: () => void, ms: number) => timers.push(window.setTimeout(fn, ms));
 
+    const scale = parseFloat(getComputedStyle(overlayRef.current ?? html).getPropertyValue("--t")) || 1;
+
+    // The line flies up to become the hero's top rule (the issue line's
+    // hairline), so the intro and the hero read as one motion.
+    const handOff = () => {
+      const line = lineRef.current;
+      const rule = document.querySelector<HTMLElement>("[data-hero-rule]");
+      if (!line || !rule) return;
+      const from = line.getBoundingClientRect();
+      const to = rule.getBoundingClientRect();
+      const dx = to.left - from.left;
+      const dy = to.bottom - 1 - from.top;
+      line.animate(
+        [
+          { transform: "translate(0, 0) scaleX(1)", opacity: 1 },
+          { transform: `translate(${dx}px, ${dy}px) scaleX(${to.width / from.width})`, opacity: 0.35 },
+        ],
+        { duration: SPLIT_MS * scale, easing: "cubic-bezier(0.76, 0, 0.24, 1)", fill: "forwards" },
+      );
+    };
+
     const doSplit = () => {
       if (split || cancelled) return;
       split = true;
+      handOff();
       html.dataset.intro = "split";
       setPhase("splitting");
-      later(() => setPhase("done"), SPLIT_MS + 20);
+      later(() => setPhase("done"), SPLIT_MS * scale + 20);
       // The hero's reveal ends by ~840ms after the split; then hand the page back.
       later(() => {
         delete html.dataset.intro;
         delete html.dataset.introFont;
-      }, 900);
+      }, Math.max(900, SPLIT_MS * scale + 300));
     };
 
     // Phase 1 (0 → 92%) is the CSS animation already running since first paint.
@@ -51,11 +76,15 @@ export function Preloader({ date }: { date: string }) {
     const phase1 = done(lineRef.current ? [lineRef.current] : []);
     const name = done(Array.from(document.querySelectorAll(".sa-pl-nm1, .sa-pl-nm2")));
     const fonts = document.fonts?.ready ?? Promise.resolve();
-    const cap = new Promise((r) => later(() => r(undefined), Math.max(0, CAP_MS - performance.now())));
+    // Cap: measured from when the line started, never later than 92% + a short grace.
+    const started = Number(lineRef.current?.getAnimations()[0]?.startTime ?? 0);
+    const now = Number(document.timeline.currentTime ?? performance.now());
+    const capIn = Math.max(0, started + (LINE_MS + FONT_GRACE_MS) * scale - now);
+    const cap = new Promise((r) => later(() => r(undefined), capIn));
     Promise.all([phase1, Promise.race([Promise.all([fonts, name]), cap])]).then(() => {
       if (split || cancelled) return;
       setPhase("finishing");
-      later(doSplit, FINISH_MS);
+      later(doSplit, FINISH_MS * scale);
     });
 
     const skip = () => doSplit();
@@ -72,6 +101,7 @@ export function Preloader({ date }: { date: string }) {
   return (
     phase !== "done" && (
         <div
+          ref={overlayRef}
           aria-hidden="true"
           className={["sa-intro sa-pl-overlay", phase === "finishing" || phase === "splitting" ? "sa-pl-finishing" : "", phase === "splitting" ? "sa-pl-splitting" : ""].join(" ")}
         >

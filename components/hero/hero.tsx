@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { BuiltInIndex } from "./built-in-index";
+import { HeroEntrance } from "./hero-entrance";
 import { CoverGrid } from "@/components/system/cover-grid";
 import { COVER, FOIL, GLOW, HERO_COPY } from "./hero-data";
 import { issueDate } from "@/lib/issue-date";
@@ -22,16 +23,18 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
       className="relative overflow-hidden"
       style={{ backgroundColor: COVER.ink, color: COVER.paper }}
     >
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={GLOW} />
+      {/* The copper glow drifts slowly on its own (never follows the cursor). */}
+      <div aria-hidden="true" className="hero-glow pointer-events-none absolute -inset-[6%]" style={GLOW} />
       <CoverGrid />
 
       {/* Top padding clears the floating navbar; svh keeps phone browser bars from cutting it off. */}
       <div className="relative mx-auto flex min-h-svh max-w-[1360px] flex-col px-4 pb-11 pt-[calc(env(safe-area-inset-top)+96px)] min-[560px]:px-8 min-[900px]:pt-[calc(env(safe-area-inset-top)+100px)]">
         {/* Issue line */}
+        {/* Its hairline is where the intro's line lands (data-hero-rule, preloader.tsx). */}
         <p
-          data-intro-rv=""
+          data-hero-rule=""
           className="m-0 flex flex-wrap justify-between gap-x-4 gap-y-1 pb-2.5 font-mono text-[11px] uppercase tracking-[0.14em]"
-          style={{ ...rv(100).style, color: COVER.muted2, borderBottom: "1px solid rgba(232,178,122,.3)" }}
+          style={{ color: COVER.muted2, borderBottom: "1px solid rgba(232,178,122,.3)" }}
         >
           <span>No. 01 — {date}</span>
           {/* Phones: just the issue number and date, on one line. */}
@@ -39,13 +42,13 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
           <span className="max-[699px]:hidden">{HERO_COPY.issueRight}</span>
         </p>
 
-        {/* Masthead: decorative; the h1 below carries the meaning. */}
+        {/* Masthead: decorative; the h1 below carries the meaning. Each letter is
+            its own box so the entrance can raise them one by one (hero-entrance.tsx). */}
         <p
           aria-hidden="true"
-          data-intro-rv=""
+          data-hero-masthead=""
           className="m-0 mt-2.5 whitespace-nowrap text-center font-[family-name:var(--font-archivo)] font-black uppercase"
           style={{
-            ...rv(60).style,
             ...FOIL,
             fontStretch: "62%",
             fontVariationSettings: "'wdth' 62",
@@ -54,7 +57,15 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
             letterSpacing: "-0.03em",
           }}
         >
-          {HERO_COPY.masthead}
+          {Array.from(HERO_COPY.masthead).map((c, i) =>
+            c === " " ? (
+              " "
+            ) : (
+              <span key={i} data-l="" className="inline-block">
+                {c}
+              </span>
+            ),
+          )}
         </p>
 
         {/* Credit line */}
@@ -70,8 +81,12 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
 
         {/* Lower row: the cover story and the Built-in index. Side by side, the index's copper rule lines up with the top of the headline (44px = eyebrow + gap). */}
         <div className="mt-auto flex flex-wrap items-start justify-between gap-12 pt-11">
-          <div {...rv(160)} className="flex min-w-0 flex-[999_1_600px] flex-col gap-[26px]">
-            <p className="m-0 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.16em]" style={{ color: COVER.copper }}>
+          <div className="flex min-w-0 flex-[999_1_600px] flex-col gap-[26px]">
+            <p
+              {...rv(140)}
+              className="m-0 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.16em]"
+              style={{ ...rv(140).style, color: COVER.copper }}
+            >
               <span aria-hidden="true" className="h-px w-7" style={{ background: COVER.copper }} />
               {HERO_COPY.eyebrow}
             </p>
@@ -89,11 +104,16 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
               }}
             >
               Websites with the systems{" "}
-              <em className="not-italic" style={FOIL}>
+              {/* One copper sweep crosses it as the hero settles (globals.css .hero-sweep). */}
+              <em data-hero-sweep="" className="hero-sweep not-italic">
                 built in.
               </em>
             </h1>
-            <p className="m-0 max-w-[58ch] text-[17px] leading-[1.65] min-[900px]:text-[18px]" style={{ color: COVER.muted }}>
+            <p
+              {...rv(200)}
+              className="m-0 max-w-[58ch] text-[17px] leading-[1.65] min-[900px]:text-[18px]"
+              style={{ ...rv(200).style, color: COVER.muted }}
+            >
               I&apos;m{" "}
               <strong className="font-semibold" style={{ color: COVER.paper }}>
                 Shayan Ahmed
@@ -101,7 +121,7 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
               . I build the storefront your customers use and the back office that runs it, with agents that take the routine work off your plate while you
               approve every decision.
             </p>
-            <div className="flex flex-wrap gap-3">
+            <div data-hero-cta="" className="flex flex-wrap gap-3">
               <a
                 href="#contact"
                 className="group inline-flex min-h-[54px] items-center gap-2.5 rounded-[4px] px-[26px] text-[16px] font-bold transition-[transform,box-shadow] duration-150 hover:-translate-y-px active:translate-y-[3px] active:shadow-[inset_0_1px_0_rgba(255,255,255,.45),0_1px_0_#6B3F22]"
@@ -129,6 +149,7 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
           </div>
         </div>
       </div>
+      <HeroEntrance />
     </section>
   );
 }

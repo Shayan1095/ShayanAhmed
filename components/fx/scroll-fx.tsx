@@ -10,6 +10,8 @@ import { motionGrammar } from "@/lib/motion";
  *
  *  rise      [data-fx="item"]     y + fade, staggered, tied to scroll
  *  fan       [data-fx="item"]     items fan in from their side toward place
+ *  plates    [data-fx="item"]     items start tilted back and stacked in depth,
+ *                                 then separate and settle flat (desktop only)
  *  draw      [data-fx="line"]     scaleX (or scaleY with data-fx-axis="y") 0 → 1
  *  stroke    [data-fx="stroke"]   an SVG path draws itself along its length (DrawSVG)
  *  parallax  [data-fx-speed="n"]  moves at its own speed through the section;
@@ -20,7 +22,7 @@ import { motionGrammar } from "@/lib/motion";
  * Transform and opacity only, so they stay smooth even without GPU
  * acceleration. Off with reduced motion, where content simply sits in place.
  */
-export type FxName = "rise" | "fan" | "draw" | "stroke" | "parallax" | "tilt" | "progress";
+export type FxName = "rise" | "fan" | "plates" | "draw" | "stroke" | "parallax" | "tilt" | "progress";
 
 type ScrollFxProps = Omit<React.ComponentProps<"div">, "ref"> & {
   effects: FxName[];
@@ -65,6 +67,24 @@ export function ScrollFx({ effects, as = "div", children, ...props }: ScrollFxPr
                 x: 0,
                 y: 0,
                 rotate: 0,
+                opacity: 1,
+                ease: motionGrammar.ease,
+                scrollTrigger: { trigger: el, start: "top 95%", end: "top 35%", scrub },
+              },
+            );
+          });
+        }
+
+        if (effects.includes("plates") && items.length && window.matchMedia("(min-width: 900px)").matches) {
+          gsap.set(el, { perspective: 1400 });
+          items.forEach((it, i) => {
+            gsap.fromTo(
+              it,
+              { rotateX: 24, z: -90 * (i + 1), y: 60 + i * 18, opacity: 0.35, transformOrigin: "50% 100%" },
+              {
+                rotateX: 0,
+                z: 0,
+                y: 0,
                 opacity: 1,
                 ease: motionGrammar.ease,
                 scrollTrigger: { trigger: el, start: "top 95%", end: "top 35%", scrub },

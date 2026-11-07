@@ -1,5 +1,6 @@
 /** Hardware design system (DESIGN.md §5). Build once, reuse everywhere. */
 export { Band } from "./band";
+export { BottomSheet } from "./bottom-sheet";
 export { Button, type ButtonProps } from "./button";
 export { Cartridge } from "./cartridge";
 export { Drawer } from "./drawer";

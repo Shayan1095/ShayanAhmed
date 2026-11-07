@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Project } from "@/lib/content/types";
 import { hasOwnerView, ProjectMonitor, type MonitorView } from "@/components/site/project-monitor";
 import { Button, InsetToggle, StatusBadge, Tag, UiFragment, type ScreenHandle } from "@/components/system";
@@ -22,7 +22,27 @@ const spots = [
 
 export function WorkSlide({ project, index }: { project: Project; index: number }) {
   const screen = useRef<ScreenHandle>(null);
+  const slide = useRef<HTMLElement>(null);
   const [view, setView] = useState<MonitorView>("customer");
+
+  // Desktop: as the case slides into view, its agent notifications fly in one by
+  // one (globals.css .frag-armed / .frag-play). Armed by JS, so they never stay
+  // hidden without it.
+  useEffect(() => {
+    const el = slide.current;
+    if (!el || !window.matchMedia("(min-width: 900px) and (prefers-reduced-motion: no-preference)").matches) return;
+    el.classList.add("frag-armed");
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        el.classList.add("frag-play");
+        io.disconnect();
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   const hasOwner = hasOwnerView(project);
 
   const changeView = (v: MonitorView) => {
@@ -32,6 +52,7 @@ export function WorkSlide({ project, index }: { project: Project; index: number 
 
   return (
     <article
+      ref={slide}
       data-slide
       aria-labelledby={`work-${project.slug}`}
       className="grid grid-cols-1 items-center gap-7 min-[900px]:flex-[0_0_min(1120px,88vw)] min-[900px]:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]"
@@ -54,13 +75,15 @@ export function WorkSlide({ project, index }: { project: Project; index: number 
                   : "absolute hidden min-[900px]:block",
               )}
             >
-              <UiFragment
-                tag={f.tag}
-                text={f.text}
-                actions={f.actions}
-                live={i === 0}
-                className="max-[899px]:w-full"
-              />
+              <div className="frag-in" style={{ "--i": i } as React.CSSProperties}>
+                <UiFragment
+                  tag={f.tag}
+                  text={f.text}
+                  actions={f.actions}
+                  live={i === 0}
+                  className="max-[899px]:w-full"
+                />
+              </div>
             </div>
           );
         })}

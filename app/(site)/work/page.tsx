@@ -61,7 +61,7 @@ export default async function WorkIndexPage() {
         </div>
       </Band>
 
-      <Archive projects={archive} index="02" className="pb-16 pt-6" />
+      <Archive projects={archive} index="02" className="pb-16 pt-6" codeStart={featured.length + 1} />
 
       <Band aria-label="Start a project" className="pb-24">
         <div className="wrap">

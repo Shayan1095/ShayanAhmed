@@ -42,14 +42,14 @@ export default async function HomePage() {
     <main id="main">
       <Hero caseStudyHref={flagship ? `/work/${flagship.slug}` : undefined} />
       <VelocityMarquee items={["Websites", "Systems", "Automation", "Storefronts", "Admin panels", "Operations agents"]} />
-      <Work projects={featured} />
+      <Work projects={featured} totalBuilds={featured.length + archive.length} />
       <Band aria-label="Talk about your project" className="pb-20 max-[767px]:hidden min-[900px]:pb-24">
         <div className="wrap">
           <CtaStrip title="Want a system like this for your business?" />
         </div>
       </Band>
       <Services />
-      <Archive projects={archive} limit={3} seeAllHref="/work" />
+      <Archive projects={archive} limit={3} seeAllHref="/work" codeStart={featured.length + 1} />
       <Process>
         <CtaStrip
           tone="ink"

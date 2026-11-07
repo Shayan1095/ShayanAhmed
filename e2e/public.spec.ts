@@ -34,8 +34,10 @@ test.describe("public site", () => {
     );
     const kb = Math.round(scripts.reduce((a, s) => a + s.size, 0) / 1024);
     // 871 KB before the motion upgrade; GSAP Flip, DrawSVG, MorphSVG, ScrambleText,
-    // Observer and CustomEase add about 41 KB. Anything beyond this needs a reason.
-    expect(kb).toBeLessThanOrEqual(930);
+    // Observer and CustomEase add about 41 KB. Phase 4 set pieces (order ticket,
+    // process ruler, bottom sheets, hero entrance) add ~10 KB net: 950 until the
+    // Phase 5 split loads heavy code only where it is used. Anything beyond needs a reason.
+    expect(kb).toBeLessThanOrEqual(950);
 
     // React Hook Form and TanStack Table are admin-only: none of their code ships here.
     for (const { url } of scripts) {

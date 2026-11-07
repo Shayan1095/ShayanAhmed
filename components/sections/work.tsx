@@ -7,12 +7,13 @@ import { Band, Label, RollingNumber, SplitReveal, Typewriter } from "@/component
 import { gsap, Observer, useGSAP } from "@/lib/gsap";
 import { motionGrammar } from "@/lib/motion";
 import { WorkSlide } from "./work-slide";
+import { WorkSnapRow } from "./work-snap-row";
 
 /**
  * 01 Selected work (cream), straight after the hero: proof first. Desktop: the band pins and the rail slides
  * sideways, fragments drift at their own speeds. Mobile / reduced motion: stacked.
  */
-export function Work({ projects }: { projects: Project[] }) {
+export function Work({ projects, totalBuilds }: { projects: Project[]; totalBuilds?: number }) {
   const root = useRef<HTMLElement>(null);
   const pin = useRef<HTMLDivElement>(null);
   const rail = useRef<HTMLDivElement>(null);
@@ -124,18 +125,28 @@ export function Work({ projects }: { projects: Project[] }) {
                 Case <em>studies</em>
               </SplitReveal>
             </div>
-            <div className="flex items-center gap-3.5" aria-hidden="true">
-              <b
-                className="font-display text-[40px] font-extrabold leading-none tabular-nums"
-              >
-                <RollingNumber value={String(current).padStart(2, "0")} />
+            {/* Total builds shipped (case studies + archive); on desktop the rail position sits beside it. */}
+            <div className="flex items-end gap-3.5">
+              <b className="font-display text-[40px] font-extrabold leading-none tabular-nums">
+                <RollingNumber value={String(totalBuilds ?? total).padStart(2, "0")} />
               </b>
-              <Label>/ {String(total).padStart(2, "0")} shipped</Label>
+              <span className="flex flex-col gap-1 pb-0.5">
+                <Label>Builds shipped</Label>
+                {total > 1 && (
+                  <Label aria-hidden="true" className="hidden text-muted min-[900px]:block">
+                    Case study <RollingNumber value={String(current).padStart(2, "0")} /> / {String(total).padStart(2, "0")}
+                  </Label>
+                )}
+              </span>
             </div>
           </div>
         </div>
         <div className="wrap">
-          <div ref={rail} className="flex flex-col gap-16 will-change-transform min-[900px]:flex-row min-[900px]:gap-10">
+          {/* Phones: a swipeable row of case cards instead of the stacked slides. */}
+          <div className="min-[768px]:hidden">
+            <WorkSnapRow projects={projects} />
+          </div>
+          <div ref={rail} className="flex flex-col gap-16 will-change-transform max-[767px]:hidden min-[900px]:flex-row min-[900px]:gap-10">
             {projects.map((p, i) => (
               <WorkSlide key={p.slug} project={p} index={i} />
             ))}

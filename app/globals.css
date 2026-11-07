@@ -845,10 +845,10 @@ html[data-theme="dark"]:not([data-admin-theme]) :is([data-band="ink"], .ink-band
 
 /* Below-the-fold sections: the browser skips their layout and painting until
    they come near the screen, so the first paint is faster on every device.
-   Not on sections with pinned (position: fixed) scroll scenes, which
-   containment would break (#process, #work). Scroll-linked effects
+   Not on sections with pinned (position: fixed) scroll scenes or sticky
+   stacks, which containment would break (#work, #services, #process). Scroll-linked effects
    re-measure when the real sizes arrive (SmoothScrollProvider). */
-main#main > :is(#services, #archive, #about, #faq, #contact) {
+main#main > :is(#archive, #about, #faq, #contact) {
   content-visibility: auto;
   contain-intrinsic-size: auto 1000px;
 }
@@ -953,4 +953,101 @@ html[data-power="low"] .dock-glass {
   .type-label:not([aria-hidden="true"] *) {
     letter-spacing: 0.15em;
   }
+}
+
+/* Hero "built in.": the copper foil, plus one bright sweep across it as the
+   hero settles (hero-entrance.tsx adds .is-sweeping once). */
+.hero-sweep {
+  background-image: linear-gradient(100deg, #8c5530 0%, #e8b27a 20%, #f7dcb5 30%, #c08048 46%, #7a4626 60%, #d9a06a 78%, #f2cc9c 88%, #9a5e33 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero-sweep.is-sweeping {
+  background-image:
+    linear-gradient(100deg, transparent 38%, rgb(255 246 232 / 0.95) 50%, transparent 62%),
+    linear-gradient(100deg, #8c5530 0%, #e8b27a 20%, #f7dcb5 30%, #c08048 46%, #7a4626 60%, #d9a06a 78%, #f2cc9c 88%, #9a5e33 100%);
+  background-size: 250% 100%, 100% 100%;
+  background-repeat: no-repeat;
+  animation: hero-sweep 1.2s var(--ease-inout) both;
+}
+@keyframes hero-sweep {
+  from { background-position: 0% 0, 0 0; }
+  to { background-position: 100% 0, 0 0; }
+}
+
+/* Hero "What's built in": the current system's bar fills while it is shown. */
+@keyframes bi-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Hero glow: a slow drift, composited (transform only). Still with reduced
+   motion and on low-power devices. */
+.hero-glow {
+  will-change: transform;
+  animation: hero-glow-drift 22s var(--ease-inout) infinite alternate;
+}
+@keyframes hero-glow-drift {
+  from { transform: translate3d(-2.5%, 1.5%, 0) scale(1); }
+  to { transform: translate3d(2.5%, -2%, 0) scale(1.06); }
+}
+html[data-power="low"] .hero-glow {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-glow { animation: none; }
+}
+
+/* Work (desktop): agent notifications fly in one by one as a case enters. */
+@keyframes frag-in {
+  from { opacity: 0; transform: translate3d(0, 18px, 0) scale(0.94); }
+  to { opacity: 1; transform: none; }
+}
+@media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+  .frag-armed .frag-in {
+    opacity: 0;
+  }
+  .frag-armed.frag-play .frag-in {
+    animation: frag-in var(--dur-reveal) var(--ease-out) calc(var(--i) * 180ms + 250ms) both;
+  }
+}
+
+/* Services order ticket: the Approve control breathes while it waits. */
+@keyframes approve-pulse {
+  0% { box-shadow: 0 0 0 0 rgb(201 133 63 / 0.55); }
+  70% { box-shadow: 0 0 0 12px rgb(201 133 63 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(201 133 63 / 0); }
+}
+.approve-pulse {
+  animation: approve-pulse 1.6s var(--ease-out) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .approve-pulse { animation: none; }
+  [data-stamp] { opacity: 1 !important; }
+}
+
+/* Process ruler: where stacked step cards hold (below the header on desktop;
+   phones have the dock at the bottom instead). */
+#process {
+  --stack-top: 20px;
+}
+@media (min-width: 900px) {
+  #process {
+    --stack-top: 104px;
+  }
+}
+/* A step's number stamps in as it inks. */
+@keyframes process-stamp {
+  0% { transform: scale(1.6) rotate(-6deg); opacity: 0; }
+  60% { transform: scale(0.94) rotate(1deg); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+.process-stamp {
+  display: inline-block;
+  transform-origin: 30% 60%;
+  animation: process-stamp 520ms var(--ease-out) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .process-stamp { animation: none; }
 }

@@ -1,6 +1,6 @@
 import { ScrollFx } from "@/components/fx/scroll-fx";
 import { Band, CoverGrid, Label, Panel, Screen, SectionHeader } from "@/components/system";
-import { ServicesFlow } from "./services-flow";
+import { OrderTicket } from "./order-ticket";
 
 const layers = [
   {
@@ -43,10 +43,10 @@ export function Services() {
           intro="The system runs the routine work. You stay in control of every decision that matters."
         />
 
-        <ServicesFlow />
+        <OrderTicket />
 
-        {/* Signature: the three layer modules fan in from their sides as you scroll. */}
-        <ScrollFx as="ul" effects={["fan"]} className="grid grid-cols-1 gap-[22px] max-[767px]:hidden min-[980px]:grid-cols-3">
+        {/* The three layers: plates that start stacked in depth and separate as you scroll (desktop). */}
+        <ScrollFx as="ul" effects={["plates"]} className="grid grid-cols-1 gap-[22px] max-[767px]:hidden min-[980px]:grid-cols-3">
           {layers.map((l) => (
             <li key={l.title} data-fx="item">
               <Panel tone="ink" as="article" className="group/layer flex h-full flex-col gap-4 px-7 py-[30px]">

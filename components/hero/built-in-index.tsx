@@ -23,6 +23,7 @@ export function BuiltInIndex() {
   const [hidden, setHidden] = useState(false);
   const [cycle, setCycle] = useState(0); // bumping it restarts the timer
   const panel = useRef<HTMLElement>(null);
+  const swipeX = useRef<number | null>(null);
 
   useEffect(() => {
     const onVis = () => setHidden(document.visibilityState === "hidden");
@@ -72,12 +73,37 @@ export function BuiltInIndex() {
         </span>
       </p>
 
-      <div className="flex h-[150px] items-start gap-5 overflow-hidden">
-        <Mask className="flex-none">
-          <motion.span key={`n${index}`} {...roll} className="inline-block font-[family-name:var(--font-archivo)] text-[112px] font-black leading-[0.82] tracking-[-0.02em]" style={{ ...FOIL, fontStretch: "62%", fontVariationSettings: "'wdth' 62" }}>
-            {pad(index + 1)}
-          </motion.span>
-        </Mask>
+      {/* Phones: swipe sideways to move through the systems (vertical scrolling still works). */}
+      <div
+        className="flex h-[150px] touch-pan-y items-start gap-5 overflow-hidden"
+        onPointerDown={(e) => {
+          if (e.pointerType !== "mouse") swipeX.current = e.clientX;
+        }}
+        onPointerUp={(e) => {
+          const from = swipeX.current;
+          swipeX.current = null;
+          if (from === null) return;
+          const dx = e.clientX - from;
+          if (Math.abs(dx) < 40) return;
+          pick((index + (dx < 0 ? 1 : -1) + BUILT_IN.length) % BUILT_IN.length);
+        }}
+        onPointerCancel={() => (swipeX.current = null)}
+      >
+        {/* Odometer: each digit is its own reel, so only the digit that changes rolls. */}
+        <span className="flex flex-none">
+          {Array.from(pad(index + 1)).map((d, i) => (
+            <Mask key={i}>
+              <motion.span
+                key={`n${i}-${d}`}
+                {...roll}
+                className="inline-block font-[family-name:var(--font-archivo)] text-[112px] font-black leading-[0.82] tracking-[-0.02em]"
+                style={{ ...FOIL, fontStretch: "62%", fontVariationSettings: "'wdth' 62" }}
+              >
+                {d}
+              </motion.span>
+            </Mask>
+          ))}
+        </span>
         <div className="flex min-w-0 flex-col gap-2.5 pt-1.5">
           <Mask>
             <motion.span key={`t${index}`} {...roll} className="inline-block font-[family-name:var(--font-archivo)] text-[28px] font-bold leading-[1.05] tracking-[-0.01em]" style={{ color: COVER.paper }}>
@@ -106,11 +132,22 @@ export function BuiltInIndex() {
           >
             <span
               aria-hidden="true"
-              className="block h-0.5 w-full transition-colors duration-300"
-              style={{
-                background: k === index ? COVER.copper : k < index ? "rgba(232,178,122,.45)" : "rgba(243,234,219,.16)",
-              }}
-            />
+              className="relative block h-0.5 w-full overflow-hidden transition-colors duration-300"
+              style={{ background: k < index ? "rgba(232,178,122,.45)" : "rgba(243,234,219,.16)" }}
+            >
+              {/* The current system's bar fills over the time it is shown, pausing with the cycle. */}
+              {k === index && (
+                <span
+                  key={`${index}-${cycle}`}
+                  className="absolute inset-0 origin-left"
+                  style={{
+                    background: COVER.copper,
+                    animation: reduce ? undefined : `bi-fill ${BUILT_IN_INTERVAL_MS}ms linear both`,
+                    animationPlayState: held || hidden ? "paused" : "running",
+                  }}
+                />
+              )}
+            </span>
           </button>
         ))}
       </div>

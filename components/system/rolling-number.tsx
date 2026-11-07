@@ -38,6 +38,10 @@ export function RollingNumber({
       const reels = Array.from(el.querySelectorAll<HTMLElement>("[data-reel]"));
       const target = (r: HTMLElement) => -Number(r.dataset.reel) * 10;
 
+      // The server renders each reel already at its digit (a CSS translateY %),
+      // which GSAP would read as a pixel offset and add to yPercent: hand the
+      // position over to yPercent alone.
+      if (!seen.current) gsap.set(reels, { y: 0, yPercent: (_: number, r: HTMLElement) => target(r) });
       const mm = gsap.matchMedia();
       mm.add(MQ.reduce, () => {
         reels.forEach((r) => gsap.set(r, { yPercent: target(r) }));

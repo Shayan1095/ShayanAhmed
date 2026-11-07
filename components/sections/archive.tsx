@@ -7,6 +7,7 @@ import { ScrollFx } from "@/components/fx/scroll-fx";
 import { Band, Cartridge, InsetToggle, Rise, SectionHeader } from "@/components/system";
 import { Flip, gsap, MQ, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { motionGrammar } from "@/lib/motion";
+import { ArchiveRows } from "./archive-rows";
 
 const filters = [
   { value: "all", label: "All" },
@@ -35,6 +36,8 @@ type ArchiveProps = {
   seeAllHref?: string;
   index?: string;
   className?: string;
+  /** First project code on the phone rows (SA–03 when two case studies come first). */
+  codeStart?: number;
 };
 
 /**
@@ -42,7 +45,7 @@ type ArchiveProps = {
  * list with a filter. Filtering uses GSAP Flip: every card stays in the page,
  * the ones that remain glide to their new places, the rest shrink away.
  */
-export function Archive({ projects, limit, seeAllHref, index = "03", className }: ArchiveProps) {
+export function Archive({ projects, limit, seeAllHref, index = "03", className, codeStart = 1 }: ArchiveProps) {
   const filterable = !limit;
   const [filter, setFilter] = useState<Filter>("all");
   const grid = useRef<HTMLUListElement>(null);
@@ -97,7 +100,11 @@ export function Archive({ projects, limit, seeAllHref, index = "03", className }
           className="min-[900px]:mb-[40px]"
         />
         {/* Signature: columns drift at different speeds as the grid passes (preview only; the filtered grid reflows instead). */}
-        <ScrollFx effects={filterable ? [] : ["parallax"]}>
+        {/* Phones: compact index rows; a tap opens the details in a bottom sheet. */}
+        <div className="min-[768px]:hidden">
+          <ArchiveRows projects={shown} codeStart={codeStart} />
+        </div>
+        <ScrollFx effects={filterable ? [] : ["parallax"]} className="max-[767px]:hidden">
         <ul ref={grid} className="grid grid-cols-1 gap-[22px] min-[640px]:grid-cols-2 min-[980px]:grid-cols-3">
             {list.map((p, i) => (
               <li
