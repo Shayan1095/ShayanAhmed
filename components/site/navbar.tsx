@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useDragControls } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -9,6 +9,7 @@ import { useSmoothScroll } from "@/components/providers/smooth-scroll";
 import { gsap, MQ, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { easeOutExpo, motionGrammar } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+import { Clock } from "./clock";
 import { chapters, navLinks, sectionHref, type ChapterId, type NavId, type NavProject } from "./nav-links";
 
 type NavbarProps = {
@@ -52,6 +53,9 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
   const [chapter, setChapter] = useState<ChapterId | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
+  // Phone dock: steps aside while scrolling down, back on scroll up or a pause.
+  const [dockAway, setDockAway] = useState(false);
+  const [endInView, setEndInView] = useState(false);
 
   // Work preview: opens on hover or focus; closing waits a beat so the pointer can travel into it.
   const [preview, setPreview] = useState(false);
@@ -76,6 +80,11 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
     () => {
       const setProgress = gsap.quickSetter(progress.current, "scaleX");
       let compactNow = false;
+      let awayNow = false;
+      let idle = 0;
+      const setAway = (v: boolean) => {
+        if (v !== awayNow) setDockAway((awayNow = v));
+      };
 
       // Runs every scroll frame: only touch React state when a value actually flips.
       ScrollTrigger.create({
@@ -86,10 +95,13 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
           setProgress(self.progress);
           const c = y > 60;
           if (c !== compactNow) setCompact((compactNow = c));
+          setAway(self.direction === 1 && y > 160);
+          window.clearTimeout(idle);
+          idle = window.setTimeout(() => setAway(false), 600);
         },
       });
-
-      if (!onHome) return;
+      const stopIdle = () => window.clearTimeout(idle);
+      if (!onHome) return stopIdle;
       // Scroll spy: the chapter crossing 45% of the viewport is "here".
       for (const { id } of chapters) {
         const el = document.getElementById(id);
@@ -104,9 +116,25 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
           },
         });
       }
+      return stopIdle;
     },
     { dependencies: [onHome] },
   );
+
+  // The dock steps aside while the contact form or the footer is on screen.
+  useEffect(() => {
+    const targets = [document.getElementById("contact"), document.querySelector("footer")].filter(Boolean) as Element[];
+    const seen = new Set<Element>();
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) seen.add(e.target);
+        else seen.delete(e.target);
+      }
+      setEndInView(seen.size > 0);
+    }, { rootMargin: "0px 0px -20% 0px" });
+    targets.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [onHome]);
 
   // Readout: scramble to the new chapter name.
   const target = (chapter && chapters.find((c) => c.id === chapter)?.label) || place || DEFAULT_PLACE;
@@ -148,7 +176,8 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
       <header
         className={cn(
           // Own layer: the page scrolls under it without repainting it.
-          "fixed inset-x-0 top-[env(safe-area-inset-top)] z-70 transition-[transform,padding] duration-500 ease-out-expo will-change-transform",
+          // Phones and small tablets use the bottom dock instead (below).
+          "fixed inset-x-0 top-[env(safe-area-inset-top)] z-70 transition-[transform,padding] duration-500 ease-out-expo will-change-transform max-[899px]:hidden",
           compact ? "py-2" : "py-3.5",
         )}
       >
@@ -254,19 +283,6 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
                   </span>
                 </a>
               </div>
-              <button
-                ref={menuButton}
-                type="button"
-                aria-label="Open menu"
-                aria-expanded={menuOpen}
-                aria-controls="mobile-menu"
-                onClick={() => setMenuOpen(true)}
-                className="inset-track inline-flex size-[46px] items-center justify-center rounded-control min-[900px]:hidden"
-              >
-                <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6 text-ink">
-                  <path d={MENU_PATH} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </button>
             </div>
 
             {/* Progress line, clipped to the bar's rounded corners. */}
@@ -276,6 +292,47 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
           </div>
         </div>
       </header>
+
+      {/* Phone dock (under 900px): one floating pill for the menu, where you are, and Start. */}
+      <div
+        className={cn(
+          "fixed inset-x-3 bottom-[calc(12px+env(safe-area-inset-bottom))] z-70 transition-[transform,opacity] duration-[260ms] ease-out-expo min-[900px]:hidden",
+          (dockAway || endInView) && !menuOpen ? "pointer-events-none translate-y-[140%] opacity-0" : "translate-y-0 opacity-100",
+        )}
+        inert={(dockAway || endInView) && !menuOpen ? true : undefined}
+      >
+        <div className="dock-glass mx-auto flex h-14 max-w-[520px] items-center gap-2 rounded-full pl-1.5 pr-1.5">
+          <button
+            ref={menuButton}
+            type="button"
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            onClick={() => setMenuOpen(true)}
+            className="grid size-11 shrink-0 place-items-center rounded-full bg-paper-hi text-ink transition-transform duration-[120ms] active:scale-[0.94]"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-[22px]">
+              <path d={MENU_PATH} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
+          <Link href="/" aria-label="Shayan Ahmed, home" className="flex min-h-11 min-w-0 flex-1 items-center justify-center gap-2.5">
+            <SALogo size={28} aria-hidden="true" className="shrink-0" />
+            <span className="flex min-w-0 flex-col leading-tight">
+              <span className="truncate font-display text-[14px] font-bold">Shayan Ahmed</span>
+              <span aria-hidden="true" className="truncate font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+                {readoutText}
+              </span>
+            </span>
+          </Link>
+          <a
+            href={sectionHref("contact", onHome)}
+            className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-[linear-gradient(180deg,#f2cc9c,#d49a62_55%,#b8763f)] px-4 text-[15px] font-bold text-[#140d08] shadow-[inset_0_1px_0_rgb(255_255_255/.5),0_3px_0_#6b3f22] transition-transform duration-[120ms] active:translate-y-0.5 active:scale-[0.97]"
+          >
+            Start
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
 
       <MobileMenu
         open={menuOpen}
@@ -317,7 +374,7 @@ function LetterReveal({ text, delay = 0 }: { text: string; delay?: number }) {
   );
 }
 
-/** A project's screenshot, or its monitor label on an ink screen until screenshots are added. */
+/** A project's screenshot, or its initials on an ink tile until screenshots are added. */
 function ProjectThumb({ project, className }: { project: NavProject; className?: string }) {
   return (
     <span className={cn("tone-ink relative block overflow-hidden rounded-lg bg-ink", className)}>
@@ -332,8 +389,17 @@ function ProjectThumb({ project, className }: { project: NavProject; className?:
           className="absolute inset-0 size-full object-cover object-top transition-transform duration-700 ease-out-expo group-hover/card:scale-[1.04]"
         />
       ) : (
-        <span className="absolute inset-0 grid place-items-center px-3 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-muted-ink">
-          {project.monitorLabel ?? project.title}
+        // Until screenshots are added: the project's initials, drawn like a mark.
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 grid place-items-center bg-[radial-gradient(80%_70%_at_50%_0%,rgb(201_133_63/.22),transparent_70%)] font-display text-[26px] font-black tracking-[-0.03em] text-copper"
+        >
+          {project.title
+            .split(/\s+/)
+            .slice(0, 2)
+            .map((w) => w[0])
+            .join("")
+            .toUpperCase()}
         </span>
       )}
     </span>
@@ -422,6 +488,7 @@ function MobileMenu({
   const dialog = useRef<HTMLDivElement>(null);
   const closeBtn = useRef<HTMLButtonElement>(null);
   const icon = useRef<SVGPathElement>(null);
+  const drag = useDragControls();
 
   useEffect(() => {
     if (!open) return;
@@ -480,17 +547,46 @@ function MobileMenu({
     <AnimatePresence>
       {open && (
         <motion.div
+          key="menu-backdrop"
+          aria-hidden="true"
+          onClick={onClose}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.26 }}
+          className="fixed inset-0 z-[74] bg-black/60"
+        />
+      )}
+      {open && (
+        <motion.div
+          key="menu-sheet"
           ref={dialog}
           id="mobile-menu"
           role="dialog"
           aria-modal="true"
           aria-label="Menu"
-          initial={{ clipPath: "inset(0 0 100% 0)" }}
-          animate={{ clipPath: "inset(0 0 0% 0)" }}
-          exit={{ clipPath: "inset(0 0 100% 0)" }}
-          transition={{ duration: 0.55, ease: easeOutExpo }}
-          className="tone-ink fixed inset-0 z-75 flex flex-col gap-7 overflow-y-auto bg-ink px-[max(20px,env(safe-area-inset-right))] pb-[calc(env(safe-area-inset-bottom)+28px)] pt-[calc(env(safe-area-inset-top)+24px)] text-paper"
+          // A bottom sheet: slides up, and a swipe down on the handle closes it.
+          initial={{ y: "100%" }}
+          animate={{ y: 0 }}
+          exit={{ y: "100%" }}
+          transition={{ duration: 0.5, ease: easeOutExpo }}
+          drag="y"
+          dragControls={drag}
+          dragListener={false}
+          dragConstraints={{ top: 0, bottom: 0 }}
+          dragElastic={{ top: 0, bottom: 0.7 }}
+          onDragEnd={(_, info) => {
+            if (info.offset.y > 110 || info.velocity.y > 600) onClose();
+          }}
+          className="tone-ink fixed inset-x-0 bottom-0 z-75 flex max-h-[92svh] flex-col gap-6 overflow-y-auto overscroll-contain rounded-t-[28px] bg-ink px-[max(20px,env(safe-area-inset-right))] pb-[calc(env(safe-area-inset-bottom)+24px)] pt-2 text-paper shadow-[0_-20px_50px_-10px_rgb(0_0_0/.6),inset_0_1px_0_rgb(232_178_122/.18)]"
         >
+          {/* Grab handle: drag it down (or tap the backdrop) to close. */}
+          <div
+            onPointerDown={(e) => drag.start(e)}
+            className="-mx-5 flex h-7 shrink-0 cursor-grab touch-none items-center justify-center active:cursor-grabbing"
+          >
+            <span aria-hidden="true" className="h-1.5 w-11 rounded-full bg-paper/25" />
+          </div>
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-3 font-display text-[15px] font-bold">
               <SALogo size={38} aria-hidden="true" className="shrink-0" />
@@ -527,7 +623,7 @@ function MobileMenu({
                           current && "text-copper",
                         )}
                       >
-                        <LetterReveal text={l.label} delay={0.14 + i * 0.07} />
+                        <LetterReveal text={l.label} delay={0.14 + i * 0.04} />
                       </span>
                       {current && (
                         <span aria-hidden="true" className="ml-auto size-2 self-center rounded-full bg-copper shadow-glow" />
@@ -562,6 +658,7 @@ function MobileMenu({
             </motion.div>
           )}
           <div className="mt-auto flex flex-col gap-3.5 font-mono text-xs tracking-[0.08em] text-muted-ink">
+            <Clock className="whitespace-nowrap text-[12px]" />
             {contacts.length > 0 && (
               <ul className="flex flex-col gap-2 border-t border-ink-3 pt-4">
                 {contacts.map((c) => (

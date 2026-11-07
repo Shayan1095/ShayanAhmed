@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { gsap, MQ, SplitText, useGSAP } from "@/lib/gsap";
-import { motionGrammar } from "@/lib/motion";
+import { motionGrammar, tokens } from "@/lib/motion";
 
 type RevealTag = "h1" | "h2" | "h3" | "p" | "div" | "span";
 
@@ -33,7 +33,7 @@ export function SplitReveal({ as = "h2", start = motionGrammar.heading.start, ch
           onSplit: (self) =>
             gsap.from(self.lines, {
               yPercent,
-              duration,
+              duration: Math.min(duration, tokens().reveal + 0.2),
               stagger,
               ease: motionGrammar.ease,
               scrollTrigger: { trigger: el, start, once: true },
@@ -53,29 +53,38 @@ export function SplitReveal({ as = "h2", start = motionGrammar.heading.start, ch
 }
 
 type RiseProps = Omit<React.ComponentProps<"div">, "ref"> & {
-  as?: RevealTag | "article" | "li" | "section";
+  as?: RevealTag | "article" | "li" | "section" | "ul" | "ol";
   start?: string;
   delay?: number;
+  /** Reveal the direct children one after another instead of the block. */
+  stagger?: boolean;
 };
 
 /**
- * The shared content reveal: y 40 → 0, once. Transform only, so the block is
- * always visible. Never wrap a Screen or a Motion-animated element directly.
+ * The shared content reveal (motion spec): fade + rise by --travel (32px,
+ * 18px on phones), once. The hidden start state is set by JS when it runs,
+ * so without JS everything is simply there. With `stagger`, children follow
+ * each other 60ms apart (40ms on phones), and anything past the 6th (4th on
+ * phones) arrives with the last, so long lists never keep content waiting.
+ * Never wrap a Screen or a Motion-animated element directly.
  */
-export function Rise({ as = "div", start = motionGrammar.block.start, delay = 0, children, ...props }: RiseProps) {
+export function Rise({ as = "div", start = motionGrammar.block.start, delay = 0, stagger = false, children, ...props }: RiseProps) {
   const ref = useRef<HTMLElement>(null);
-  const { y, duration } = motionGrammar.block;
 
   useGSAP(
     () => {
       const el = ref.current;
       if (!el) return;
       gsap.matchMedia().add(MQ.motion, () => {
-        gsap.from(el, {
-          y,
-          duration,
+        const t = tokens();
+        const targets = stagger ? Array.from(el.children) : el;
+        gsap.from(targets, {
+          y: t.travel,
+          opacity: 0,
+          duration: t.reveal,
           delay,
           ease: motionGrammar.ease,
+          stagger: stagger ? (i: number) => Math.min(i, t.maxStagger - 1) * t.stagger : 0,
           scrollTrigger: { trigger: el, start, once: true },
         });
       });

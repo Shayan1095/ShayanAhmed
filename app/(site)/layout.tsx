@@ -1,9 +1,9 @@
 import { SiteProviders } from "@/components/providers/site-providers";
 import { Footer } from "@/components/site/footer";
-import { MobileCta, RouteMobileCta } from "@/components/site/mobile-cta";
 import { toNavProjects } from "@/components/site/nav-links";
 import { Navbar, RouteNavbar } from "@/components/site/navbar";
 import { Suspense } from "react";
+import { ThemeColorSync } from "@/components/fx/theme-color-sync";
 import { Preloader } from "@/components/preloader/preloader";
 import { introGateScript } from "@/lib/intro-script";
 import { issueDate } from "@/lib/issue-date";
@@ -31,9 +31,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       </Suspense>
       {children}
       <Footer />
-      <Suspense fallback={<MobileCta onHome={false} />}>
-        <RouteMobileCta />
-      </Suspense>
+      <ThemeColorSync />
     </SiteProviders>
   );
 }

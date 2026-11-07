@@ -1,10 +1,11 @@
 /*
  * Page-level rules for the intro (global: CSS modules need a local class).
  * The hero marks elements with data-intro-rv and a --d delay; they rise
- * as the overlay splits. The late variant is a failsafe if JS never runs.
+ * as the overlay splits. Movement only, never opacity: the hero text is
+ * painted from the first frame (under the overlay), which keeps LCP early. The late variant is a failsafe if JS never runs.
  */
-@keyframes sa-rv-in { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
-@keyframes sa-rv-late { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes sa-rv-in { from { transform: translateY(16px); } to { transform: none; } }
+@keyframes sa-rv-late { from { transform: translateY(16px); } to { transform: none; } }
 
 /* The overlay (.sa-intro) is only shown while the intro runs. */
 .sa-intro { display: none; }

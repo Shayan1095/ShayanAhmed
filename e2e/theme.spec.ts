@@ -9,7 +9,7 @@ test.describe("site theme (dark only)", () => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(17, 15, 13)");
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(26, 21, 17)"); // the espresso surface (#1a1511)
     // No theme switch any more.
     await expect(page.getByRole("button", { name: /Switch to (light|dark) theme/ })).toHaveCount(0);
   });

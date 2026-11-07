@@ -61,7 +61,9 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     const html = document.documentElement;
     const low = isLowPowerDevice();
     html.dataset.power = low ? "low" : "full";
-    if (reduce) return;
+    // Touch screens keep their native scrolling (it is already smooth, and
+    // momentum under a finger must never lag); inertia is for wheels and trackpads.
+    if (reduce || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
     // Inertia scrolling: the page glides slightly behind the wheel for a weighted,
     // premium feel. anchors: plain <a href="#id"> links scroll smoothly too.

@@ -43,7 +43,7 @@ export default async function HomePage() {
       <Hero caseStudyHref={flagship ? `/work/${flagship.slug}` : undefined} />
       <VelocityMarquee items={["Websites", "Systems", "Automation", "Storefronts", "Admin panels", "Operations agents"]} />
       <Work projects={featured} />
-      <Band aria-label="Talk about your project" className="pb-20 min-[900px]:pb-24">
+      <Band aria-label="Talk about your project" className="pb-20 max-[767px]:hidden min-[900px]:pb-24">
         <div className="wrap">
           <CtaStrip title="Want a system like this for your business?" />
         </div>
@@ -51,7 +51,12 @@ export default async function HomePage() {
       <Services />
       <Archive projects={archive} limit={3} seeAllHref="/work" />
       <Process>
-        <CtaStrip tone="ink" title="Ready to map out your build?" note="It starts with a discovery call, and you get a written summary of goals." />
+        <CtaStrip
+          tone="ink"
+          title="Ready to map out your build?"
+          note="It starts with a discovery call, and you get a written summary of goals."
+          className="max-[767px]:hidden"
+        />
       </Process>
       <VelocityMarquee items={["Milestones you approve", "A live link every week", "A clean handover"]} />
       <About settings={settings} />

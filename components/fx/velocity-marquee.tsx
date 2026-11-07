@@ -72,7 +72,8 @@ export function VelocityMarquee({ items, tone = "paper", className }: VelocityMa
     <div
       ref={root}
       className={cn(
-        "relative overflow-clip py-4 min-[900px]:py-6",
+        // Phones: no marquees (motion spec): they add length without content.
+        "relative overflow-clip py-4 max-[767px]:hidden min-[900px]:py-6",
         tone === "ink" ? "tone-ink ink-band text-paper" : "text-ink",
         className,
       )}

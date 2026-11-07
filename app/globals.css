@@ -731,10 +731,12 @@ html[data-power="low"] .screen::after { display: none; }
    ========================================================================= */
 html[data-theme="dark"]:not([data-admin-theme]) {
   color-scheme: dark;
-  --color-paper: #110f0d;
-  --color-paper-hi: #1b1815;
-  --color-paper-lo: #25211c;
-  --color-paper-edge: #3b342b;
+  /* Two surfaces give the page its rhythm: this warm espresso for reading
+     chapters, and the deep ink bands ([data-band="ink"]) for set pieces. */
+  --color-paper: #1a1511;
+  --color-paper-hi: #241e19;
+  --color-paper-lo: #2e2620;
+  --color-paper-edge: #463b31;
   --color-ink: #f3eadb;
   --color-ink-2: #e4d8c3;
   --color-ink-3: #cdbfa6;
@@ -751,9 +753,9 @@ html[data-theme="dark"]:not([data-admin-theme]) {
   --grain: none;
 
   --nav-glow-ink: #e2a566;
-  --nav-glass-bg: rgb(27 24 21 / 0.72);
+  --nav-glass-bg: rgb(36 30 25 / 0.72);
   --nav-glass-border: rgb(255 255 255 / 0.08);
-  --nav-glass-solid: rgb(27 24 21); /* opaque: nothing to blend while the page scrolls under it */
+  --nav-glass-solid: rgb(36 30 25); /* opaque: nothing to blend while the page scrolls under it */
   /* "Ink" keys (primary buttons) become cream keys on the dark page, like the admin. */
   --ink-key-top: #fffaf1;
   --ink-key-bottom: #e4d8c3;
@@ -816,8 +818,13 @@ html[data-theme="dark"]:not([data-admin-theme]) .screw {
    while scrolling. (A fixed background-attachment would repaint the whole
    screen on every scroll frame, which is what made scrolling lag without a GPU.) */
 html[data-theme="dark"]:not([data-admin-theme]) body {
-  background-color: #110f0d;
+  background-color: #1a1511;
   background-image: none;
+}
+/* A whisper of paper grain on the espresso surface (bands are opaque, so it
+   only shows on the reading chapters). Skipped on low-power devices. */
+html[data-theme="dark"][data-power="full"]:not([data-admin-theme]) body {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .93 0 0 0 0 .84 0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 html[data-theme="dark"]:not([data-admin-theme]) body::before {
   content: "";
@@ -863,5 +870,87 @@ html {
   select,
   textarea {
     font-size: max(16px, 1em);
+  }
+}
+
+/* =========================================================================
+   Motion tokens (motion & mobile spec, phase 2). Mirrored in lib/motion.ts
+   for GSAP and Motion. Phones get shorter travel and quicker reveals.
+   ========================================================================= */
+:root {
+  --dur-micro: 150ms;
+  --dur-ui: 260ms;
+  --dur-reveal: 700ms;
+  --dur-hero: 1100ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --travel: 32px;
+  --stagger: 60ms;
+}
+@media (max-width: 767px) {
+  :root {
+    --dur-micro: 120ms;
+    --dur-ui: 220ms;
+    --dur-reveal: 550ms;
+    --dur-hero: 900ms;
+    --travel: 18px;
+    --stagger: 40ms;
+  }
+}
+
+/* Press: cards and link-cards give a little under the finger or the click
+   (keycap buttons have their own 2px drop in components/system/button.tsx). */
+.press {
+  transition: transform var(--dur-micro) var(--ease-out);
+}
+.press:active {
+  transform: scale(0.97);
+  transition-duration: 120ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .press:active {
+    transform: none;
+    opacity: 0.85;
+  }
+}
+
+/* Phone dock (navbar.tsx): blurred espresso glass, solid on low-power devices. */
+.dock-glass {
+  background-color: rgb(26 21 17 / 0.78);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 0 0 1px rgb(232 178 122 / 0.16), 0 14px 32px -12px rgb(0 0 0 / 0.75);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+}
+html[data-power="low"] .dock-glass {
+  background-color: rgb(26 21 17);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+/* No bottom padding for the dock: it steps aside while the contact form and
+   footer are on screen, so it never covers the end of the page. */
+
+/* Service layer accordion (phones): smooth open/close where the browser can
+   animate to "auto" height; elsewhere it simply opens. */
+.layer-acc {
+  interpolate-size: allow-keywords;
+}
+.layer-acc::details-content {
+  height: 0;
+  overflow: clip;
+  transition: height var(--dur-ui) var(--ease-out), content-visibility var(--dur-ui) allow-discrete;
+}
+.layer-acc[open]::details-content {
+  height: auto;
+}
+
+/* Typography floor on phones (motion & mobile spec): small mono labels are
+   at least 12px. Mock-up UI inside decorative device screens is exempt (it is
+   aria-hidden and drawn to scale). */
+@media (max-width: 767px) {
+  :is(.type-label, .font-mono:is(.text-\[9\.5px\], .text-\[10px\], .text-\[10\.5px\], .text-\[11px\], .text-\[11\.5px\], .text-xs)):not([aria-hidden="true"] *, [aria-hidden="true"]) {
+    font-size: 12px;
+  }
+  .type-label:not([aria-hidden="true"] *) {
+    letter-spacing: 0.15em;
   }
 }

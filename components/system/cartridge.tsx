@@ -33,7 +33,9 @@ export function Cartridge({ title, kind, status, summary, fact, shot, href, clas
       className={cn(
         "group/cart relative flex h-full flex-col rounded-[16px_16px_22px_22px] px-[18px] pb-5",
         "bg-[linear-gradient(180deg,var(--color-paper-hi),var(--color-paper)_50%,var(--color-paper-lo))] shadow-raised",
-        "transition-[transform,box-shadow] duration-300 ease-out-expo hover:-translate-y-1 hover:shadow-[var(--shadow-raised),0_22px_30px_-22px_rgb(17_17_17/.35)]",
+        "transition-[transform,translate,scale,box-shadow] duration-300 ease-out-expo hover:-translate-y-1 hover:shadow-[var(--shadow-raised),0_22px_30px_-22px_rgb(17_17_17/.35)]",
+        // Press: gives a little under the finger or the click (motion spec).
+        "active:scale-[0.97] active:duration-[120ms]",
       )}
     >
       {/* grip strip */}

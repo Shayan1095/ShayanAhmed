@@ -46,7 +46,7 @@ export function Services() {
         <ServicesFlow />
 
         {/* Signature: the three layer modules fan in from their sides as you scroll. */}
-        <ScrollFx as="ul" effects={["fan"]} className="grid grid-cols-1 gap-[22px] min-[980px]:grid-cols-3">
+        <ScrollFx as="ul" effects={["fan"]} className="grid grid-cols-1 gap-[22px] max-[767px]:hidden min-[980px]:grid-cols-3">
           {layers.map((l) => (
             <li key={l.title} data-fx="item">
               <Panel tone="ink" as="article" className="group/layer flex h-full flex-col gap-4 px-7 py-[30px]">
@@ -80,6 +80,42 @@ export function Services() {
             </li>
           ))}
         </ScrollFx>
+
+        {/* Phones: the same three layers as a single-open accordion (native
+            <details name>, so the browser keeps one open; no JS needed). */}
+        <div className="flex flex-col gap-3 min-[768px]:hidden">
+          {layers.map((l, i) => (
+            <details key={l.title} name="service-layers" open={i === 0} className="layer-acc group/acc rounded-[18px] bg-ink-2 shadow-ink-raised">
+              <summary className="flex min-h-16 cursor-pointer list-none items-center gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
+                <span className="min-w-0 flex-1">
+                  <Label className="block">
+                    Layer {l.n} · {l.part}
+                  </Label>
+                  <span className="mt-1.5 block font-display text-[24px] font-extrabold leading-none tracking-[-0.02em]">{l.title}</span>
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="grid size-9 shrink-0 place-items-center rounded-full bg-ink-3/60 text-[20px] leading-none text-copper transition-transform duration-[260ms] ease-out-expo group-open/acc:rotate-45"
+                >
+                  +
+                </span>
+              </summary>
+              <div className="flex flex-col gap-3 px-5 pb-5">
+                <p className="text-[16px] text-muted-ink">{l.promise}</p>
+                <ul className="flex flex-col gap-1.5 font-mono text-[13px] leading-relaxed">
+                  {l.outputs.map((o) => (
+                    <li key={o}>
+                      <span aria-hidden="true" className="mr-2 text-copper">
+                        ›
+                      </span>
+                      {o}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </details>
+          ))}
+        </div>
       </div>
     </Band>
   );

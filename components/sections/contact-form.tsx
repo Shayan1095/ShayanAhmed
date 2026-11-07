@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { sendInquiry } from "@/app/actions/contact";
 import { checkContact, type ContactField, type ContactState } from "@/lib/contact-rules";
 import { Screen, Screws, StatusLight, TypeText, type ScreenHandle } from "@/components/system";
@@ -11,6 +11,20 @@ type Line = { text: string; key: number };
 const field =
   "ink-inset w-full rounded-[11px] border-0 px-[15px] py-3.5 text-[16px] text-paper placeholder:text-[#6f675c] transition-shadow focus:outline-none focus:shadow-[var(--shadow-ink-inset),0_0_0_2px_var(--color-copper)] aria-invalid:shadow-[var(--shadow-ink-inset),0_0_0_2px_#e7a27f]";
 const labelCls = "type-label text-[10.5px] text-muted-ink";
+
+/** True on phones (under 768px); false on the server, so desktop markup renders first. */
+const phoneQuery = "(max-width: 767px)";
+function usePhone() {
+  return useSyncExternalStore(
+    (cb) => {
+      const mq = window.matchMedia(phoneQuery);
+      mq.addEventListener("change", cb);
+      return () => mq.removeEventListener("change", cb);
+    },
+    () => window.matchMedia(phoneQuery).matches,
+    () => false,
+  );
+}
 
 /**
  * Control-panel form (DESIGN.md §8 Contact). The readout screen boots and
@@ -23,6 +37,10 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
   const [printKey, setPrintKey] = useState(0);
   const screen = useRef<ScreenHandle>(null);
   const form = useRef<HTMLFormElement>(null);
+  // Project type: chips on phones, a select on larger screens. Only the one in
+  // use carries the field name, so the form always sends a single value.
+  const phone = usePhone();
+  const [projectType, setProjectType] = useState(projectTypes[0] ?? "");
 
   const print = (texts: string[]) => {
     const key = Date.now();
@@ -40,13 +58,14 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
       if (state.status === "ok") {
         print(["Message received", "Reply within 24h"]);
         form.current?.reset();
+        setProjectType(projectTypes[0] ?? "");
       } else if (state.status === "error") {
         print([`Not sent: ${state.message}`, ...(state.fix ? [state.fix] : [])]);
         if (state.field) form.current?.querySelector<HTMLElement>(`[name="${state.field}"]`)?.focus();
       }
     }, 0);
     return () => window.clearTimeout(id);
-  }, [state]);
+  }, [state, projectTypes]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     const issue = checkContact(Object.fromEntries(new FormData(e.currentTarget)));
@@ -110,14 +129,41 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
         </div>
         <div className={cn("grid grid-cols-1 gap-4", budgetRanges.length > 0 && "min-[560px]:grid-cols-2")}>
           <div className="flex flex-col gap-2">
-            <label htmlFor="f-type" className={labelCls}>
+            <label htmlFor="f-type" className={cn(labelCls, "max-[767px]:hidden")}>
               Project
             </label>
-            <select id="f-type" name="projectType" className={cn(field, "appearance-none")}>
+            <span aria-hidden="true" className={cn(labelCls, "min-[768px]:hidden")}>
+              Project
+            </span>
+            <select
+              id="f-type"
+              name={phone ? undefined : "projectType"}
+              value={projectType}
+              onChange={(e) => setProjectType(e.target.value)}
+              className={cn(field, "appearance-none max-[767px]:hidden")}
+            >
               {projectTypes.map((t) => (
                 <option key={t}>{t}</option>
               ))}
             </select>
+            <div role="radiogroup" aria-label="Project" className="flex flex-wrap gap-2 min-[768px]:hidden">
+              {projectTypes.map((t) => (
+                <label
+                  key={t}
+                  className="inline-flex min-h-11 cursor-pointer items-center rounded-full px-4 text-[15px] shadow-[inset_0_0_0_1px_var(--color-ink-3)] transition-[background-color,color,box-shadow,scale] duration-[150ms] active:scale-[0.97] has-[:checked]:bg-copper has-[:checked]:font-semibold has-[:checked]:text-[#140d08] has-[:checked]:shadow-none has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-copper"
+                >
+                  <input
+                    type="radio"
+                    name={phone ? "projectType" : undefined}
+                    value={t}
+                    checked={projectType === t}
+                    onChange={() => setProjectType(t)}
+                    className="sr-only"
+                  />
+                  {t}
+                </label>
+              ))}
+            </div>
           </div>
           {budgetRanges.length > 0 && (
             <div className="flex flex-col gap-2">
