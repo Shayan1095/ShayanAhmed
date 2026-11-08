@@ -80,8 +80,11 @@ export function Wordmark({ text, className, huge = false }: { text: string; clas
             opacity: 1,
             ease: motionGrammar.ease,
             stagger: 0.06,
-            // Ends with the page: in the footer finale the name is the last thing, so its bottom meets the screen bottom.
-            scrollTrigger: { trigger: el, start: "top bottom", end: "bottom bottom", scrub: 0.8 },
+            // Mouse devices: scroll-linked, ending with the page (the name is the last thing, so its
+            // bottom meets the screen bottom). Touch screens: the letters rise once, as it arrives.
+            ...(window.matchMedia("(hover: hover) and (pointer: fine)").matches
+              ? { scrollTrigger: { trigger: el, start: "top bottom", end: "bottom bottom", scrub: 0.8 } }
+              : { duration: 1, scrollTrigger: { trigger: el, start: "top 95%", once: true } }),
           },
         );
       });

@@ -33,7 +33,7 @@
 @keyframes sa-pl-countEnd { from { --n: 92; } to { --n: 100; } }
 
 .sa-pl-overlay {
-  /* Timeline scale: the whole intro runs in ~1.6s on desktop, ~1.0s on phones. */
+  /* Timeline scale: the whole intro runs in ~1.6s on every screen. */
   --t: 1;
   --frame-w: min(1000px, calc(100vw - 32px));
   --frame-h: 380px;
@@ -222,7 +222,7 @@ html[data-intro-font] .sa-pl-nm2 { animation-play-state: running; }
 .sa-pl-splitting .sa-pl-line { animation: none; }
 
 @media (max-width: 639px) {
-  .sa-pl-overlay { --frame-h: 300px; --arm: 20px; --t: 0.62; }
+  .sa-pl-overlay { --frame-h: 300px; --arm: 20px; }
   .sa-pl-caption { font-size: 10px; }
   .sa-pl-captionMiddle { display: none; }
 }

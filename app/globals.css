@@ -866,9 +866,13 @@ html[data-theme="dark"]:not([data-admin-theme]) :is([data-band="ink"], .ink-band
    Not on sections with pinned (position: fixed) scroll scenes or sticky
    stacks, which containment would break (#work, #services, #process). Scroll-linked effects
    re-measure when the real sizes arrive (SmoothScrollProvider). */
-main#main > :is(#archive, #about, #faq, #contact) {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 1000px;
+/* Mouse and trackpad devices only: on phones the real heights arriving
+   mid-flick shifted the page under the finger. */
+@media (hover: hover) and (pointer: fine) {
+  main#main > :is(#archive, #about, #faq, #contact) {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 1000px;
+  }
 }
 
 /* =========================================================================

@@ -6,17 +6,17 @@ import "./intro.css";
 
 type Phase = "playing" | "finishing" | "splitting" | "done";
 
-// Desktop timings; phones run the same timeline faster (--t in preloader.css).
+// One timeline for every screen (--t in preloader.css scales it).
 const LINE_MS = 900; // the line reaches 92%
 const FINISH_MS = 140; // 92 → 100%
 const SPLIT_MS = 620; // halves part
-const FONT_GRACE_MS = 150; // after 92%, wait at most this long for fonts (total cap ~1.6s / ~1.0s)
+const FONT_GRACE_MS = 150; // after 92%, wait at most this long for fonts (total cap ~1.6s)
 
 /**
  * The intro (SA-Brand preloader brief): crop marks, the name, a measured line
  * that is a real progress bar (fonts), then the screen splits along it and
  * the hero rises. First visit per tab session only, never with reduced
- * motion, and any click or key skips straight to the split. The gate script
+ * motion, and a mouse click or a key skips straight to the split (a touch does not). The gate script
  * decides before first paint (html[data-intro]), so a skipped intro never
  * flashes (the site layout puts it right before this); this component only
  * drives the timeline.
@@ -87,13 +87,16 @@ export function Preloader({ date }: { date: string }) {
       later(doSplit, FINISH_MS * scale);
     });
 
+    // A mouse click or a key skips to the split. A touch does not: on a phone
+    // the first touch is usually the start of a scroll, which cut the intro short.
     const skip = () => doSplit();
-    window.addEventListener("pointerdown", skip, { once: true });
+    const click = (e: PointerEvent) => e.pointerType === "mouse" && skip();
+    window.addEventListener("pointerdown", click);
     window.addEventListener("keydown", skip, { once: true });
     return () => {
       cancelled = true;
       timers.forEach(clearTimeout);
-      window.removeEventListener("pointerdown", skip);
+      window.removeEventListener("pointerdown", click);
       window.removeEventListener("keydown", skip);
     };
   }, []);

@@ -39,17 +39,27 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     const main = document.getElementById("main");
     if (!main) return;
+    // Never mid-scroll: a re-measure during a flick stops the momentum and
+    // jumps the page, so it waits until scrolling has paused.
     let t = 0;
     let last = main.offsetHeight;
+    let lastScroll = 0;
+    const onScroll = () => (lastScroll = performance.now());
+    const settle = () => {
+      window.clearTimeout(t);
+      const quiet = performance.now() - lastScroll;
+      t = window.setTimeout(() => (performance.now() - lastScroll < 250 ? settle() : refreshScrollTriggers()), quiet < 250 ? 300 : 150);
+    };
     const ro = new ResizeObserver(() => {
       if (main.offsetHeight === last) return;
       last = main.offsetHeight;
-      window.clearTimeout(t);
-      t = window.setTimeout(refreshScrollTriggers, 150);
+      settle();
     });
     ro.observe(main);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       ro.disconnect();
+      window.removeEventListener("scroll", onScroll);
       window.clearTimeout(t);
     };
   }, []);
@@ -61,25 +71,16 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     const html = document.documentElement;
     const low = isLowPowerDevice();
     html.dataset.power = low ? "low" : "full";
-    if (reduce) return;
-    const touch = !window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    // Touch screens keep the browser's own momentum scrolling. On iOS a
+    // JavaScript glide fights Safari's momentum and feels sticky; the native
+    // scroll is the smooth one there. Inertia is for wheels and trackpads.
+    if (reduce || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
     // Inertia scrolling: the page glides slightly behind the wheel for a weighted,
     // premium feel. anchors: plain <a href="#id"> links scroll smoothly too.
     // Low power: a snappier glide, so it never trails far behind the wheel.
-    // Phones (syncTouch): the page follows the finger with the same weighted
-    // glide, and a flick carries less far than native momentum. Sideways swipes
-    // (work cards) and sheets/menus (data-lenis-prevent) keep native scrolling.
-    const lenis = new Lenis({
-      lerp: low ? 0.12 : 0.1,
-      wheelMultiplier: 1,
-      smoothWheel: true,
-      anchors: true,
-      syncTouch: touch,
-      syncTouchLerp: low ? 0.1 : 0.075,
-      touchInertiaExponent: 1.55,
-      allowNestedScroll: true,
-    });
+    // Sheets and menus (data-lenis-prevent) scroll on their own.
+    const lenis = new Lenis({ lerp: low ? 0.12 : 0.1, wheelMultiplier: 1, smoothWheel: true, anchors: true });
     lenisRef.current = lenis;
     lenis.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);

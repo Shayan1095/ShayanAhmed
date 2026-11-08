@@ -44,7 +44,7 @@ export async function Footer() {
 
   return (
     <footer
-      className="tone-ink relative overflow-hidden rounded-t-[32px] bg-[#110f0d] pt-[88px] text-paper min-[900px]:rounded-t-[44px]"
+      className="tone-ink relative overflow-hidden bg-[#110f0d] pt-[72px] text-paper min-[900px]:rounded-t-[44px] min-[900px]:pt-[88px]"
       style={BAND}
     >
       {/* Copper hairline catching the light along the top edge. */}

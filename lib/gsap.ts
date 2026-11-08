@@ -36,6 +36,10 @@ gsap.registerPlugin(
  *  sa.inOut   weighted both ways (toggles, morphs, layout moves)
  *  sa.settle  slight overshoot then rest (numbers landing, keys)
  */
+// Phones: Safari's address bar showing or hiding changes the viewport height
+// on every scroll; re-measuring for it made the page jump. Ignore it.
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 CustomEase.create("sa.out", "M0,0 C0.12,0.72 0.2,0.96 0.42,0.99 0.6,1 0.78,1 1,1");
 CustomEase.create("sa.inOut", "M0,0 C0.55,0 0.18,1 1,1");
 CustomEase.create("sa.settle", "M0,0 C0.18,0.7 0.32,1.06 0.56,1.03 0.74,1.005 0.86,1 1,1");

@@ -40,6 +40,15 @@ export function ScrollFx({ effects, as = "div", children, ...props }: ScrollFxPr
         const q = gsap.utils.selector(el);
         const scrub = motionGrammar.scrub;
         const items = q('[data-fx="item"]');
+        // Touch screens: entrances play once, smoothly, as the block arrives,
+        // instead of following the finger frame by frame (on iOS a scrubbed
+        // entrance trails the momentum scroll and looks shaky). Mouse devices
+        // keep the scroll-linked versions.
+        const touch = !window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+        const enter = (trigger: Element, start: string, end: string) =>
+          touch
+            ? { duration: 0.9, scrollTrigger: { trigger, start: "top 88%", once: true } }
+            : { scrollTrigger: { trigger, start, end, scrub } };
 
         if (effects.includes("rise") && items.length) {
           gsap.fromTo(
@@ -49,8 +58,8 @@ export function ScrollFx({ effects, as = "div", children, ...props }: ScrollFxPr
               y: 0,
               opacity: 1,
               ease: motionGrammar.ease,
-              stagger: 0.12,
-              scrollTrigger: { trigger: el, start: "top 92%", end: "top 40%", scrub },
+              stagger: touch ? 0.08 : 0.12,
+              ...enter(el, "top 92%", "top 40%"),
             },
           );
         }
@@ -68,7 +77,7 @@ export function ScrollFx({ effects, as = "div", children, ...props }: ScrollFxPr
                 rotate: 0,
                 opacity: 1,
                 ease: motionGrammar.ease,
-                scrollTrigger: { trigger: el, start: "top 95%", end: "top 35%", scrub },
+                ...enter(el, "top 95%", "top 35%"),
               },
             );
           });
@@ -100,15 +109,16 @@ export function ScrollFx({ effects, as = "div", children, ...props }: ScrollFxPr
               { [y ? "scaleY" : "scaleX"]: 0 },
               {
                 [y ? "scaleY" : "scaleX"]: 1,
-                ease: "none",
+                ease: touch ? motionGrammar.ease : "none",
                 transformOrigin: y ? "50% 0%" : "0% 50%",
-                scrollTrigger: { trigger: el, start: "top 80%", end: "bottom 65%", scrub },
+                ...enter(el, "top 80%", "bottom 65%"),
               },
             );
           });
         }
 
-        if (effects.includes("parallax")) {
+        // Parallax drift is a mouse-device flourish; on phones items sit still.
+        if (effects.includes("parallax") && !touch) {
           q("[data-fx-speed]").forEach((it) => {
             const speed = Number(it.dataset.fxSpeed) || 0;
             const rot = Number(it.dataset.fxRotate) || 0;
