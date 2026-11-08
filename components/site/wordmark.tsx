@@ -22,7 +22,11 @@ const LIT: React.CSSProperties = {
   color: "transparent",
 };
 
-export function Wordmark({ text, className }: { text: string; className?: string }) {
+/**
+ * `huge`: the footer's finale, the name spanning the full width of the screen.
+ * Its letters widen less near the cursor so the name never outgrows the edge.
+ */
+export function Wordmark({ text, className, huge = false }: { text: string; className?: string; huge?: boolean }) {
   const root = useRef<HTMLDivElement>(null);
   const fine = useFinePointer();
   const reduce = useReducedMotion();
@@ -42,7 +46,8 @@ export function Wordmark({ text, className }: { text: string; className?: string
           const r = s.getBoundingClientRect();
           const d = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2));
           const k = Math.max(0, 1 - d / RADIUS);
-          s.style.fontVariationSettings = `"wdth" ${Math.round(MIN_WDTH + k * (MAX_WDTH - MIN_WDTH))}`;
+          const max = huge ? MIN_WDTH + 14 : MAX_WDTH;
+          s.style.fontVariationSettings = `"wdth" ${Math.round(MIN_WDTH + k * (max - MIN_WDTH))}`;
         }
       });
     };
@@ -59,7 +64,7 @@ export function Wordmark({ text, className }: { text: string; className?: string
       area.removeEventListener("pointerleave", onLeave);
       onLeave();
     };
-  }, [fine, reduce]);
+  }, [fine, reduce, huge]);
 
   // Scroll-linked finale: letters rise one after another as the page ends.
   useGSAP(
@@ -75,7 +80,8 @@ export function Wordmark({ text, className }: { text: string; className?: string
             opacity: 1,
             ease: motionGrammar.ease,
             stagger: 0.06,
-            scrollTrigger: { trigger: el, start: "top bottom", end: "bottom 92%", scrub: 0.8 },
+            // Ends with the page: in the footer finale the name is the last thing, so its bottom meets the screen bottom.
+            scrollTrigger: { trigger: el, start: "top bottom", end: "bottom bottom", scrub: 0.8 },
           },
         );
       });
@@ -91,10 +97,14 @@ export function Wordmark({ text, className }: { text: string; className?: string
       role="img"
       aria-label={text}
       // Soft copper glow around the lit letters (inline so it can never be lost to stale CSS).
-      style={{ filter: "drop-shadow(0 0 22px rgb(224 154 79 / 0.32)) drop-shadow(0 1px 0 rgb(0 0 0 / 0.6))" }}
+      style={{
+        filter: "drop-shadow(0 0 22px rgb(224 154 79 / 0.32)) drop-shadow(0 1px 0 rgb(0 0 0 / 0.6))",
+        // Huge: condensed by default, so the full name spans the screen at a bigger size.
+        ...(huge && { fontVariationSettings: '"wdth" 75' }),
+      }}
       className={cn(
         "flex select-none justify-between whitespace-nowrap font-display font-black uppercase leading-[0.85] tracking-[-0.04em]",
-        "text-[min(11cqi,184px)]",
+        huge ? "text-[14cqi] leading-[0.8]" : "text-[min(11cqi,184px)]",
       )}
     >
       {Array.from(text).map((ch, i) => (
