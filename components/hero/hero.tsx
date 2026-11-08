@@ -38,7 +38,7 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
         >
           <span>No. 01 — {date}</span>
           {/* Phones: just the issue number and date, on one line. */}
-          <span className="max-[699px]:hidden">{HERO_COPY.issueMiddle}</span>
+          <span className="max-[899px]:hidden">{HERO_COPY.issueMiddle}</span>
           <span className="max-[699px]:hidden">{HERO_COPY.issueRight}</span>
         </p>
 
@@ -52,7 +52,8 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
             ...FOIL,
             fontStretch: "62%",
             fontVariationSettings: "'wdth' 62",
-            fontSize: "clamp(88px, 23.5vw, 340px)",
+            // Scales with the screen down to 320px phones (a fixed floor cut the D off).
+            fontSize: "clamp(64px, 23.5vw, 340px)",
             lineHeight: 0.8,
             letterSpacing: "-0.03em",
           }}
@@ -76,7 +77,7 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
         >
           {/* Phones: just what's built (the name is in the bar and the copy). */}
           <span className="max-[699px]:hidden">{HERO_COPY.creditLeft}</span>
-          <span className="max-[699px]:tracking-[0.1em]">{HERO_COPY.creditRight}</span>
+          <span className="whitespace-nowrap max-[699px]:tracking-[0.1em] max-[359px]:text-[10.5px] max-[359px]:tracking-[0.04em]">{HERO_COPY.creditRight}</span>
         </p>
 
         {/* Lower row: the cover story and the Built-in index. Side by side, the index's copper rule lines up with the top of the headline (44px = eyebrow + gap). */}

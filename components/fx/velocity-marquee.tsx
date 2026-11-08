@@ -82,7 +82,7 @@ export function VelocityMarquee({ items, tone = "paper", className }: VelocityMa
       <div
         ref={track}
         aria-hidden="true"
-        className="flex w-max font-display text-[clamp(22px,3vw,42px)] font-extrabold uppercase leading-none tracking-[-0.035em] will-change-transform"
+        className="flex w-max font-display text-[clamp(22px,3vw,42px)] font-extrabold uppercase leading-none tracking-[-0.035em] [word-spacing:0.18em] will-change-transform"
       >
         {run(0)}
         {run(1)}

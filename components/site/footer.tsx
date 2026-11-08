@@ -89,7 +89,7 @@ export async function Footer() {
           </nav>
           {/* Phones: clock and back-to-top share a line. */}
           <div className="flex items-center justify-between gap-4 min-[900px]:contents">
-          <Clock className="whitespace-nowrap" />
+          <Clock className="min-w-0 min-[360px]:whitespace-nowrap" />
           <a
             href="#main"
             aria-label="Back to top"

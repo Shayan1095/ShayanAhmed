@@ -290,8 +290,9 @@ function Stamp({ kind, show = true, desktop, className }: { kind: "flag" | "sent
     <span
       data-stamp={desktop ? kind : undefined}
       className={cn(
-        "inline-block rounded-[6px] border-2 px-2 py-1 font-mono text-[11px] font-bold uppercase tracking-[0.14em]",
-        flag ? "-rotate-[8deg] border-[#c2552f] text-[#c2552f]" : "rotate-[6deg] border-[#4f8a3c] text-[#4f8a3c]",
+        // One line at every width (it wrapped and clipped on phones); a little room below for the tilt.
+        "my-1 inline-block whitespace-nowrap rounded-[6px] border-2 px-2 py-1 font-mono text-[11px] font-bold uppercase tracking-[0.14em] max-[899px]:tracking-[0.08em]",
+        flag ? "-rotate-[6deg] border-[#c2552f] text-[#c2552f]" : "rotate-[6deg] border-[#4f8a3c] text-[#4f8a3c]",
         !desktop && "transition-[opacity,transform] duration-300 ease-out-expo",
         !desktop && !show && "scale-125 opacity-0",
         desktop && "opacity-0",
@@ -299,7 +300,13 @@ function Stamp({ kind, show = true, desktop, className }: { kind: "flag" | "sent
         className,
       )}
     >
-      {flag ? (desktop ? "Flagged · dup. address" : "Flagged · duplicate address") : "Dispatched"}
+      {flag ? (
+        <>
+          Flagged<span className="max-[399px]:hidden"> · dup. address</span>
+        </>
+      ) : (
+        "Dispatched"
+      )}
     </span>
   );
 }

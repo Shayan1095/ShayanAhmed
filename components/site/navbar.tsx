@@ -306,6 +306,7 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
 
       {/* Phone dock (under 900px): one floating pill for the menu, where you are, and Start. */}
       <div
+        data-dock
         className={cn(
           "fixed inset-x-3 bottom-[calc(12px+env(safe-area-inset-bottom))] z-70 transition-[transform,opacity] duration-[260ms] ease-out-expo min-[900px]:hidden",
           (dockAway || endInView) && !menuOpen ? "pointer-events-none translate-y-[140%] opacity-0" : "translate-y-0 opacity-100",
@@ -329,7 +330,8 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
           <Link href="/" aria-label="Shayan Ahmed, home" className="flex min-h-11 min-w-0 flex-1 items-center justify-center gap-2.5">
             <SALogo size={28} aria-hidden="true" className="shrink-0" />
             <span className="flex min-w-0 flex-col leading-tight">
-              <span className="truncate font-display text-[14px] font-bold">Shayan Ahmed</span>
+              {/* Small phones (under 360px): just where you are, so nothing gets cut. */}
+              <span className="truncate font-display text-[14px] font-bold max-[359px]:sr-only">Shayan Ahmed</span>
               <span aria-hidden="true" className="truncate font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
                 {readoutText}
               </span>

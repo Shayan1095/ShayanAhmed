@@ -76,7 +76,7 @@ export function BuiltInIndex() {
 
       {/* Phones: swipe sideways to move through the systems (vertical scrolling still works). */}
       <div
-        className="flex h-[150px] touch-pan-y items-start gap-5 overflow-hidden"
+        className="flex touch-pan-y items-start gap-5 overflow-hidden"
         onPointerDown={(e) => {
           if (e.pointerType !== "mouse") swipeX.current = e.clientX;
         }}
@@ -105,7 +105,16 @@ export function BuiltInIndex() {
             </Mask>
           ))}
         </span>
-        <div className="flex min-w-0 flex-col gap-2.5 pt-1.5">
+        {/* Sized by the tallest system (invisible copies in the same grid cell),
+            so the panel never jumps and never leaves a gap at any width. */}
+        <div className="grid min-w-0 flex-1 pt-1.5">
+          {BUILT_IN.map((it) => (
+            <div key={it.title} aria-hidden="true" className="invisible col-start-1 row-start-1 flex flex-col gap-2.5">
+              <span className="font-[family-name:var(--font-archivo)] text-[28px] font-bold leading-[1.05] tracking-[-0.01em]">{it.title}</span>
+              <span className="text-[15px] leading-[1.55]">{it.desc}</span>
+            </div>
+          ))}
+        <div className="col-start-1 row-start-1 flex min-w-0 flex-col gap-2.5">
           <Mask>
             <m.span key={`t${index}`} {...roll} className="inline-block font-[family-name:var(--font-archivo)] text-[28px] font-bold leading-[1.05] tracking-[-0.01em]" style={{ color: COVER.paper }}>
               {item.title}
@@ -116,6 +125,7 @@ export function BuiltInIndex() {
               {item.desc}
             </m.span>
           </Mask>
+        </div>
         </div>
       </div>
 

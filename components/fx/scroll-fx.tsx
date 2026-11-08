@@ -125,7 +125,8 @@ export function ScrollFx({ effects, as = "div", children, ...props }: ScrollFxPr
           });
         }
 
-        if (effects.includes("tilt")) {
+        // Desktop only: on phones and tablets the half-tilted form hid its first fields mid-scroll.
+        if (effects.includes("tilt") && window.matchMedia("(min-width: 900px)").matches) {
           q('[data-fx="tilt"]').forEach((it) => {
             gsap.fromTo(
               it,

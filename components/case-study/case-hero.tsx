@@ -22,11 +22,14 @@ export function CaseHero({ project, index, total }: { project: Project; index: n
     project.outcome && { label: "Outcome", value: project.outcome },
   ].filter(Boolean) as { label: string; value: string }[];
 
+  const wide = (label: string) => label === "Stack" || label === "Outcome";
+  const liveSpans = meta.filter((m) => !wide(m.label)).length % 2 === 0;
+
   return (
     <section aria-labelledby="case-title" className="pb-16 pt-[calc(env(safe-area-inset-top)+112px)] min-[900px]:pb-24">
       <div className="wrap">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-          <Link href="/#work" className="type-label text-muted transition-colors hover:text-ink">
+          <Link href="/#work" className="type-label -my-3 inline-flex min-h-11 items-center text-muted transition-colors hover:text-ink">
             ← All work
           </Link>
           <Label>
@@ -75,14 +78,15 @@ export function CaseHero({ project, index, total }: { project: Project; index: n
                 <div
                   key={m.label}
                   className={`flex flex-col gap-1 border-b border-paper-edge py-3 min-[768px]:flex-row min-[768px]:items-baseline min-[768px]:gap-6 ${
-                    m.label === "Stack" || m.label === "Outcome" ? "col-span-2 min-[768px]:col-span-1" : ""
+                    wide(m.label) ? "col-span-2 min-[768px]:col-span-1" : ""
                   }`}
                 >
                   <dt className="type-label shrink-0 text-[10.5px] text-muted min-[768px]:w-[96px]">{m.label}</dt>
                   <dd className="text-[15px] font-medium">{m.value}</dd>
                 </div>
               ))}
-              <div className="col-span-2 flex flex-col gap-1 border-b border-paper-edge py-3 min-[768px]:col-span-1 min-[768px]:flex-row min-[768px]:items-baseline min-[768px]:gap-6">
+              {/* Live fills the empty half when the cells above leave one (phones). */}
+              <div className={`${liveSpans ? "col-span-2" : ""} flex flex-col gap-1 border-b border-paper-edge py-3 min-[768px]:col-span-1 min-[768px]:flex-row min-[768px]:items-baseline min-[768px]:gap-6`}>
                 <dt className="type-label shrink-0 text-[10.5px] text-muted min-[768px]:w-[96px]">Live</dt>
                 <dd className="text-[15px] font-medium">
                   {project.liveUrl ? (

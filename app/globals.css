@@ -185,16 +185,22 @@ body {
   margin-inline: auto;
   padding-left: max(16px, env(safe-area-inset-left));
   padding-right: max(16px, env(safe-area-inset-right));
+  /* Tablets: the same 32px margin as the hero, so every edge lines up. */
+  @media (width >= 560px) {
+    padding-left: max(32px, env(safe-area-inset-left));
+    padding-right: max(32px, env(safe-area-inset-right));
+  }
   @media (width >= 900px) {
     padding-left: max(56px, env(safe-area-inset-left));
     padding-right: max(56px, env(safe-area-inset-right));
   }
 }
 
-/* Home page on phones: the footer's sign-off repeats the contact form above it. */
+/* Phones: when the page already ends on a call to action (the home contact
+   form, a case study's "Your project"), the footer's sign-off would repeat it. */
 @media (width < 768px) {
-  body:has(#contact) [data-footer-signoff],
-  body:has(#contact) [data-footer-top]:not(:has(nav)) {
+  body:has(#contact, [data-page-cta]) [data-footer-signoff],
+  body:has(#contact, [data-page-cta]) [data-footer-top]:not(:has(nav)) {
     display: none;
   }
 }
@@ -955,10 +961,10 @@ html[data-power="low"] .dock-glass {
   height: auto;
 }
 
-/* Typography floor on phones (motion & mobile spec): small mono labels are
-   at least 12px. Mock-up UI inside decorative device screens is exempt (it is
-   aria-hidden and drawn to scale). */
-@media (max-width: 767px) {
+/* Typography floor on phones and tablets (motion & mobile spec): small mono
+   labels are at least 12px. Mock-up UI inside decorative device screens is
+   exempt (it is aria-hidden and drawn to scale). */
+@media (max-width: 899px) {
   :is(.type-label, .font-mono:is(.text-\[9\.5px\], .text-\[10px\], .text-\[10\.5px\], .text-\[11px\], .text-\[11\.5px\], .text-xs)):not([aria-hidden="true"] *, [aria-hidden="true"]) {
     font-size: 12px;
   }

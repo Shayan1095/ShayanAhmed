@@ -161,12 +161,12 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
                 <option key={t}>{t}</option>
               ))}
             </select>
-            {/* One swipeable line of chips (the last one peeks), not three wrapped rows. */}
-            <div role="radiogroup" aria-label="Project" className="-mr-[22px] flex gap-2 overflow-x-auto overscroll-x-contain pr-[22px] [scrollbar-width:none] min-[768px]:hidden [&::-webkit-scrollbar]:hidden">
+            {/* Two even columns; long names wrap inside their chip (nothing is cut off). */}
+            <div role="radiogroup" aria-label="Project" className="grid grid-cols-2 gap-2 min-[768px]:hidden">
               {projectTypes.map((t) => (
                 <label
                   key={t}
-                  className="inline-flex min-h-11 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-full px-4 text-[15px] shadow-[inset_0_0_0_1px_var(--color-ink-3)] transition-[background-color,color,box-shadow,scale] duration-[150ms] active:scale-[0.97] has-[:checked]:bg-copper has-[:checked]:font-semibold has-[:checked]:text-[#140d08] has-[:checked]:shadow-none has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-copper"
+                  className="flex min-h-12 cursor-pointer items-center rounded-[14px] px-3.5 py-2 text-[14.5px] leading-snug shadow-[inset_0_0_0_1px_var(--color-ink-3)] transition-[background-color,color,box-shadow,scale] duration-[150ms] active:scale-[0.97] has-[:checked]:bg-copper has-[:checked]:font-semibold has-[:checked]:text-[#140d08] has-[:checked]:shadow-none has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-copper"
                 >
                   <input
                     type="radio"

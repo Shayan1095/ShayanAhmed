@@ -253,7 +253,7 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
         </Band>
       )}
 
-      <Band tone="ink" aria-label="Start a project" className="section-pad">
+      <Band tone="ink" aria-label="Start a project" data-page-cta="" className="section-pad">
         <div className="wrap flex flex-col items-start gap-8 min-[900px]:flex-row min-[900px]:items-end min-[900px]:justify-between">
           <div>
             <Label>Your project</Label>
