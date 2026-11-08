@@ -125,7 +125,7 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
             <div data-hero-cta="" className="flex flex-wrap gap-3">
               <a
                 href="#contact"
-                className="group inline-flex min-h-[54px] items-center gap-2.5 rounded-[4px] px-[26px] text-[16px] font-bold transition-[transform,box-shadow] duration-150 hover:-translate-y-px active:translate-y-[3px] active:shadow-[inset_0_1px_0_rgba(255,255,255,.45),0_1px_0_#6B3F22]"
+                className="group inline-flex min-h-[54px] items-center gap-2.5 rounded-[12px] px-[26px] text-[16px] font-bold transition-[transform,box-shadow] duration-150 hover:-translate-y-px active:translate-y-[3px] active:shadow-[inset_0_1px_0_rgba(255,255,255,.45),0_1px_0_#6B3F22]"
                 style={{
                   color: COVER.onCopper,
                   background: "linear-gradient(180deg, #F2CC9C 0%, #D49A62 55%, #B8763F 100%)",
@@ -137,7 +137,7 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
               </a>
               <a
                 href={caseStudyHref ?? "#work"}
-                className="inline-flex min-h-[54px] items-center rounded-[4px] px-6 text-[16px] font-semibold transition-colors hover:text-[#E8B27A]"
+                className="inline-flex min-h-[54px] items-center rounded-[12px] px-6 text-[16px] font-semibold transition-colors hover:text-[#E8B27A]"
                 style={{ color: COVER.paper, background: "rgba(18,12,8,.5)", boxShadow: "inset 0 0 0 1px rgba(243,234,219,.4)" }}
               >
                 {HERO_COPY.secondaryCta}

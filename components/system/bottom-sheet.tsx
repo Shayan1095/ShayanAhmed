@@ -101,6 +101,8 @@ export function BottomSheet({
           onDragEnd={(_, info) => {
             if (info.offset.y > 110 || info.velocity.y > 600) onClose();
           }}
+          // The sheet scrolls natively; the page's smooth scroll leaves it alone.
+          data-lenis-prevent=""
           className={cn(
             "fixed inset-x-0 bottom-0 z-[81] flex max-h-[88svh] flex-col overflow-y-auto overscroll-contain rounded-t-[28px] bg-paper-hi px-5 pb-[calc(env(safe-area-inset-bottom)+24px)] text-ink shadow-[0_-20px_50px_-10px_rgb(0_0_0/.6),inset_0_1px_0_rgb(232_178_122/.18)] outline-none",
             className,

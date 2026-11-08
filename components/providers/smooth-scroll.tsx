@@ -61,14 +61,25 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     const html = document.documentElement;
     const low = isLowPowerDevice();
     html.dataset.power = low ? "low" : "full";
-    // Touch screens keep their native scrolling (it is already smooth, and
-    // momentum under a finger must never lag); inertia is for wheels and trackpads.
-    if (reduce || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    if (reduce) return;
+    const touch = !window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
     // Inertia scrolling: the page glides slightly behind the wheel for a weighted,
     // premium feel. anchors: plain <a href="#id"> links scroll smoothly too.
     // Low power: a snappier glide, so it never trails far behind the wheel.
-    const lenis = new Lenis({ lerp: low ? 0.12 : 0.1, wheelMultiplier: 1, smoothWheel: true, anchors: true });
+    // Phones (syncTouch): the page follows the finger with the same weighted
+    // glide, and a flick carries less far than native momentum. Sideways swipes
+    // (work cards) and sheets/menus (data-lenis-prevent) keep native scrolling.
+    const lenis = new Lenis({
+      lerp: low ? 0.12 : 0.1,
+      wheelMultiplier: 1,
+      smoothWheel: true,
+      anchors: true,
+      syncTouch: touch,
+      syncTouchLerp: low ? 0.1 : 0.075,
+      touchInertiaExponent: 1.55,
+      allowNestedScroll: true,
+    });
     lenisRef.current = lenis;
     lenis.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);

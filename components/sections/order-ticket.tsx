@@ -30,6 +30,7 @@ export function OrderTicket() {
   const [stage, setStage] = useState<Stage>(0);
   const [approved, setApproved] = useState(false);
   const approvedRef = useRef(false);
+  const railFill = useRef<HTMLSpanElement>(null);
 
   const approve = useCallback(() => {
     if (approvedRef.current) return;
@@ -96,10 +97,22 @@ export function OrderTicket() {
       // Phones and tablets: stations light as they reach the middle of the screen.
       mm.add("(max-width: 899px) and (prefers-reduced-motion: no-preference)", () => {
         const items = gsap.utils.toArray<HTMLElement>("[data-station]", el);
+        // The copper line follows the scroll exactly: its tip sits on the same
+        // screen line (62% down) that lights each station, so they move together.
+        const rail = railFill.current?.parentElement;
+        const fill =
+          railFill.current && rail
+            ? gsap.fromTo(
+                railFill.current,
+                { scaleY: 0 },
+                { scaleY: 1, ease: "none", scrollTrigger: { trigger: rail, start: "top 62%", end: "bottom 62%", scrub: 0.25 } },
+              )
+            : null;
         const triggers = items.map((it, i) =>
           ScrollTrigger.create({
             trigger: it,
-            start: "top 62%",
+            // The number badge's centre (22px down) meets the line's tip.
+            start: "top+=22 62%",
             onEnter: () => {
               if (i < 3 && !approvedRef.current) setStage((cur) => (i > cur ? (i as Stage) : cur));
             },
@@ -110,6 +123,8 @@ export function OrderTicket() {
         return () => {
           triggers.forEach((t) => t.kill());
           past.kill();
+          fill?.scrollTrigger?.kill();
+          fill?.kill();
         };
       });
     },
@@ -185,10 +200,8 @@ export function OrderTicket() {
       {/* Phones and tablets: stations down a rail. */}
       <ol className="relative flex flex-col gap-3 min-[900px]:hidden">
         <li aria-hidden="true" className="pointer-events-none absolute bottom-6 left-[22px] top-6 w-px bg-ink-3">
-          <span
-            className="absolute inset-x-0 top-0 bg-copper shadow-glow transition-[height] duration-700 ease-out-expo"
-            style={{ height: `${((approved ? 3 : stage) / 3) * 100}%` }}
-          />
+          {/* Full without JS or with reduced motion; scroll-scrubbed otherwise (above). */}
+          <span ref={railFill} className="absolute inset-0 origin-top bg-copper shadow-glow will-change-transform" />
         </li>
         {stations.map((s, i) => (
           <li key={s.title} data-station className="relative z-[1] flex gap-3">

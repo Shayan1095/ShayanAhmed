@@ -534,6 +534,7 @@ function MobileMenu({
           onDragEnd={(_, info) => {
             if (info.offset.y > 110 || info.velocity.y > 600) onClose();
           }}
+          data-lenis-prevent=""
           className="tone-ink fixed inset-x-0 bottom-0 z-75 flex max-h-[92svh] flex-col gap-6 overflow-y-auto overscroll-contain rounded-t-[28px] bg-ink px-[max(20px,env(safe-area-inset-right))] pb-[calc(env(safe-area-inset-bottom)+24px)] pt-2 text-paper shadow-[0_-20px_50px_-10px_rgb(0_0_0/.6),inset_0_1px_0_rgb(232_178_122/.18)]"
         >
           {/* Grab handle: drag it down (or tap the backdrop) to close. */}

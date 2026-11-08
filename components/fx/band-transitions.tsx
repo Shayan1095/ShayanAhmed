@@ -7,12 +7,13 @@ import { motionGrammar } from "@/lib/motion";
 /**
  * Chapter transitions: every ink band opens out as it scrolls in, from a
  * rounded, inset panel to full bleed, like a screen sliding up into the page.
- * Mounted once per page; scans for [data-band="ink"].
+ * Mounted once per page; scans for [data-band="ink"]. Desktop only: on a
+ * phone's narrow screen the inset edges read as broken borders.
  */
 export function BandTransitions() {
   useGSAP(() => {
     if (isLowPowerDevice()) return;
-    gsap.matchMedia().add(MQ.motion, () => {
+    gsap.matchMedia().add(MQ.desktop, () => {
       gsap.utils.toArray<HTMLElement>('[data-band="ink"]').forEach((band) => {
         gsap.fromTo(
           band,
