@@ -39,7 +39,7 @@ export function CaseHero({ project, index, total }: { project: Project; index: n
 
         <div className="grid grid-cols-1 items-start gap-10 min-[1000px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] min-[1000px]:gap-14">
           <div className="min-[1000px]:sticky min-[1000px]:top-28">
-            <ProjectMonitor project={project} view={view} screenRef={screen} priority />
+            <ProjectMonitor project={project} view={view} screenRef={screen} priority responsive />
           </div>
 
           <div className="flex flex-col gap-6">

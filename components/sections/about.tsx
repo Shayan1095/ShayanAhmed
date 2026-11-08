@@ -58,8 +58,7 @@ export function About({ settings }: { settings: SiteSettings }) {
           <div data-fx="item" className="mb-[30px] mt-7">
             <SpecSheet rows={settings.specSheet} />
           </div>
-          {/* Phones: the dock's Start button is always in reach. */}
-          <div data-fx="item" className="max-[767px]:hidden">
+          <div data-fx="item">
             <Button href="#contact" variant="paper" arrow>
               Work with me
             </Button>

@@ -11,6 +11,8 @@ import { Work } from "@/components/sections/work";
 import { BandTransitions } from "@/components/fx/band-transitions";
 import { VelocityMarquee } from "@/components/fx/velocity-marquee";
 import { CtaStrip } from "@/components/site/cta-strip";
+import { SocialOrbit } from "@/components/sections/social-orbit";
+import { orbitLinks, socialLinks } from "@/lib/content/socials";
 import { homeJsonLd, JsonLd } from "@/components/site/json-ld";
 import { Band } from "@/components/system";
 import {
@@ -35,6 +37,12 @@ export default async function HomePage() {
     getFaqs(),
   ]);
   const flagship = featured.find((p) => p.hasCaseStudy);
+  // Social orbit: real profiles once any are saved (email alone is not enough);
+  // in development, stand-ins so the section can be previewed before then.
+  const socials = socialLinks(settings);
+  const orbit = orbitLinks(socials, process.env.NODE_ENV !== "production");
+  // Two logos would look empty: the orbit appears once there are three, at least one a real profile.
+  const showOrbit = orbit.length >= 3 && orbit.some((l) => l.key !== "email");
   // Chapter numbers run without gaps: Testimonials (05) only shows once there are some.
   // The archive shares chapter 01 with Selected work (on phones it is merged into it).
   const hasTestimonials = testimonials.length > 0;
@@ -76,6 +84,7 @@ export default async function HomePage() {
       {/* 05 · Testimonials: renders nothing until the first one is added in the admin. */}
       <Testimonials items={testimonials} />
       <FaqSection items={faqs} index={n(6)} />
+      {showOrbit && <SocialOrbit links={orbit} />}
       <Contact settings={settings} index={n(7)} />
       <JsonLd data={homeJsonLd(settings, featured)} />
       <BandTransitions />

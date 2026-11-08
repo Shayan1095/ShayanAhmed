@@ -7,6 +7,7 @@ import { ProjectTile } from "@/components/site/project-tile";
 import { Label, Tag } from "@/components/system";
 import { code, ProjectSheet } from "./archive-rows";
 import { cn } from "@/lib/utils";
+import { morphName } from "@/components/site/responsive-morph";
 
 /**
  * Selected work on phones (motion spec, Phase 4): a swipeable row of case
@@ -70,7 +71,8 @@ export function WorkSnapRow({
             <li key={p.slug} className="w-[88vw] max-w-[420px] shrink-0 snap-start">
               <article className="press relative flex h-full flex-col overflow-hidden rounded-[22px] bg-paper-hi shadow-raised">
                 {/* Morphs into the case study's main screen when opened (same name as its monitor). */}
-                <ViewTransition name={`monitor-${p.slug}`} share="morph" default="none">
+                {/* Its own name (the slide's monitor has the desktop one); case pages match it on phones. */}
+                <ViewTransition name={morphName(p.slug, true)} share="morph" default="none">
                   <ProjectTile project={p} className="aspect-[16/10] w-full" />
                 </ViewTransition>
                 <div className="flex flex-1 flex-col gap-3 p-5">

@@ -54,9 +54,6 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
   const [chapter, setChapter] = useState<ChapterId | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
-  // Phone dock: steps aside while scrolling down, back on scroll up or a pause.
-  const [dockAway, setDockAway] = useState(false);
-  const [endInView, setEndInView] = useState(false);
 
   // Work preview: opens on hover or focus; closing waits a beat so the pointer can travel into it.
   const [preview, setPreview] = useState(false);
@@ -81,11 +78,6 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
     () => {
       const setProgress = gsap.quickSetter(progress.current, "scaleX");
       let compactNow = false;
-      let awayNow = false;
-      let idle = 0;
-      const setAway = (v: boolean) => {
-        if (v !== awayNow) setDockAway((awayNow = v));
-      };
 
       // Runs every scroll frame: only touch React state when a value actually flips.
       ScrollTrigger.create({
@@ -96,13 +88,9 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
           setProgress(self.progress);
           const c = y > 60;
           if (c !== compactNow) setCompact((compactNow = c));
-          setAway(self.direction === 1 && y > 160);
-          window.clearTimeout(idle);
-          idle = window.setTimeout(() => setAway(false), 600);
         },
       });
-      const stopIdle = () => window.clearTimeout(idle);
-      if (!onHome) return stopIdle;
+      if (!onHome) return;
       // Scroll spy: the chapter crossing 45% of the viewport is "here".
       for (const { id } of chapters) {
         const el = document.getElementById(id);
@@ -117,25 +105,9 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
           },
         });
       }
-      return stopIdle;
     },
     { dependencies: [onHome] },
   );
-
-  // The dock steps aside while the contact form or the footer is on screen.
-  useEffect(() => {
-    const targets = [document.getElementById("contact"), document.querySelector("footer")].filter(Boolean) as Element[];
-    const seen = new Set<Element>();
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) seen.add(e.target);
-        else seen.delete(e.target);
-      }
-      setEndInView(seen.size > 0);
-    }, { rootMargin: "0px 0px -20% 0px" });
-    targets.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [onHome]);
 
   // Readout: scramble to the new chapter name.
   const target = (chapter && chapters.find((c) => c.id === chapter)?.label) || place || DEFAULT_PLACE;
@@ -187,8 +159,8 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
       <header
         className={cn(
           // Own layer: the page scrolls under it without repainting it.
-          // Phones and small tablets use the bottom dock instead (below).
-          "fixed inset-x-0 top-[env(safe-area-inset-top)] z-70 transition-[transform,padding] duration-500 ease-out-expo will-change-transform max-[899px]:hidden",
+          // The same bar on every screen; phones get the menu button instead of the links.
+          "fixed inset-x-0 top-[env(safe-area-inset-top)] z-70 transition-[transform,padding] duration-500 ease-out-expo will-change-transform",
           compact ? "py-2" : "py-3.5",
         )}
       >
@@ -294,6 +266,20 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
                   </span>
                 </a>
               </div>
+              {/* Phones and small tablets: the menu (a sheet with every chapter, contact and Start). */}
+              <button
+                ref={menuButton}
+                type="button"
+                aria-label="Open menu"
+                aria-expanded={menuOpen}
+                aria-controls="mobile-menu"
+                onClick={() => setMenuOpen(true)}
+                className="inset-track inline-flex size-[46px] items-center justify-center rounded-control transition-transform duration-[120ms] active:scale-[0.94] min-[900px]:hidden"
+              >
+                <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6 text-ink">
+                  <path d={MENU_PATH} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </button>
             </div>
 
             {/* Progress line, clipped to the bar's rounded corners. */}
@@ -303,49 +289,6 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
           </div>
         </div>
       </header>
-
-      {/* Phone dock (under 900px): one floating pill for the menu, where you are, and Start. */}
-      <div
-        data-dock
-        className={cn(
-          "fixed inset-x-3 bottom-[calc(12px+env(safe-area-inset-bottom))] z-70 transition-[transform,opacity] duration-[260ms] ease-out-expo min-[900px]:hidden",
-          (dockAway || endInView) && !menuOpen ? "pointer-events-none translate-y-[140%] opacity-0" : "translate-y-0 opacity-100",
-        )}
-        inert={(dockAway || endInView) && !menuOpen ? true : undefined}
-      >
-        <div className="dock-glass mx-auto flex h-14 max-w-[520px] items-center gap-2 rounded-full pl-1.5 pr-1.5">
-          <button
-            ref={menuButton}
-            type="button"
-            aria-label="Open menu"
-            aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
-            onClick={() => setMenuOpen(true)}
-            className="grid size-11 shrink-0 place-items-center rounded-full bg-paper-hi text-ink transition-transform duration-[120ms] active:scale-[0.94]"
-          >
-            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-[22px]">
-              <path d={MENU_PATH} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </button>
-          <Link href="/" aria-label="Shayan Ahmed, home" className="flex min-h-11 min-w-0 flex-1 items-center justify-center gap-2.5">
-            <SALogo size={28} aria-hidden="true" className="shrink-0" />
-            <span className="flex min-w-0 flex-col leading-tight">
-              {/* Small phones (under 360px): just where you are, so nothing gets cut. */}
-              <span className="truncate font-display text-[14px] font-bold max-[359px]:sr-only">Shayan Ahmed</span>
-              <span aria-hidden="true" className="truncate font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
-                {readoutText}
-              </span>
-            </span>
-          </Link>
-          <a
-            href={sectionHref("contact", onHome)}
-            className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-[linear-gradient(180deg,#f2cc9c,#d49a62_55%,#b8763f)] px-4 text-[15px] font-bold text-[#140d08] shadow-[inset_0_1px_0_rgb(255_255_255/.5),0_3px_0_#6b3f22] transition-transform duration-[120ms] active:translate-y-0.5 active:scale-[0.97]"
-          >
-            Start
-            <span aria-hidden="true">→</span>
-          </a>
-        </div>
-      </div>
 
       <MobileMenu
         open={menuOpen}

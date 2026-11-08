@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ViewTransition } from "react";
+import { ResponsiveMorph } from "@/components/site/responsive-morph";
 import { ProjectTile } from "@/components/site/project-tile";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -238,9 +238,9 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
               href={`/work/${next.slug}`}
               className="press group mt-5 grid grid-cols-1 items-center gap-6 overflow-hidden rounded-[24px] bg-paper-hi p-3 shadow-raised min-[768px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] min-[768px]:gap-10 min-[768px]:p-4"
             >
-              <ViewTransition name={`monitor-${next.slug}`} share="morph" default="none">
+              <ResponsiveMorph slug={next.slug}>
                 <ProjectTile project={next} sizes="(min-width: 768px) 45vw, 92vw" className="aspect-[16/10] w-full rounded-[16px]" />
-              </ViewTransition>
+              </ResponsiveMorph>
               <span className="flex flex-col gap-3 px-3 pb-4 min-[768px]:px-0 min-[768px]:pb-0 min-[768px]:pr-6">
                 <span className="type-label text-muted">{next.kind}</span>
                 <span className="font-display text-[clamp(32px,4.6vw,64px)] font-extrabold leading-[0.95] tracking-[-0.03em] transition-colors group-hover:text-walnut">

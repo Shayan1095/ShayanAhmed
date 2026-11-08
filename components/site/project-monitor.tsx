@@ -1,6 +1,8 @@
 "use client";
 
 import { ViewTransition } from "react";
+import { usePhone } from "@/lib/use-phone";
+import { morphName } from "./responsive-morph";
 import type { Project } from "@/lib/content/types";
 import type { ScreenHandle } from "@/components/system";
 import { cn } from "@/lib/utils";
@@ -22,14 +24,18 @@ export function ProjectMonitor({
   view,
   screenRef,
   priority,
+  responsive = false,
   className,
 }: {
   project: Project;
   view: MonitorView;
   screenRef?: React.Ref<ScreenHandle>;
   priority?: boolean;
+  /** Case pages: match the phone card's name on phones (the home slide always uses the desktop name). */
+  responsive?: boolean;
   className?: string;
 }) {
+  const phone = usePhone();
   const customer = project.customerView ?? project.cover;
   const views: Record<MonitorView, React.ReactNode> = {
     customer: customer ? <MonitorImage image={customer} priority={priority} /> : <MonitorStandby project={project} />,
@@ -45,7 +51,7 @@ export function ProjectMonitor({
       : project.monitorLabel;
 
   return (
-    <ViewTransition name={`monitor-${project.slug}`} share="morph" default="none">
+    <ViewTransition name={morphName(project.slug, responsive && phone)} share="morph" default="none">
       <Monitor label={label} screenRef={screenRef} className={className}>
         {(Object.keys(views) as MonitorView[]).map((v) =>
           views[v] ? (

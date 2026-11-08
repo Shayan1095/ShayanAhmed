@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
+import { usePhone } from "@/lib/use-phone";
 import { sendInquiry } from "@/app/actions/contact";
 import { checkContact, type ContactField, type ContactState } from "@/lib/contact-rules";
 import { Screen, Screws, StatusLight, TypeText, type ScreenHandle } from "@/components/system";
@@ -16,20 +17,6 @@ const field =
   "transition-[background-size,box-shadow] duration-[260ms] ease-out-expo focus:bg-[length:100%_2px]! " +
   "focus:shadow-[var(--shadow-ink-inset),0_0_0_2px_rgb(201_133_63/.45)] aria-invalid:shadow-[var(--shadow-ink-inset),0_0_0_2px_#e7a27f]";
 const labelCls = "type-label text-[10.5px] text-muted-ink";
-
-/** True on phones (under 768px); false on the server, so desktop markup renders first. */
-const phoneQuery = "(max-width: 767px)";
-function usePhone() {
-  return useSyncExternalStore(
-    (cb) => {
-      const mq = window.matchMedia(phoneQuery);
-      mq.addEventListener("change", cb);
-      return () => mq.removeEventListener("change", cb);
-    },
-    () => window.matchMedia(phoneQuery).matches,
-    () => false,
-  );
-}
 
 /**
  * Control-panel form (DESIGN.md §8 Contact). The readout screen boots and
