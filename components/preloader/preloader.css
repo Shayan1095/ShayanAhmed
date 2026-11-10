@@ -33,8 +33,11 @@
 @keyframes sa-pl-countEnd { from { --n: 92; } to { --n: 100; } }
 
 .sa-pl-overlay {
-  /* Timeline scale: the whole intro runs in ~1.6s on every screen. */
-  --t: 1;
+  /* Timeline scale. --t paces the entrance (crop marks, name, line: ~1.4s);
+     --tx paces the exit (the split: ~0.9s). With the hold in between
+     (preloader.tsx) the intro is on screen for about 4s, on every screen. */
+  --t: 1.5;
+  --tx: 1.45;
   --frame-w: min(1000px, calc(100vw - 32px));
   --frame-h: 380px;
   --arm: 28px;
@@ -62,14 +65,15 @@
 }
 .sa-pl-top { top: 0; }
 .sa-pl-bottom { top: var(--split); background-position: 0 calc(-1 * var(--split)); }
-/* Failsafe: if the script never runs, the intro still opens by itself at 4s. */
+/* Failsafe: if the script never runs, the intro still opens by itself at 6.5s
+   (well after the normal ~3.3s, so it never cuts the intro short). */
 @keyframes sa-pl-upLate { to { transform: translateY(-100%); } }
 @keyframes sa-pl-downLate { to { transform: translateY(100%); } }
-.sa-pl-top { animation: sa-pl-upLate 620ms cubic-bezier(0.76, 0, 0.24, 1) 4000ms forwards; }
-.sa-pl-bottom { animation: sa-pl-downLate 620ms cubic-bezier(0.76, 0, 0.24, 1) 4000ms forwards; }
+.sa-pl-top { animation: sa-pl-upLate 900ms cubic-bezier(0.76, 0, 0.24, 1) 6500ms forwards; }
+.sa-pl-bottom { animation: sa-pl-downLate 900ms cubic-bezier(0.76, 0, 0.24, 1) 6500ms forwards; }
 /* ...and stops covering the page once open (visibility also drops hit-testing). */
 @keyframes sa-pl-release { to { visibility: hidden; } }
-.sa-pl-overlay { animation: sa-pl-release 1ms linear 4640ms forwards; }
+.sa-pl-overlay { animation: sa-pl-release 1ms linear 7420ms forwards; }
 .sa-pl-splitting.sa-pl-overlay { animation: none; }
 
 /* Crop marks: 10px outside the frame corners. */
@@ -215,8 +219,8 @@ html[data-intro-font] .sa-pl-nm2 { animation-play-state: running; }
 
 /* Split: the halves part along the line (the line fades), from wherever the
    intro is (a click skips straight here). */
-.sa-pl-splitting .sa-pl-top { animation: sa-pl-up calc(620ms * var(--t)) cubic-bezier(0.76, 0, 0.24, 1) forwards; }
-.sa-pl-splitting .sa-pl-bottom { animation: sa-pl-down calc(620ms * var(--t)) cubic-bezier(0.76, 0, 0.24, 1) forwards; }
+.sa-pl-splitting .sa-pl-top { animation: sa-pl-up calc(620ms * var(--tx)) cubic-bezier(0.76, 0, 0.24, 1) forwards; }
+.sa-pl-splitting .sa-pl-bottom { animation: sa-pl-down calc(620ms * var(--tx)) cubic-bezier(0.76, 0, 0.24, 1) forwards; }
 /* At the split the line is handed to the component, which flies it up to
    become the hero's top rule (preloader.tsx). */
 .sa-pl-splitting .sa-pl-line { animation: none; }

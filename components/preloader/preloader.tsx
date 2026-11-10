@@ -10,7 +10,8 @@ type Phase = "playing" | "finishing" | "splitting" | "done";
 const LINE_MS = 900; // the line reaches 92%
 const FINISH_MS = 140; // 92 → 100%
 const SPLIT_MS = 620; // halves part
-const FONT_GRACE_MS = 150; // after 92%, wait at most this long for fonts (total cap ~1.6s)
+const FONT_GRACE_MS = 150; // after 92%, wait at most this long for fonts
+const HOLD_MS = 550; // the finished line and the lit name rest on screen before the split
 
 /**
  * The intro (SA-Brand preloader brief): crop marks, the name, a measured line
@@ -35,7 +36,9 @@ export function Preloader({ date }: { date: string }) {
     const timers: number[] = [];
     const later = (fn: () => void, ms: number) => timers.push(window.setTimeout(fn, ms));
 
-    const scale = parseFloat(getComputedStyle(overlayRef.current ?? html).getPropertyValue("--t")) || 1;
+    const css = getComputedStyle(overlayRef.current ?? html);
+    const scale = parseFloat(css.getPropertyValue("--t")) || 1; // entrance pace
+    const exit = parseFloat(css.getPropertyValue("--tx")) || 1; // split pace
 
     // The line flies up to become the hero's top rule (the issue line's
     // hairline), so the intro and the hero read as one motion.
@@ -52,7 +55,7 @@ export function Preloader({ date }: { date: string }) {
           { transform: "translate(0, 0) scaleX(1)", opacity: 1 },
           { transform: `translate(${dx}px, ${dy}px) scaleX(${to.width / from.width})`, opacity: 0.35 },
         ],
-        { duration: SPLIT_MS * scale, easing: "cubic-bezier(0.76, 0, 0.24, 1)", fill: "forwards" },
+        { duration: SPLIT_MS * exit, easing: "cubic-bezier(0.76, 0, 0.24, 1)", fill: "forwards" },
       );
     };
 
@@ -62,12 +65,12 @@ export function Preloader({ date }: { date: string }) {
       handOff();
       html.dataset.intro = "split";
       setPhase("splitting");
-      later(() => setPhase("done"), SPLIT_MS * scale + 20);
+      later(() => setPhase("done"), SPLIT_MS * exit + 20);
       // The hero's reveal ends by ~840ms after the split; then hand the page back.
       later(() => {
         delete html.dataset.intro;
         delete html.dataset.introFont;
-      }, Math.max(900, SPLIT_MS * scale + 300));
+      }, Math.max(900, SPLIT_MS * exit + 300));
     };
 
     // Phase 1 (0 → 92%) is the CSS animation already running since first paint.
@@ -84,8 +87,13 @@ export function Preloader({ date }: { date: string }) {
     Promise.all([phase1, Promise.race([Promise.all([fonts, name]), cap])]).then(() => {
       if (split || cancelled) return;
       setPhase("finishing");
-      later(doSplit, FINISH_MS * scale);
+      // Finish the line, then hold: the complete mark stays on screen for a beat.
+      later(doSplit, FINISH_MS * scale + HOLD_MS);
     });
+
+    // Safety net: if the animations ever stall (a backgrounded tab, iOS Low
+    // Power Mode), the intro still opens and the page unlocks by 5s.
+    later(doSplit, 5000);
 
     // A mouse click or a key skips to the split. A touch does not: on a phone
     // the first touch is usually the start of a scroll, which cut the intro short.
