@@ -1134,51 +1134,18 @@ html[data-power="low"] .hero-glow {
   .orbit-halo { animation: orbit-breathe 4.8s ease-in-out infinite; }
 }
 
-/* Paper section (build brief, Phase 6): Process is printed on cream inside the
-   dark site. Copper darkens to pass 4.5:1 on cream; cards are ink-outlined,
-   not glowing. The curtain rounds its corners as it rises and leaves (CurtainBand). */
-html:not([data-admin-theme]) .tone-cream {
-  --color-paper: #f3eadb;
-  --color-paper-hi: #fbf6ec;
-  --color-paper-lo: #e4d8c3;
-  --color-paper-edge: #b9a98d;
-  --color-ink: #111111;
-  --color-ink-2: #2a2826;
-  --color-ink-3: #3d3a36;
-  --color-muted: #574e43; /* 7:1 on cream */
-  --color-copper: #8a521a; /* 5.3:1 on cream */
-  --color-walnut: #8a521a;
-  --tone-fg: #111111;
-  --tone-muted: #574e43;
-  --tone-accent: #8a521a;
-  --tone-hairline: #b9a98d;
-  --shadow-glow: none;
-  --shadow-raised: none;
-  --grain: none;
-  color-scheme: light;
-  background-color: var(--color-paper);
-  color: var(--color-ink);
+/* "Meet the builder": the agent alerts arrive 400ms apart once in view.
+   Hidden only after JS marks the list as able to play (.alerts-play is
+   added by the component; before that, everything is simply shown). */
+@keyframes alert-in {
+  from { opacity: 0; transform: translate3d(0, 14px, 0) scale(0.97); }
+  to { opacity: 1; transform: none; }
 }
-/* The curtain's corners: page-coloured pieces with a quarter-circle cut out,
-   scaled from their outer corner by CurtainBand. Hidden until it runs. */
-.curtain-corner {
-  --r: 28px;
-  position: absolute;
-  z-index: 2;
-  width: var(--r);
-  height: var(--r);
-  pointer-events: none;
-  transform: scale(0);
-  will-change: transform;
-}
-@media (min-width: 900px) {
-  .curtain-corner { --r: 56px; }
-}
-.curtain-corner[data-curtain="tl"] { top: 0; left: 0; transform-origin: 0 0; background: radial-gradient(circle at 100% 100%, transparent calc(var(--r) - 0.5px), #1a1511 var(--r)); }
-.curtain-corner[data-curtain="tr"] { top: 0; right: 0; transform-origin: 100% 0; background: radial-gradient(circle at 0 100%, transparent calc(var(--r) - 0.5px), #1a1511 var(--r)); }
-.curtain-corner[data-curtain="bl"] { bottom: 0; left: 0; transform-origin: 0 100%; background: radial-gradient(circle at 100% 0, transparent calc(var(--r) - 0.5px), #1a1511 var(--r)); }
-.curtain-corner[data-curtain="br"] { bottom: 0; right: 0; transform-origin: 100% 100%; background: radial-gradient(circle at 0 0, transparent calc(var(--r) - 0.5px), #1a1511 var(--r)); }
-.tone-cream ::selection {
-  background: #111111;
-  color: #f3eadb;
+@media (prefers-reduced-motion: no-preference) {
+  .alerts-armed:not(.alerts-play) .alert-in {
+    opacity: 0;
+  }
+  .alerts-play .alert-in {
+    animation: alert-in var(--dur-reveal) var(--ease-out) calc(var(--i) * 400ms) both;
+  }
 }

@@ -8,7 +8,6 @@ import { FaqSection } from "@/components/sections/faq";
 import { Process } from "@/components/sections/process";
 import { Services } from "@/components/sections/services";
 import { Testimonials } from "@/components/sections/testimonials";
-import { pickPullQuote } from "@/components/sections/pull-quote";
 import { Work } from "@/components/sections/work";
 import { BandTransitions } from "@/components/fx/band-transitions";
 import { VelocityMarquee } from "@/components/fx/velocity-marquee";
@@ -69,12 +68,9 @@ export default async function HomePage() {
       <main id="main">
       <Hero caseStudyHref={flagship ? `/work/${flagship.slug}` : undefined} />
       <MeetBuilder
-        index={n("builder")}
         video={settings.introVideo}
         alerts={flagship?.uiFragments ?? []}
         caseHref={flagship ? `/work/${flagship.slug}` : undefined}
-        caseTitle={flagship?.title}
-        portrait={settings.portrait}
       />
       <VelocityMarquee items={["Websites", "Systems", "Automation", "Storefronts", "Admin panels", "Operations agents"]} />
       <Work index={n("work")} projects={featured} totalBuilds={buildCount} />
@@ -88,7 +84,7 @@ export default async function HomePage() {
       <Services index={n("services")} />
       {/* A shorter bottom: "See all builds" ends the section, so no long blank run after it. */}
       <Archive projects={archive} limit={3} seeAllHref="/work" total={buildCount} index={n("archive")} codeStart={featured.length + 1} className="section-pad pb-10! min-[900px]:pb-16!" />
-      <Process index={n("process")} quote={testimonials.length > 0 ? pickPullQuote(testimonials) : undefined} />
+      <Process index={n("process")} />
       <VelocityMarquee items={["Milestones you approve", "A live link every week", "A clean handover"]} />
       <About settings={settings} index={n("about")} />
       <FaqSection items={faqs} index={n("faq")} />
