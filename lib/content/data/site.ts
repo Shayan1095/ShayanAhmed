@@ -75,15 +75,14 @@ export const siteSettings: SiteSettings = {
 /** Published only with the client's consent. Empty = section not rendered. */
 export const testimonials: Testimonial[] = [];
 
-/** FAQ. Unpublished entries are waiting for Shayan's real answers. */
+/** FAQ starter questions. Answers are Shayan's to write (Admin → FAQ); empty ones never render. */
 export const faqs: Faq[] = [
   {
     id: "outside-pakistan",
     question: "Do you work with clients outside Pakistan?",
-    answer:
-      "Yes. I work remotely with clients in Pakistan and abroad, with calls in your time zone and a live link so you can see progress at any time.",
+    answer: "",
     order: 1,
-    published: true,
+    published: false,
   },
   {
     id: "timeline",

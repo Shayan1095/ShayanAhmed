@@ -174,7 +174,7 @@ test.describe("motion components", () => {
   test("typed labels and rolling numbers keep their real text for everyone", async ({ page }) => {
     await page.goto("/");
     // Full text is in the page from the start (screen readers, search engines).
-    await expect(page.locator("#services .sr-only", { hasText: "02 · Services" })).toHaveCount(1);
+    await expect(page.locator("#services .sr-only", { hasText: "03 · Services" })).toHaveCount(1);
     await expect(page.locator("#work .sr-only", { hasText: /^01$/ })).toHaveCount(1);
   });
 
@@ -182,7 +182,7 @@ test.describe("motion components", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     await scrollToSection(page, "process");
-    const label = page.locator("#process header [aria-hidden='true']").filter({ hasText: "03 · Process" }).last();
-    await expect(label).toHaveText("03 · Process");
+    const label = page.locator("#process header [aria-hidden='true']").filter({ hasText: "05 · Process" }).last();
+    await expect(label).toHaveText("05 · Process");
   });
 });

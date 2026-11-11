@@ -14,11 +14,13 @@ import { WorkSnapRow } from "./work-snap-row";
  * sideways, fragments drift at their own speeds. Mobile / reduced motion: stacked.
  */
 export function Work({
+  index = "01",
   projects,
   more,
   codeStart,
   totalBuilds,
 }: {
+  index?: string;
   projects: Project[];
   /** Other builds, merged into the phone row (the archive section is hidden there). */
   more?: Project[];
@@ -130,7 +132,7 @@ export function Work({
           <div className="mb-9 flex flex-wrap items-end justify-between gap-6 [@media(min-width:900px)_and_(max-height:820px)]:mb-6">
             <div>
               <Label className="block">
-                <Typewriter text="01 · Selected work" speed={38} />
+                <Typewriter text={`${index} · Selected work`} speed={38} />
               </Label>
               <SplitReveal className="type-section mt-[18px]">
                 Case <em>studies</em>

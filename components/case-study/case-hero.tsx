@@ -23,7 +23,9 @@ export function CaseHero({ project, index, total }: { project: Project; index: n
   ].filter(Boolean) as { label: string; value: string }[];
 
   const wide = (label: string) => label === "Stack" || label === "Outcome";
-  const liveSpans = meta.filter((m) => !wide(m.label)).length % 2 === 0;
+  // Phones: a lone half-width cell at the end fills the row instead of leaving a gap.
+  const singles = meta.filter((m) => !wide(m.label));
+  const lastSingle = singles.length % 2 === 1 ? singles[singles.length - 1]?.label : undefined;
 
   return (
     <section aria-labelledby="case-title" className="pb-16 pt-[calc(env(safe-area-inset-top)+112px)] min-[900px]:pb-24">
@@ -78,29 +80,22 @@ export function CaseHero({ project, index, total }: { project: Project; index: n
                 <div
                   key={m.label}
                   className={`flex flex-col gap-1 border-b border-paper-edge py-3 min-[768px]:flex-row min-[768px]:items-baseline min-[768px]:gap-6 ${
-                    wide(m.label) ? "col-span-2 min-[768px]:col-span-1" : ""
+                    wide(m.label) || m.label === lastSingle ? "col-span-2 min-[768px]:col-span-1" : ""
                   }`}
                 >
                   <dt className="type-label shrink-0 text-[10.5px] text-muted min-[768px]:w-[96px]">{m.label}</dt>
                   <dd className="text-[15px] font-medium">{m.value}</dd>
                 </div>
               ))}
-              {/* Live fills the empty half when the cells above leave one (phones). */}
-              <div className={`${liveSpans ? "col-span-2" : ""} flex flex-col gap-1 border-b border-paper-edge py-3 min-[768px]:col-span-1 min-[768px]:flex-row min-[768px]:items-baseline min-[768px]:gap-6`}>
-                <dt className="type-label shrink-0 text-[10.5px] text-muted min-[768px]:w-[96px]">Live</dt>
-                <dd className="text-[15px] font-medium">
-                  {project.liveUrl ? (
-                    <a href={project.liveUrl} target="_blank" rel="noopener" className="underline decoration-paper-edge underline-offset-4 hover:decoration-walnut">
-                      {project.liveUrl.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")} ↗
-                    </a>
-                  ) : (
-                    (project.demoNote ?? "Demo on request")
-                  )}
-                </dd>
-              </div>
             </dl>
 
             <div className="flex flex-wrap gap-3">
+              {/* A real link only when the project is live; otherwise nothing (no "demo on request"). */}
+              {project.liveUrl && (
+                <Button href={project.liveUrl} variant="paper" target="_blank" rel="noopener noreferrer">
+                  Visit live site <span aria-hidden="true">↗</span>
+                </Button>
+              )}
               <Button href="/#contact" arrow>
                 Start a project like this
               </Button>

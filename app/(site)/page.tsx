@@ -17,6 +17,7 @@ import { homeJsonLd, JsonLd } from "@/components/site/json-ld";
 import { Band } from "@/components/system";
 import {
   getArchiveProjects,
+  getBuildCount,
   getFaqs,
   getFeaturedProjects,
   getSiteSettings,
@@ -29,12 +30,13 @@ import {
  * then questions and contact. Calls to action sit where decisions happen.
  */
 export default async function HomePage() {
-  const [settings, featured, archive, testimonials, faqs] = await Promise.all([
+  const [settings, featured, archive, testimonials, faqs, buildCount] = await Promise.all([
     getSiteSettings(),
     getFeaturedProjects(),
     getArchiveProjects(),
     getTestimonials(),
     getFaqs(),
+    getBuildCount(),
   ]);
   const flagship = featured.find((p) => p.hasCaseStudy);
   // Social orbit: real profiles once any are saved (email alone is not enough);
@@ -43,49 +45,51 @@ export default async function HomePage() {
   const orbit = orbitLinks(socials, process.env.NODE_ENV !== "production");
   // Two logos would look empty: the orbit appears once there are three, at least one a real profile.
   const showOrbit = orbit.length >= 3 && orbit.some((l) => l.key !== "email");
-  // Chapter numbers run without gaps: Testimonials (05) only shows once there are some.
-  // The archive shares chapter 01 with Selected work (on phones it is merged into it).
-  const hasTestimonials = testimonials.length > 0;
-  const n = (k: number) => String(hasTestimonials ? k : k - 1).padStart(2, "0");
+  // Chapter numbers come from this one ordered list, so they always run 01, 02,
+  // 03... without gaps; sections that render nothing (no testimonials, no FAQ,
+  // no social profiles yet) are left out of it.
+  const chapters = [
+    "builder",
+    "work",
+    "services",
+    archive.length > 0 && "archive",
+    "process",
+    "about",
+    testimonials.length > 0 && "testimonials",
+    faqs.length > 0 && "faq",
+    showOrbit && "elsewhere",
+    "contact",
+  ].filter(Boolean) as string[];
+  const n = (id: string) => String(chapters.indexOf(id) + 1).padStart(2, "0");
 
   return (
     <main id="main">
       <Hero caseStudyHref={flagship ? `/work/${flagship.slug}` : undefined} />
       <MeetBuilder
+        index={n("builder")}
         video={settings.introVideo}
         alerts={flagship?.uiFragments ?? []}
         caseHref={flagship ? `/work/${flagship.slug}` : undefined}
+        portrait={settings.portrait}
       />
       <VelocityMarquee items={["Websites", "Systems", "Automation", "Storefronts", "Admin panels", "Operations agents"]} />
-      <Work
-        projects={featured}
-        more={archive.slice(0, 3)}
-        codeStart={featured.length + 1}
-        totalBuilds={featured.length + archive.length}
-      />
+      <Work index={n("work")} projects={featured} totalBuilds={buildCount} />
       <Band aria-label="Talk about your project" className="pb-20 max-[767px]:hidden min-[900px]:pb-24">
         <div className="wrap">
           <CtaStrip title="Want a system like this for your business?" />
         </div>
       </Band>
-      <Services />
-      {/* Phones: the archive is merged into the work row above. */}
-      <Archive projects={archive} limit={3} seeAllHref="/work" index="01" codeStart={featured.length + 1} className="section-pad max-[767px]:hidden" />
-      <Process>
-        <CtaStrip
-          tone="ink"
-          title="Ready to map out your build?"
-          note="It starts with a discovery call, and you get a written summary of goals."
-          className="max-[767px]:hidden"
-        />
-      </Process>
+      <Services index={n("services")} />
+      {/* A shorter bottom: "See all builds" ends the section, so no long blank run after it. */}
+      <Archive projects={archive} limit={3} seeAllHref="/work" total={buildCount} index={n("archive")} codeStart={featured.length + 1} className="section-pad pb-10! min-[900px]:pb-16!" />
+      <Process index={n("process")} />
       <VelocityMarquee items={["Milestones you approve", "A live link every week", "A clean handover"]} />
-      <About settings={settings} />
-      {/* 05 · Testimonials: renders nothing until the first one is added in the admin. */}
-      <Testimonials items={testimonials} />
-      <FaqSection items={faqs} index={n(6)} />
-      {showOrbit && <SocialOrbit links={orbit} />}
-      <Contact settings={settings} index={n(7)} />
+      <About settings={settings} index={n("about")} />
+      {/* Testimonials render nothing until the first one is added in the admin. */}
+      <Testimonials items={testimonials} index={n("testimonials")} />
+      <FaqSection items={faqs} index={n("faq")} />
+      {showOrbit && <SocialOrbit links={orbit} index={n("elsewhere")} />}
+      <Contact settings={settings} index={n("contact")} />
       <JsonLd data={homeJsonLd(settings, featured)} />
       <BandTransitions />
     </main>

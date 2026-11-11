@@ -17,7 +17,7 @@ export function FaqSection({ items, index = "07" }: { items: Faq[]; index?: stri
   };
 
   return (
-    <Band id="faq" aria-label="Questions" className="pb-20 min-[900px]:pb-[120px]">
+    <Band id="faq" aria-label="Questions" className="pb-12 min-[900px]:pb-16">
       <div className="wrap">
         <SectionHeader
           index={index}

@@ -37,7 +37,7 @@ export function UiFragment({ tag, text, live, actions, className, ...props }: Ui
             <span
               key={a}
               className={cn(
-                "rounded-md px-[9px] py-1 text-[11px]",
+                "rounded-md px-[9px] py-1 text-[11px] max-[899px]:text-[12px]",
                 i === 0 ? "bg-copper font-semibold text-ink" : "bg-paper/8",
               )}
             >

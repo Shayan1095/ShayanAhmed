@@ -27,19 +27,16 @@ const layers = [
 ];
 
 /** 02 Services (ink): the three layers every build ships with. */
-export function Services() {
+export function Services({ index = "02" }: { index?: string }) {
   return (
     <Band tone="ink" id="services" aria-labelledby="services-title" className="section-pad">
       <CoverGrid strength={0.5} />
       <div className="wrap relative">
         <SectionHeader
-          index="02"
+          index={index}
           label="Services"
-          title={
-            <span id="services-title">
-              Three layers. <em>One build.</em>
-            </span>
-          }
+          titleId="services-title"
+          title={<>Three layers. <em>One build.</em></>}
           intro="The system runs the routine work. You stay in control of every decision that matters."
         />
 
@@ -84,7 +81,7 @@ export function Services() {
         {/* Phones: the same three layers as a single-open accordion (native
             <details name>, so the browser keeps one open; no JS needed). */}
         <div className="flex flex-col gap-3 min-[768px]:hidden">
-          {layers.map((l, i) => (
+          {layers.map((l) => (
             <details key={l.title} name="service-layers" className="layer-acc group/acc rounded-[18px] bg-ink-2 shadow-ink-raised">
               <summary className="flex min-h-16 cursor-pointer list-none items-center gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
                 <span className="min-w-0 flex-1">

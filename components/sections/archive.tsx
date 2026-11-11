@@ -34,6 +34,8 @@ type ArchiveProps = {
   limit?: number;
   /** Link to the full list, shown with a preview. */
   seeAllHref?: string;
+  /** The site-wide build count (getBuildCount), so every "all builds" link agrees. */
+  total?: number;
   index?: string;
   className?: string;
   /** First project code on the phone rows (SA–03 when two case studies come first). */
@@ -45,7 +47,7 @@ type ArchiveProps = {
  * list with a filter. Filtering uses GSAP Flip: every card stays in the page,
  * the ones that remain glide to their new places, the rest shrink away.
  */
-export function Archive({ projects, limit, seeAllHref, index = "03", className, codeStart = 1 }: ArchiveProps) {
+export function Archive({ projects, limit, seeAllHref, total, index = "03", className, codeStart = 1 }: ArchiveProps) {
   const filterable = !limit;
   const [filter, setFilter] = useState<Filter>("all");
   const grid = useRef<HTMLUListElement>(null);
@@ -151,7 +153,7 @@ export function Archive({ projects, limit, seeAllHref, index = "03", className, 
               href={seeAllHref}
               className="group inline-flex items-center gap-3 rounded-control px-4 py-3 text-[15px] font-semibold text-ink transition-colors hover:text-walnut"
             >
-              See all {projects.length} builds
+              See all {String(total ?? projects.length).padStart(2, "0")} builds
               <span aria-hidden="true" className="transition-transform duration-300 ease-out-expo group-hover:translate-x-1">
                 →
               </span>

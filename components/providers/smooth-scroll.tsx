@@ -56,10 +56,24 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       settle();
     });
     ro.observe(main);
+    // Media that changes size once it knows its dimensions: an image finishing,
+    // a video's metadata. (load/loadedmetadata don't bubble, so listen in capture.)
+    const onMedia = (e: Event) => {
+      const el = e.target as Element | null;
+      if (el instanceof HTMLImageElement || el instanceof HTMLVideoElement) settle();
+    };
+    // Everything loaded: pin spacers are measured again after layout has settled.
+    const onLoad = () => settle();
     window.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("load", onMedia, true);
+    document.addEventListener("loadedmetadata", onMedia, true);
+    window.addEventListener("load", onLoad);
     return () => {
       ro.disconnect();
       window.removeEventListener("scroll", onScroll);
+      document.removeEventListener("load", onMedia, true);
+      document.removeEventListener("loadedmetadata", onMedia, true);
+      window.removeEventListener("load", onLoad);
       window.clearTimeout(t);
     };
   }, []);

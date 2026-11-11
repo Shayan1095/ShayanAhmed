@@ -7,16 +7,18 @@ import { Button, InsetToggle, StatusBadge, Tag, UiFragment, type ScreenHandle } 
 import { cn } from "@/lib/utils";
 
 /** Fragment spots around the monitor, mirrored on alternate slides. data-speed drives parallax. */
+// Floating cards sit on the frame's corners and edges (top band and bottom
+// edge), never over the middle, which holds the project's title or media.
 const spots = [
   [
-    { style: { left: -28, top: "18%" }, speed: 1.2 },
-    { style: { right: -24, top: "40%" }, speed: -0.9 },
-    { style: { left: "12%", bottom: -26 }, speed: 0.7 },
+    { style: { left: -28, top: -22 }, speed: 1.2 },
+    { style: { right: -24, top: "13%" }, speed: -0.9 },
+    { style: { left: "6%", bottom: -28 }, speed: 0.7 },
   ],
   [
-    { style: { right: -26, top: "14%" }, speed: -1 },
-    { style: { left: -26, top: "46%" }, speed: 0.8 },
-    { style: { right: "14%", bottom: -24 }, speed: -0.6 },
+    { style: { right: -26, top: -22 }, speed: -1 },
+    { style: { left: -26, top: "13%" }, speed: 0.8 },
+    { style: { right: "6%", bottom: -28 }, speed: -0.6 },
   ],
 ] as const;
 

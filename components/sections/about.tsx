@@ -8,7 +8,7 @@ import { SpecSheet } from "./spec-sheet";
  * 05 About (cream). Portrait in a raised frame, spec sheet, short story.
  * Signature: the frame drifts and straightens with scroll; the story rises in.
  */
-export function About({ settings }: { settings: SiteSettings }) {
+export function About({ settings, index = "04" }: { settings: SiteSettings; index?: string }) {
   const portrait = settings.portrait;
   return (
     <Band id="about" aria-label="About" className="section-pad">
@@ -46,7 +46,7 @@ export function About({ settings }: { settings: SiteSettings }) {
         </div>
         <div>
           <Label>
-            <Typewriter text="04 · About" speed={38} />
+            <Typewriter text={`${index} · About`} speed={38} />
           </Label>
           <SplitReveal className="mb-[22px] mt-4 font-display text-[clamp(34px,4.4vw,60px)] font-extrabold uppercase leading-[0.94] tracking-[-0.035em] [&_em]:font-bold [&_em]:text-walnut">
             I build the part of the website <em>that does the work.</em>
@@ -59,8 +59,9 @@ export function About({ settings }: { settings: SiteSettings }) {
             <SpecSheet rows={settings.specSheet} />
           </div>
           <div data-fx="item">
-            <Button href="#contact" variant="paper" arrow>
-              Work with me
+            {/* A different action from the page's "Start a project" calls (nav, hero, mid-page, footer). */}
+            <Button href="#process" variant="paper" arrow>
+              See how I work
             </Button>
           </div>
         </div>

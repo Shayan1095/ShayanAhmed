@@ -71,7 +71,8 @@ export function OrderTicket() {
           scrollTrigger: {
             trigger: el,
             start: "center center",
-            end: () => `+=${window.innerHeight * 1.5}`,
+            // A shorter hold (it used to sit for 1.5 screens with little changing).
+            end: () => `+=${window.innerHeight * 1.1}`,
             pin: true,
             scrub: 0.6,
             invalidateOnRefresh: true,
@@ -190,7 +191,7 @@ export function OrderTicket() {
         </ol>
 
         {/* The lane the ticket travels along. */}
-        <div data-lane className="relative mt-8 h-[320px]">
+        <div data-lane className="relative mt-6 h-[270px]">
           <div data-ticket className="absolute left-0 top-0 w-[260px] will-change-transform">
             <Ticket approved={approved} waiting={stage === 2 && !approved} onApprove={approve} />
           </div>

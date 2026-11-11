@@ -29,13 +29,13 @@ const steps = [
  * ink fills a ruler as you reach each step, and each step inks in from a
  * blueprint. Cards stack as they pass; no pinning.
  */
-export function Process({ children }: { children?: React.ReactNode }) {
+export function Process({ index = "03", children }: { index?: string; children?: React.ReactNode }) {
   return (
     <Band id="process" aria-label="Process" className="section-pad">
       <CoverGrid strength={0.35} />
       <div className="wrap relative">
         <SectionHeader
-          index="03"
+          index={index}
           label="Process"
           title={
             <>

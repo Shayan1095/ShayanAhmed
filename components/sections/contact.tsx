@@ -29,6 +29,18 @@ export function Contact({ settings, index = "08" }: { settings: SiteSettings; in
       value: settings.linkedin.replace(/^https?:\/\/(www\.)?/, ""),
       href: settings.linkedin,
     },
+    // GitHub and Instagram from the social links (Admin → Settings), only when set.
+    ...(["github", "instagram"] as const).map((key) => {
+      const href = settings.socials?.[key];
+      return (
+        href && {
+          id: `contact-${key}`,
+          label: key === "github" ? "GitHub" : "Instagram",
+          value: href.replace(/^https?:\/\/(www\.)?/, "").replace(/[?#].*$/, "").replace(/\/$/, ""),
+          href,
+        }
+      );
+    }),
   ].filter(Boolean) as { id: string; label: string; value: string; href: string }[];
 
   return (
@@ -39,7 +51,7 @@ export function Contact({ settings, index = "08" }: { settings: SiteSettings; in
           <Label>
             <Typewriter text={`${index} · Contact`} speed={38} />
           </Label>
-          <SplitReveal className="mb-6 mt-4 font-display text-[clamp(40px,5vw,72px)] font-extrabold leading-[0.95] tracking-[-0.03em] [&_em]:font-bold [&_em]:text-copper">
+          <SplitReveal className="type-section mb-6 mt-4">
             Let&apos;s build <em>your system.</em>
           </SplitReveal>
           <Rise as="p" className="max-w-[28em] text-[17px] text-muted-ink">

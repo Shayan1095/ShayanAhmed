@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play } from "lucide-react";
 import type { SocialLink } from "@/lib/content/socials";
@@ -52,7 +51,7 @@ function pose(ring: 0 | 1, angle: number) {
  * writes transforms only, and runs only while the section is on screen.
  * Reduced motion: the logos rest in place around the core.
  */
-export function SocialOrbit({ links }: { links: SocialLink[] }) {
+export function SocialOrbit({ links, index }: { links: SocialLink[]; index?: string }) {
   const preview = links.some((l) => l.preview);
   const stage = useRef<HTMLDivElement>(null);
   const items = useRef<(HTMLLIElement | null)[]>([]);
@@ -116,12 +115,10 @@ export function SocialOrbit({ links }: { links: SocialLink[] }) {
       <div className="wrap relative grid grid-cols-1 items-center gap-10 min-[980px]:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] min-[980px]:gap-14">
         <div>
           <Label accent className="mb-3.5 block min-[640px]:mb-[18px]">
-            Find me elsewhere
+            {index ? `${index} · Find me elsewhere` : "Find me elsewhere"}
           </Label>
-          <SplitReveal as="h2" className="type-section">
-            <span id="elsewhere-title">
-              Follow <em>the build.</em>
-            </span>
+          <SplitReveal as="h2" id="elsewhere-title" className="type-section">
+            Follow <em>the build.</em>
           </SplitReveal>
           <p className="mt-4 max-w-[30em] text-[17px] text-tone-muted">
             New builds, behind-the-scenes and quick tips. Pick a planet; it opens in a new tab.
@@ -131,12 +128,6 @@ export function SocialOrbit({ links }: { links: SocialLink[] }) {
               Preview: dashed logos are stand-ins. Add them in Admin → Settings; the live site shows saved profiles only.
             </p>
           )}
-          <p className="mt-6 text-[15px] text-tone-muted">
-            Prefer to talk?{" "}
-            <Link href="#contact" className="font-semibold text-copper underline-offset-4 hover:underline">
-              Start a project
-            </Link>
-          </p>
         </div>
 
         <div className="relative">

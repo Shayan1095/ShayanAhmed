@@ -2,7 +2,7 @@ import { cacheLife } from "next/cache";
 import Link from "next/link";
 import { ArrowUp } from "lucide-react";
 import { Button, Label } from "@/components/system";
-import { getArchiveProjects, getFeaturedProjects, getSiteSettings } from "@/lib/content";
+import { getArchiveProjects, getBuildCount, getFeaturedProjects, getSiteSettings } from "@/lib/content";
 import { ProjectTile } from "./project-tile";
 import { socialLinks, whatsappHref } from "@/lib/content/socials";
 import { Clock } from "./clock";
@@ -30,14 +30,14 @@ async function currentYear() {
 }
 
 export async function Footer() {
-  const [year, settings, featured, archive] = await Promise.all([
+  const [year, settings, featured, archive, total] = await Promise.all([
     currentYear(),
     getSiteSettings(),
     getFeaturedProjects(),
     getArchiveProjects(),
+    getBuildCount(),
   ]);
   const recent = [...featured, ...archive].slice(0, 3);
-  const total = featured.length + archive.length;
   const links = [...navLinks, { id: "contact", label: "Contact" }];
   const socials = socialLinks(settings);
   const whatsapp = whatsappHref(settings.whatsapp);
@@ -54,9 +54,10 @@ export async function Footer() {
           {/* Hidden on the home page on phones: the contact form right above asks the same. */}
           <div data-footer-signoff>
             <Label accent>End of transmission</Label>
-            <p className="mt-4 max-w-[13em] font-display text-[clamp(30px,3.6vw,48px)] font-extrabold leading-[0.95] tracking-[-0.03em]">
-              Have a business that should run itself?
-            </p>
+            {/* The section heading style, like every other h2 on the site. */}
+            <h2 className="type-section mt-4 max-w-[13em]">
+              Have a business that should <em>run itself?</em>
+            </h2>
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <Button href="/#contact" variant="copper" arrow>
                 Start a project

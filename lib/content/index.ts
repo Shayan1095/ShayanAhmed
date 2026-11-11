@@ -74,6 +74,11 @@ export async function getArchiveProjects(): Promise<Project[]> {
   return (await getProjects()).filter((p) => !p.featured);
 }
 
+/** The one build count used everywhere on the site: every published project. */
+export async function getBuildCount(): Promise<number> {
+  return (await getProjects()).length;
+}
+
 export async function getProject(slug: string): Promise<Project | undefined> {
   return (await getProjects()).find((p) => p.slug === slug);
 }

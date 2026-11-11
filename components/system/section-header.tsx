@@ -13,13 +13,16 @@ type SectionHeaderProps = {
   /** One-line intro. */
   intro?: React.ReactNode;
   as?: "h1" | "h2";
+  /** id for the heading itself (for aria-labelledby). Never put ids inside the
+   * title: the line split copies inner elements onto every line. */
+  titleId?: string;
   /** Optional control on the right instead of the intro (e.g. a filter). */
   aside?: React.ReactNode;
   className?: string;
 };
 
 /** Label + split-reveal title + one-line intro (DESIGN.md §5). */
-export function SectionHeader({ index, label, title, intro, as = "h2", aside, className }: SectionHeaderProps) {
+export function SectionHeader({ index, label, title, intro, as = "h2", titleId, aside, className }: SectionHeaderProps) {
   return (
     <header
       className={cn(
@@ -31,7 +34,7 @@ export function SectionHeader({ index, label, title, intro, as = "h2", aside, cl
         <Label className="mb-3.5 block min-[640px]:mb-[18px]">
           <Typewriter text={index ? `${index} · ${label}` : label} speed={38} />
         </Label>
-        <SplitReveal as={as} className="type-section">
+        <SplitReveal as={as} id={titleId} className="type-section">
           {title}
         </SplitReveal>
       </div>
