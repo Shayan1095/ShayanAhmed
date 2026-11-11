@@ -64,7 +64,7 @@ export function ProcessRuler({ steps }: { steps: ProcessStep[] }) {
         <span className="absolute inset-y-0 left-1/2 w-[1.5px] -translate-x-1/2 bg-paper-edge" />
         <span className="absolute inset-y-0 left-1/2 w-3 -translate-x-1/2 bg-[repeating-linear-gradient(180deg,var(--color-paper-edge)_0_1.5px,transparent_1.5px_40px)]" />
         <span
-          className="absolute inset-y-0 left-1/2 w-[2px] origin-top -translate-x-1/2 bg-[linear-gradient(180deg,#9e6034,#f2cc9c_70%,#fbe3c2)] shadow-glow transition-transform duration-700 ease-out-expo"
+          className="absolute inset-y-0 left-1/2 w-[2px] origin-top -translate-x-1/2 bg-copper transition-transform duration-700 ease-out-expo"
           style={{ transform: `translateX(-50%) scaleY(${fill})` }}
         />
       </li>
@@ -90,13 +90,13 @@ export function ProcessRuler({ steps }: { steps: ProcessStep[] }) {
                 "absolute -left-[30px] top-6 size-3 rounded-full border-[1.5px] transition-[background-color,border-color,box-shadow] duration-500",
                 "min-[900px]:top-8",
                 i % 2 === 0 ? "min-[900px]:-right-[62px] min-[900px]:left-auto" : "min-[900px]:-left-[62px]",
-                inked ? "border-copper bg-copper shadow-glow" : "border-paper-edge bg-paper",
+                inked ? "border-ink bg-copper" : "border-paper-edge bg-paper",
               )}
             />
             <article
               className={cn(
                 "relative flex flex-col gap-2 rounded-[20px] border-[1.5px] p-5 transition-[background-color,border-color,box-shadow] duration-500 min-[900px]:p-7",
-                inked ? "border-solid border-copper/55 bg-paper-hi shadow-raised" : "border-dashed border-copper/35 bg-paper",
+                inked ? "border-solid border-ink bg-paper-hi" : "border-dashed border-ink/35 bg-paper",
               )}
             >
               {/* Blueprint crop marks; they fade once the step is inked. */}
@@ -104,7 +104,7 @@ export function ProcessRuler({ steps }: { steps: ProcessStep[] }) {
                 <span
                   key={pos}
                   aria-hidden="true"
-                  className={cn("absolute size-3 border-copper/60 transition-opacity duration-500", pos, inked ? "opacity-0" : "opacity-100")}
+                  className={cn("absolute size-3 border-ink/50 transition-opacity duration-500", pos, inked ? "opacity-0" : "opacity-100")}
                 />
               ))}
               {/* Phones: number beside the title (saves a line); desktop: stacked. */}
@@ -114,7 +114,7 @@ export function ProcessRuler({ steps }: { steps: ProcessStep[] }) {
                 className={cn(
                   // self-start: the box hugs the digits, so the stamp's scale never spills past the edge.
                   "shrink-0 self-start font-display text-[28px] font-extrabold leading-none max-[899px]:self-center min-[900px]:text-[34px]",
-                  inked ? "text-copper [text-shadow:0_0_18px_rgb(201_133_63/.4)]" : "text-copper/35",
+                  inked ? "text-copper" : "text-copper/45",
                   // Stamp only when a step inks in as you scroll, not on the first paint.
                   inked && armed && "process-stamp",
                 )}
@@ -125,8 +125,8 @@ export function ProcessRuler({ steps }: { steps: ProcessStep[] }) {
                 {s.title}
               </h3>
               </div>
-              <p className={cn("text-[16px] transition-colors duration-500", inked ? "text-muted" : "text-muted/70")}>{s.text}</p>
-              <p className="mt-1 border-t border-dashed border-paper-edge pt-2.5 text-[15px] min-[900px]:mt-2 min-[900px]:pt-3">
+              <p className={cn("text-[16px] transition-colors duration-500", inked ? "text-muted" : "text-muted/80")}>{s.text}</p>
+              <p className="mt-1 border-t border-dashed border-ink/30 pt-2.5 text-[15px] min-[900px]:mt-2 min-[900px]:pt-3">
                 <Label className="mb-1 block">You get</Label>
                 <TypeText as="span" text={s.get} trigger={armed && inked ? 1 : 0} speed={26} caret={false} className="font-mono text-[13.5px]" />
               </p>

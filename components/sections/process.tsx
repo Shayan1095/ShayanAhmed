@@ -1,4 +1,7 @@
 import { ProcessRuler } from "./process-ruler";
+import { PullQuote } from "./pull-quote";
+import { CurtainBand } from "@/components/fx/curtain-band";
+import type { Testimonial } from "@/lib/content/types";
 import { Band, CoverGrid, SectionHeader } from "@/components/system";
 
 const steps = [
@@ -25,14 +28,25 @@ const steps = [
 ];
 
 /**
- * 03 Process (espresso surface). Signature: the ruler (ProcessRuler). Copper
+ * 03 Process, printed on paper (cream inside the dark site, build brief
+ * Phase 6), with the curtain on its corners and an optional pull quote. Signature: the ruler (ProcessRuler). Copper
  * ink fills a ruler as you reach each step, and each step inks in from a
  * blueprint. Cards stack as they pass; no pinning.
  */
-export function Process({ index = "03", children }: { index?: string; children?: React.ReactNode }) {
+export function Process({
+  index = "03",
+  quote,
+  children,
+}: {
+  index?: string;
+  /** A client quote, set large as the magazine pull quote. */
+  quote?: Testimonial;
+  children?: React.ReactNode;
+}) {
   return (
-    <Band id="process" aria-label="Process" className="section-pad">
-      <CoverGrid strength={0.35} />
+    <Band id="process" aria-label="Process" data-paper className="tone-cream section-pad">
+      <CurtainBand target="#process" />
+      <CoverGrid strength={0.2} />
       <div className="wrap relative">
         <SectionHeader
           index={index}
@@ -45,6 +59,7 @@ export function Process({ index = "03", children }: { index?: string; children?:
           intro="Milestones you approve, a live link every week, and a clean handover at the end."
         />
         <ProcessRuler steps={steps} />
+        {quote && <PullQuote item={quote} />}
         {/* Phones: the strip is hidden (the menu carries Start), so no empty gap here. */}
         {children && <div className="mt-12 max-[767px]:hidden">{children}</div>}
       </div>

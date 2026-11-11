@@ -1133,3 +1133,35 @@ html[data-power="low"] .hero-glow {
   .orbit-path { animation: orbit-dash 6s linear infinite; }
   .orbit-halo { animation: orbit-breathe 4.8s ease-in-out infinite; }
 }
+
+/* Paper section (build brief, Phase 6): Process is printed on cream inside the
+   dark site. Copper darkens to pass 4.5:1 on cream; cards are ink-outlined,
+   not glowing. The curtain rounds its corners as it rises (--curtain-top) and
+   as it leaves (--curtain-bottom); see CurtainBand. */
+html:not([data-admin-theme]) .tone-cream {
+  --color-paper: #f3eadb;
+  --color-paper-hi: #fbf6ec;
+  --color-paper-lo: #e4d8c3;
+  --color-paper-edge: #b9a98d;
+  --color-ink: #111111;
+  --color-ink-2: #2a2826;
+  --color-ink-3: #3d3a36;
+  --color-muted: #574e43; /* 7:1 on cream */
+  --color-copper: #8a521a; /* 5.3:1 on cream */
+  --color-walnut: #8a521a;
+  --tone-fg: #111111;
+  --tone-muted: #574e43;
+  --tone-accent: #8a521a;
+  --tone-hairline: #b9a98d;
+  --shadow-glow: none;
+  --shadow-raised: none;
+  --grain: none;
+  color-scheme: light;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  clip-path: inset(0 round var(--curtain-top, 0px) var(--curtain-top, 0px) var(--curtain-bottom, 0px) var(--curtain-bottom, 0px));
+}
+.tone-cream ::selection {
+  background: #111111;
+  color: #f3eadb;
+}

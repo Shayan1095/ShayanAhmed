@@ -31,9 +31,17 @@ export function SectionHeader({ index, label, title, intro, as = "h2", titleId, 
       )}
     >
       <div>
-        <Label className="mb-3.5 block min-[640px]:mb-[18px]">
-          <Typewriter text={index ? `${index} · ${label}` : label} speed={38} />
-        </Label>
+        <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 min-[640px]:mb-[18px]">
+          <Label>
+            <Typewriter text={index ? `${index} · ${label}` : label} speed={38} />
+          </Label>
+          {/* The magazine's folio, carried past the hero: issue and page. */}
+          {index && (
+            <Label aria-hidden="true" className="opacity-75">
+              No. 01 · p. {index}
+            </Label>
+          )}
+        </div>
         <SplitReveal as={as} id={titleId} className="type-section">
           {title}
         </SplitReveal>
