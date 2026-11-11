@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { BuiltInIndex } from "./built-in-index";
 import { HeroEntrance } from "./hero-entrance";
+import { MastheadLight } from "@/components/fx/masthead-light";
+import { Magnetic } from "@/components/fx/magnetic";
 import { CoverGrid } from "@/components/system/cover-grid";
 import { COVER, FOIL, GLOW, HERO_COPY } from "./hero-data";
 import { issueDate } from "@/lib/issue-date";
@@ -51,6 +53,8 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
           className="m-0 mt-2.5 whitespace-nowrap text-center font-[family-name:var(--font-archivo)] font-black uppercase"
           style={{
             ...FOIL,
+            // The masthead light (masthead-light.tsx): a highlight in the foil at --mx/--my, parked above until used.
+            backgroundImage: `radial-gradient(24% 70% at var(--mx, 50%) var(--my, -120%), rgb(255 246 230 / 0.95), transparent), ${FOIL.backgroundImage}`,
             fontStretch: "62%",
             fontVariationSettings: "'wdth' 62",
             // Scales with the screen down to 320px phones (a fixed floor cut the D off).
@@ -124,6 +128,7 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
               approve every decision.
             </p>
             <div data-hero-cta="" className="flex flex-wrap gap-3">
+              <Magnetic>
               <a
                 href="#contact"
                 className="group inline-flex min-h-[54px] items-center gap-2.5 rounded-[12px] px-[26px] text-[16px] font-bold transition-[transform,box-shadow] duration-150 hover:-translate-y-px active:translate-y-[3px] active:shadow-[inset_0_1px_0_rgba(255,255,255,.45),0_1px_0_#6B3F22]"
@@ -136,6 +141,7 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
                 {HERO_COPY.primaryCta}
                 <ArrowRight aria-hidden="true" className="size-[18px] transition-transform duration-300 group-hover:translate-x-0.5" />
               </a>
+              </Magnetic>
               <Link
                 href={caseStudyHref ?? "#work"}
                 transitionTypes={["nav-forward"]}
@@ -153,6 +159,7 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
         </div>
       </div>
       <HeroEntrance />
+      <MastheadLight />
     </section>
   );
 }

@@ -34,6 +34,7 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
   const phone = usePhone();
   const [projectType, setProjectType] = useState(projectTypes[0] ?? "");
 
+  const receipt = useRef({ name: "", type: "" });
   const print = (texts: string[]) => {
     const key = Date.now();
     setLines(texts.map((text, i) => ({ text, key: key + i })));
@@ -57,7 +58,9 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
     lastState.current = state;
     const id = window.setTimeout(() => {
       if (state.status === "ok") {
-        print(["Message received", "Reply within 24h"]);
+        // The receipt prints downward: who, what, and when to expect a reply.
+        const r = receipt.current;
+        print(["Message received", ...(r.name ? [`Name: ${r.name}`] : []), ...(r.type ? [`Project: ${r.type}`] : []), "Reply within one working day"]);
         setJustSent(true);
         form.current?.reset();
         setProjectType(projectTypes[0] ?? "");
@@ -78,6 +81,8 @@ export function ContactForm({ projectTypes, budgetRanges }: { projectTypes: stri
       return;
     }
     setClientError(null);
+    const data = new FormData(e.currentTarget);
+    receipt.current = { name: String(data.get("name") ?? "").trim(), type: String(data.get("projectType") ?? projectType) };
     print(["Transmitting…"]);
   };
 

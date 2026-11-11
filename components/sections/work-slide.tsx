@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Project } from "@/lib/content/types";
 import { hasOwnerView, ProjectMonitor, type MonitorView } from "@/components/site/project-monitor";
@@ -60,7 +61,14 @@ export function WorkSlide({ project, index }: { project: Project; index: number 
       className="grid grid-cols-1 items-center gap-7 min-[900px]:flex-[0_0_min(1120px,88vw)] min-[900px]:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]"
     >
       <div className="relative">
-        <ProjectMonitor project={project} view={view} screenRef={screen} />
+        {project.hasCaseStudy ? (
+          // The screen opens the case study too (mouse only: the button below is the accessible link).
+          <Link href={`/work/${project.slug}`} transitionTypes={["nav-forward"]} tabIndex={-1} aria-hidden="true" data-case-frame="" className="block">
+            <ProjectMonitor project={project} view={view} screenRef={screen} />
+          </Link>
+        ) : (
+          <ProjectMonitor project={project} view={view} screenRef={screen} />
+        )}
         {project.uiFragments.map((f, i) => {
           const spot = spots[index % 2][i];
           if (!spot) return null;

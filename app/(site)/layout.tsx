@@ -5,6 +5,7 @@ import { Navbar, RouteNavbar } from "@/components/site/navbar";
 import { Suspense } from "react";
 import { ThemeColorSync } from "@/components/fx/theme-color-sync";
 import { Preloader } from "@/components/preloader/preloader";
+import { CaseCursor } from "@/components/fx/case-cursor";
 import { introGateScript } from "@/lib/intro-script";
 import { issueDate } from "@/lib/issue-date";
 import { getFeaturedProjects, getSiteSettings } from "@/lib/content";
@@ -32,6 +33,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       {children}
       <Footer />
       <ThemeColorSync />
+      <CaseCursor />
     </SiteProviders>
   );
 }

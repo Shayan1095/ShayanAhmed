@@ -10,6 +10,7 @@ import { FooterReveal } from "./footer-reveal";
 import { SocialKeys } from "./social-keys";
 import { navLinks } from "./nav-links";
 import { Wordmark } from "./wordmark";
+import { Magnetic } from "@/components/fx/magnetic";
 
 /**
  * Footer (DESIGN.md §8), top to bottom: the sign-off (call to action) beside
@@ -59,9 +60,11 @@ export async function Footer() {
               Have a business that should <em>run itself?</em>
             </h2>
             <div className="mt-7 flex flex-wrap items-center gap-3">
-              <Button href="/#contact" variant="copper" arrow>
-                Start a project
-              </Button>
+              <Magnetic>
+                <Button href="/#contact" variant="copper" arrow>
+                  Start a project
+                </Button>
+              </Magnetic>
               {whatsapp && (
                 <Button href={whatsapp} variant="paper" target="_blank" rel="noopener noreferrer">
                   WhatsApp

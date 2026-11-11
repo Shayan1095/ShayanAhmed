@@ -26,7 +26,7 @@ export type ButtonProps = ButtonAsLink | ButtonAsButton;
 
 const base =
   "group/btn relative inline-flex select-none items-center justify-center gap-2.5 whitespace-nowrap rounded-control font-sans font-semibold " +
-  "transition-[transform,box-shadow] duration-100 active:translate-y-0.5 disabled:pointer-events-none disabled:opacity-50";
+  "transition-[transform,box-shadow,filter] duration-[var(--dur-press)] ease-[cubic-bezier(.34,1.56,.64,1)] active:translate-y-0.5 active:brightness-95 active:ease-[var(--ease-out)] disabled:pointer-events-none disabled:opacity-50";
 
 const variants: Record<Variant, string> = {
   ink:

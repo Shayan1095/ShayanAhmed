@@ -39,7 +39,7 @@ export default async function WorkIndexPage() {
               .filter((p) => p.hasCaseStudy)
               .map((p) => (
                 <Rise as="li" key={p.slug}>
-                  <Link href={`/work/${p.slug}`} className="group block h-full">
+                  <Link href={`/work/${p.slug}`} data-case-frame="" className="group block h-full">
                     <Panel className="flex h-full flex-col gap-4 p-7 transition-transform duration-300 ease-out-expo group-hover:-translate-y-1">
                       <div className="flex flex-wrap gap-2">
                         <StatusBadge status={p.status}>{p.statusLabel}</StatusBadge>

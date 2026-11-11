@@ -61,5 +61,9 @@ test.describe("public site", () => {
     await form.locator("#f-msg").fill("We need a booking system with automated reminders for our clinic.");
     await form.getByRole("button", { name: /send/i }).click();
     await expect(page.getByText("Message received").first()).toBeVisible();
+    // The receipt: name, project type and the reply promise.
+    await expect(page.locator("#contact").getByText("Name: Public Test").first()).toBeVisible();
+    await expect(page.locator("#contact").getByText(/Project: /).first()).toBeVisible();
+    await expect(page.locator("#contact").getByText("Reply within one working day").first()).toBeVisible();
   });
 });
