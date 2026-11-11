@@ -12,6 +12,12 @@ export type ImageRef = {
   height: number;
 };
 
+/** A recording in two formats; browsers take WebM when they can, else MP4. */
+export type VideoSources = { mp4?: string; webm?: string };
+
+/** One captioned screenshot of a project, tagged with the side it shows. */
+export type ProjectScreen = { image: ImageRef; caption: string; view: "customer" | "owner" };
+
 export type ProjectCategory = "website" | "system" | "automation" | "web-tool";
 export type ProjectStatus = "client" | "product" | "confidential";
 
@@ -39,8 +45,18 @@ export type Project = {
   timeline?: string;
   /** One-line result, e.g. "Order checks cut from 2 hours a day to 10 minutes". */
   outcome?: string;
-  /** extension: screen-recorded walkthrough (mp4/webm in public/work/<slug>/). */
-  video?: { src: string; poster?: string; caption?: string };
+  /**
+   * Media (build brief, Phase 2). `poster` is the first frame of the recording;
+   * without one, the customer-view screenshot or the cover stands in.
+   * `video` is the main recording (`src` is the older single-URL form, still
+   * played); `videoCustomer` / `videoOwner` are the two sides for projects with
+   * a customer/owner toggle. `screens` are captioned screenshots per side.
+   */
+  poster?: ImageRef;
+  video?: VideoSources & { src?: string; poster?: string; caption?: string };
+  videoCustomer?: VideoSources;
+  videoOwner?: VideoSources;
+  screens?: ProjectScreen[];
   /** extension: key decisions and why they were made. */
   decisions?: { title: string; text: string }[];
   layers: { website: string[]; system: string[]; automation: string[] };

@@ -28,8 +28,27 @@ export const easeOutExpo = [0.16, 1, 0.3, 1] as const;
 export const motionTokens = {
   desktop: { micro: 0.15, ui: 0.26, reveal: 0.7, hero: 1.1, travel: 32, stagger: 0.06, maxStagger: 6 },
   mobile: { micro: 0.12, ui: 0.22, reveal: 0.55, hero: 0.9, travel: 18, stagger: 0.04, maxStagger: 4 },
-  easeOut: [0.22, 1, 0.36, 1],
+  easeOut: [0.16, 1, 0.3, 1],
   easeInOut: [0.65, 0, 0.35, 1],
+} as const;
+
+/**
+ * Build brief motion tokens (PORTFOLIO_BUILD_BRIEF.md section 3), mirroring the
+ * CSS variables. Durations in seconds for GSAP and Motion; easings as cubic
+ * Bezier arrays (Motion) and CSS strings.
+ */
+export const motion = {
+  dur: { press: 0.12, fast: 0.2, base: 0.4, slow: 0.8 },
+  ease: {
+    out: [0.16, 1, 0.3, 1] as const,
+    in: [0.7, 0, 0.84, 0] as const,
+    inOut: [0.65, 0, 0.35, 1] as const,
+  },
+  css: {
+    out: "cubic-bezier(0.16, 1, 0.3, 1)",
+    in: "cubic-bezier(0.7, 0, 0.84, 0)",
+    inOut: "cubic-bezier(0.65, 0, 0.35, 1)",
+  },
 } as const;
 
 /** The token set for this viewport (phones: under 768px). */

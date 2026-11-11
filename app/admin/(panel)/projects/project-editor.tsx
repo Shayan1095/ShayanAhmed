@@ -9,7 +9,7 @@ import type { z } from "zod";
 import { ExternalLink, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmButton } from "@/components/admin/confirm-button";
-import { FormSection, TextField } from "@/components/admin/fields";
+import { FormSection, ImageField, TextField } from "@/components/admin/fields";
 import {
   FormImage,
   FormLines,
@@ -44,6 +44,7 @@ export const emptyProject: Form = {
   agents: [],
   results: [],
   gallery: [],
+  screens: [],
   featured: false,
   hasCaseStudy: false,
   published: false,
@@ -101,9 +102,28 @@ export function ProjectEditor({ id, initial, canUpload }: { id: string | null; i
         <Basics hasId={Boolean(id)} onTitle={(v, slugTouched) => !slugTouched && setValue("slug", slugify(v), { shouldDirty: true })} />
 
         <FormSection title="Images" description="Cover for cards; customer and owner views for the work slides and case study. The Screenshots tab is the quickest way to swap them.">
+          <FormImage<Form>
+            name="poster"
+            label="Poster"
+            hint="First frame of the recording (WebP, 1440x900). Shown before a video plays and on every card. Without one, the customer view or cover stands in."
+            canUpload={canUpload}
+          />
           <FormImage<Form> name="cover" label="Cover" canUpload={canUpload} />
           <FormImage<Form> name="customerView" label="Customer view" canUpload={canUpload} />
           <FormImage<Form> name="ownerView" label="Owner view" canUpload={canUpload} />
+        </FormSection>
+
+        <FormSection
+          title="Recordings"
+          description="Screen recordings play muted in the project frame while it is on screen (never with reduced motion or Data Saver). Paste links to the files: a full https:// URL (for example Cloudinary) or a path in /public. Give both formats when you can; browsers pick WebM first."
+        >
+          <VideoFields />
+          <SourcesFields name="videoCustomer" title="Customer view recording" hint="For projects with the Customer view / Owner view toggle." />
+          <SourcesFields name="videoOwner" title="Owner view recording" />
+        </FormSection>
+
+        <FormSection title="Screens" description="Captioned screenshots for the case study gallery (2880x1800 WebP, three to six). Tag each with the side it shows.">
+          <ScreensField canUpload={canUpload} />
         </FormSection>
 
         <FormSection title="Three layers" description="What the build includes at each layer. Shown on the work slides and case study.">
@@ -258,25 +278,120 @@ function CaseStudy() {
           { key: "label", label: "Label", placeholder: "e.g. daily order checks" },
         ]}
       />
-      <VideoFields />
     </FormSection>
   );
 }
 
-/** The video is optional as a whole: clearing its URL removes it. */
+/** The main recording is optional as a whole: clearing every link removes it. */
 function VideoFields() {
   const video = useWatch<Form, "video">({ name: "video" });
   const { setValue, formState } = useFormContextSafe();
-  const err = (formState.errors.video as { src?: { message?: string } } | undefined)?.src?.message;
+  const errors = formState.errors.video as Record<string, { message?: string } | undefined> | undefined;
   const set = (patch: Partial<NonNullable<Form["video"]>>) => {
-    const next = { src: "", ...video, ...patch };
-    setValue("video", next.src ? next : undefined, { shouldDirty: true, shouldValidate: formState.submitCount > 0 });
+    const next = { ...video, ...patch };
+    const has = Boolean(next.mp4 || next.webm || next.src);
+    setValue("video", has ? next : undefined, { shouldDirty: true, shouldValidate: formState.submitCount > 0 });
   };
   return (
-    <div className="grid gap-4 sm:grid-cols-3">
-      <TextField label="Video URL" hint="mp4 or webm." error={err} value={video?.src} onChange={(v) => set({ src: v })} />
-      <TextField label="Video poster" value={video?.poster} disabled={!video?.src} onChange={(v) => set({ poster: v })} />
-      <TextField label="Video caption" value={video?.caption} disabled={!video?.src} onChange={(v) => set({ caption: v })} />
+    <fieldset className="flex flex-col gap-3">
+      <legend className="mb-1.5 text-[13px] font-semibold">Main recording</legend>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <TextField
+          label="MP4 link"
+          hint="H.264, under 2 MB."
+          error={errors?.mp4?.message ?? errors?.src?.message}
+          value={video?.mp4 ?? video?.src}
+          onChange={(v) => set({ mp4: v, src: undefined })}
+        />
+        <TextField label="WebM link" error={errors?.webm?.message} value={video?.webm} onChange={(v) => set({ webm: v })} />
+      </div>
+      <TextField label="Caption" hint="One line under the walkthrough on the case study." value={video?.caption} onChange={(v) => set({ caption: v })} />
+    </fieldset>
+  );
+}
+
+/** A recording with an MP4 and a WebM link (the customer and owner sides). */
+function SourcesFields({ name, title, hint }: { name: "videoCustomer" | "videoOwner"; title: string; hint?: string }) {
+  const value = useWatch<Form, typeof name>({ name });
+  const { setValue, formState } = useFormContextSafe();
+  const errors = formState.errors[name] as Record<string, { message?: string } | undefined> | undefined;
+  const set = (patch: { mp4?: string; webm?: string }) => {
+    const next = { ...value, ...patch };
+    setValue(name, next.mp4 || next.webm ? next : undefined, { shouldDirty: true, shouldValidate: formState.submitCount > 0 });
+  };
+  return (
+    <fieldset className="flex flex-col gap-3">
+      <legend className="mb-1.5 text-[13px] font-semibold">{title}</legend>
+      {hint && <p className="-mt-1 text-[12.5px] text-muted">{hint}</p>}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <TextField label="MP4 link" error={errors?.mp4?.message} value={value?.mp4} onChange={(v) => set({ mp4: v })} />
+        <TextField label="WebM link" error={errors?.webm?.message} value={value?.webm} onChange={(v) => set({ webm: v })} />
+      </div>
+    </fieldset>
+  );
+}
+
+type ScreenRow = NonNullable<Form["screens"]>[number];
+
+/** Screens: each an uploaded image, a one-line caption and the side it shows. */
+function ScreensField({ canUpload }: { canUpload: boolean }) {
+  const screens = (useWatch<Form, "screens">({ name: "screens" }) ?? []) as ScreenRow[];
+  const { setValue, formState } = useFormContextSafe();
+  const rowErrors = formState.errors.screens as unknown as
+    | Record<string, { caption?: { message?: string } } | undefined>
+    | undefined;
+  const save = (next: ScreenRow[]) => setValue("screens", next, { shouldDirty: true, shouldValidate: formState.submitCount > 0 });
+  const update = (i: number, patch: Partial<ScreenRow>) => save(screens.map((row, j) => (j === i ? { ...row, ...patch } : row)));
+  const move = (i: number, d: -1 | 1) => {
+    const next = [...screens];
+    const [row] = next.splice(i, 1);
+    next.splice(i + d, 0, row);
+    save(next);
+  };
+  return (
+    <div className="flex flex-col gap-3">
+      {screens.length === 0 && <p className="text-[13px] text-muted">No screens yet.</p>}
+      <ol className="flex flex-col gap-3">
+        {screens.map((row, i) => (
+          <li key={i} className="flex flex-col gap-3 rounded-lg border border-paper-edge/60 bg-paper p-3">
+            <ImageField label={`Screen ${i + 1}`} value={row.image} canUpload={canUpload} onChange={(image) => image && update(i, { image })} />
+            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+              <TextField label="Caption" error={rowErrors?.[i]?.caption?.message} value={row.caption} onChange={(caption) => update(i, { caption })} />
+              <label className="flex flex-col gap-1.5 text-[13px] font-semibold">
+                Side
+                <select
+                  value={row.view}
+                  onChange={(e) => update(i, { view: e.target.value as ScreenRow["view"] })}
+                  className="h-10 rounded-lg border border-paper-edge bg-paper-hi px-3 text-[14px] font-normal"
+                >
+                  <option value="customer">Customer view</option>
+                  <option value="owner">Owner view</option>
+                </select>
+              </label>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" variant="outline" size="sm" disabled={i === 0} onClick={() => move(i, -1)}>
+                Move up
+              </Button>
+              <Button type="button" variant="outline" size="sm" disabled={i === screens.length - 1} onClick={() => move(i, 1)}>
+                Move down
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => save(screens.filter((_, j) => j !== i))}>
+                Remove
+              </Button>
+            </div>
+          </li>
+        ))}
+      </ol>
+      {screens.length < 12 && (
+        <ImageField
+          label="Add a screen"
+          hint="Upload an image; then add its caption."
+          value={undefined}
+          canUpload={canUpload}
+          onChange={(image) => image && save([...screens, { image, caption: "", view: "customer" }])}
+        />
+      )}
     </div>
   );
 }

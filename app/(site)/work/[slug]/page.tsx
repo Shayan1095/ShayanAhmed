@@ -95,14 +95,18 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
             <ScrollFx effects={["tilt"]}>
               <div data-fx="tilt">
                 <Monitor label={`${project.title.toLowerCase()} · walkthrough`}>
+                  {/* Plays only when pressed (controls), so no autoplay concerns; WebM first, then MP4. */}
                   <video
                     className="absolute inset-0 size-full object-cover"
-                    src={project.video.src}
-                    poster={project.video.poster}
+                    poster={project.poster?.src ?? project.video.poster}
                     controls
                     preload="none"
                     playsInline
-                  />
+                  >
+                    {project.video.webm && <source src={project.video.webm} type="video/webm" />}
+                    {project.video.mp4 && <source src={project.video.mp4} type="video/mp4" />}
+                    {project.video.src && !project.video.mp4 && !project.video.webm && <source src={project.video.src} />}
+                  </video>
                 </Monitor>
               </div>
             </ScrollFx>

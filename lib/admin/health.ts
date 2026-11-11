@@ -9,7 +9,7 @@ export type HealthCheck = { id: string; ok: boolean; label: string; fix: string;
  */
 export function contentHealth(projects: ProjectRow[], testimonials: Testimonial[], faqs: Faq[], s: SiteSettings): HealthCheck[] {
   const live = projects.filter((p) => p.published);
-  const noShot = live.filter((p) => !p.cover && !p.customerView && p.gallery.length === 0);
+  const noShot = live.filter((p) => !p.poster && !p.cover && !p.customerView && p.gallery.length === 0 && !p.screens?.length);
   const proof = testimonials.filter((t) => t.published && t.consent).length;
   const unanswered = faqs.filter((f) => f.published && !f.answer.trim()).length;
   return [

@@ -7,6 +7,7 @@ import { ScrollFx } from "@/components/fx/scroll-fx";
 import { Band, Cartridge, InsetToggle, Rise, SectionHeader } from "@/components/system";
 import { type FlipState, gsap, lazyFlip, MQ, ScrollTrigger, useGSAP, whenIdle } from "@/lib/gsap";
 import { motionGrammar } from "@/lib/motion";
+import { hasMedia, ProjectMedia } from "@/components/site/project-media";
 import { ArchiveRows } from "./archive-rows";
 
 const filters = [
@@ -127,17 +128,11 @@ export function Archive({ projects, limit, seeAllHref, total, index = "03", clas
                     summary={p.summary}
                     fact={p.fact}
                     href={p.hasCaseStudy ? `/work/${p.slug}` : undefined}
+                    // The project's still (poster, else screenshot); its recording plays on hover
+                    // (mouse devices). Without media the cartridge's label screen fills the slot.
                     shot={
-                      p.cover ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={p.cover.src}
-                          alt={p.cover.alt}
-                          width={p.cover.width}
-                          height={p.cover.height}
-                          loading="lazy"
-                          className="absolute inset-0 size-full object-cover object-top"
-                        />
+                      hasMedia(p) ? (
+                        <ProjectMedia project={p} play="hover" fill sizes="(min-width: 980px) 30vw, (min-width: 640px) 45vw, 92vw" />
                       ) : undefined
                     }
                   />

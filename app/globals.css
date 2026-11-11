@@ -904,10 +904,17 @@ html {
   --dur-ui: 260ms;
   --dur-reveal: 700ms;
   --dur-hero: 1100ms;
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* things arriving */
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0); /* things leaving */
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1); /* things moving between positions */
   --travel: 32px;
   --stagger: 60ms;
+  /* Build brief tokens, for all new work. Exits are faster than entrances:
+     old content leaves in ~150ms, new content arrives in 200-400ms. */
+  --dur-press: 120ms; /* button press, toggles */
+  --dur-fast: 200ms; /* hover, focus, small fades */
+  --dur-base: 400ms; /* card state changes, morphs */
+  --dur-slow: 800ms; /* section reveals, curtain */
 }
 @media (max-width: 767px) {
   :root {

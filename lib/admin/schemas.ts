@@ -22,6 +22,17 @@ export const imageRefSchema = z.object({
 });
 const optImage = imageRefSchema.nullish().transform((v) => v ?? undefined);
 const optUrl = opt(300).pipe(z.url("Enter a full URL, starting with https://").optional());
+/** A video file: a full https:// URL (e.g. Cloudinary) or a path in /public (e.g. /work/slug/clip.mp4). */
+const mediaUrl = opt(600).pipe(
+  z
+    .string()
+    .refine((v) => /^https:\/\//.test(v) || v.startsWith("/"), "Use a full https:// URL or a path starting with /")
+    .optional(),
+);
+const videoSources = z
+  .object({ mp4: mediaUrl, webm: mediaUrl })
+  .nullish()
+  .transform((v) => (v && (v.mp4 || v.webm) ? v : undefined));
 
 export const projectSchema = z.object({
   slug: z
@@ -63,10 +74,24 @@ export const projectSchema = z.object({
     .array(z.object({ name: text(60).min(1, "Name the agent"), status: text(60), needsYou: z.boolean().optional() }))
     .max(12),
   results: z.array(z.object({ label: text(80).min(1, "Add a label"), value: text(40).min(1, "Add the figure") })).max(8),
+  // Main recording: MP4 and/or WebM (src is the older single-URL form, still accepted).
   video: z
-    .object({ src: text(600).min(1, "Add the video URL"), poster: opt(600), caption: opt(200) })
+    .object({ src: mediaUrl, mp4: mediaUrl, webm: mediaUrl, poster: opt(600), caption: opt(200) })
     .nullish()
-    .transform((v) => v ?? undefined),
+    .transform((v) => (v && (v.src || v.mp4 || v.webm) ? v : undefined)),
+  poster: optImage,
+  videoCustomer: videoSources,
+  videoOwner: videoSources,
+  screens: z
+    .array(
+      z.object({
+        image: imageRefSchema,
+        caption: text(140).min(1, "Add a one-line caption"),
+        view: z.enum(["customer", "owner"]),
+      }),
+    )
+    .max(12)
+    .default([]),
   cover: optImage,
   customerView: optImage,
   ownerView: optImage,

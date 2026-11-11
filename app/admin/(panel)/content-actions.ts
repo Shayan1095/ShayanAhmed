@@ -100,7 +100,8 @@ export async function reorderProjects(ids: string[]) {
 export async function deleteProject(id: string) {
   return adminAction(async () => {
     const doc = await ProjectModel.findByIdAndDelete(idSchema.parse(id)).lean();
-    for (const img of [doc?.cover, doc?.customerView, doc?.ownerView] as (ImageRef | undefined)[]) {
+    const screens = ((doc?.screens ?? []) as { image?: ImageRef }[]).map((s) => s.image);
+    for (const img of [doc?.poster, doc?.cover, doc?.customerView, doc?.ownerView, ...screens] as (ImageRef | undefined)[]) {
       await deleteStoredImage(img?.src);
     }
     updateTag(contentTags.projects);
