@@ -45,7 +45,7 @@ export function Process({
 }) {
   return (
     <Band id="process" aria-label="Process" data-paper className="tone-cream section-pad">
-      <CurtainBand target="#process" />
+      <CurtainBand />
       <CoverGrid strength={0.2} />
       <div className="wrap relative">
         <SectionHeader

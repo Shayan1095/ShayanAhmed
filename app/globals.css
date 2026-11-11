@@ -1136,8 +1136,7 @@ html[data-power="low"] .hero-glow {
 
 /* Paper section (build brief, Phase 6): Process is printed on cream inside the
    dark site. Copper darkens to pass 4.5:1 on cream; cards are ink-outlined,
-   not glowing. The curtain rounds its corners as it rises (--curtain-top) and
-   as it leaves (--curtain-bottom); see CurtainBand. */
+   not glowing. The curtain rounds its corners as it rises and leaves (CurtainBand). */
 html:not([data-admin-theme]) .tone-cream {
   --color-paper: #f3eadb;
   --color-paper-hi: #fbf6ec;
@@ -1159,8 +1158,26 @@ html:not([data-admin-theme]) .tone-cream {
   color-scheme: light;
   background-color: var(--color-paper);
   color: var(--color-ink);
-  clip-path: inset(0 round var(--curtain-top, 0px) var(--curtain-top, 0px) var(--curtain-bottom, 0px) var(--curtain-bottom, 0px));
 }
+/* The curtain's corners: page-coloured pieces with a quarter-circle cut out,
+   scaled from their outer corner by CurtainBand. Hidden until it runs. */
+.curtain-corner {
+  --r: 28px;
+  position: absolute;
+  z-index: 2;
+  width: var(--r);
+  height: var(--r);
+  pointer-events: none;
+  transform: scale(0);
+  will-change: transform;
+}
+@media (min-width: 900px) {
+  .curtain-corner { --r: 56px; }
+}
+.curtain-corner[data-curtain="tl"] { top: 0; left: 0; transform-origin: 0 0; background: radial-gradient(circle at 100% 100%, transparent calc(var(--r) - 0.5px), #1a1511 var(--r)); }
+.curtain-corner[data-curtain="tr"] { top: 0; right: 0; transform-origin: 100% 0; background: radial-gradient(circle at 0 100%, transparent calc(var(--r) - 0.5px), #1a1511 var(--r)); }
+.curtain-corner[data-curtain="bl"] { bottom: 0; left: 0; transform-origin: 0 100%; background: radial-gradient(circle at 100% 0, transparent calc(var(--r) - 0.5px), #1a1511 var(--r)); }
+.curtain-corner[data-curtain="br"] { bottom: 0; right: 0; transform-origin: 100% 100%; background: radial-gradient(circle at 0 0, transparent calc(var(--r) - 0.5px), #1a1511 var(--r)); }
 .tone-cream ::selection {
   background: #111111;
   color: #f3eadb;

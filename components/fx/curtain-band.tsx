@@ -2,25 +2,30 @@
 
 import { gsap, useGSAP } from "@/lib/gsap";
 
+const CORNERS = ["tl", "tr", "bl", "br"] as const;
+
 /**
  * Curtain (build brief, Phase 6): the paper section rises over the dark page
  * as a sheet with rounded top corners that flatten as it reaches the top of
  * the screen, and its bottom corners round again as the next dark section
- * comes up over it. Scroll-scrubbed CSS variables read by .tone-cream's
- * clip-path; no layout change. Reduced motion: a plain colour change.
+ * comes up over it. The corners are four small page-coloured pieces that only
+ * scale (compositor work, no repaint of the section). Hidden by default, so
+ * reduced motion is a plain colour change. Render it inside the section.
  */
-export function CurtainBand({ target }: { target: string }) {
+export function CurtainBand() {
   useGSAP(() => {
-    const el = document.querySelector<HTMLElement>(target);
+    const el =
+      document.querySelector<HTMLElement>("[data-curtain]")?.parentElement;
     if (!el) return;
     gsap.matchMedia().add("(prefers-reduced-motion: no-preference)", () => {
-      const r = window.innerWidth < 900 ? 28 : 56;
+      const q = (k: string) =>
+        el.querySelectorAll<HTMLElement>(`[data-curtain="${k}"]`);
       const scrub = 0.3;
       gsap.fromTo(
-        el,
-        { "--curtain-top": `${r}px` },
+        [...q("tl"), ...q("tr")],
+        { scale: 1 },
         {
-          "--curtain-top": "0px",
+          scale: 0,
           ease: "none",
           scrollTrigger: {
             trigger: el,
@@ -31,10 +36,10 @@ export function CurtainBand({ target }: { target: string }) {
         },
       );
       gsap.fromTo(
-        el,
-        { "--curtain-bottom": "0px" },
+        [...q("bl"), ...q("br")],
+        { scale: 0 },
         {
-          "--curtain-bottom": `${r}px`,
+          scale: 1,
           ease: "none",
           immediateRender: false,
           scrollTrigger: {
@@ -47,5 +52,16 @@ export function CurtainBand({ target }: { target: string }) {
       );
     });
   });
-  return null;
+  return (
+    <>
+      {CORNERS.map((c) => (
+        <span
+          key={c}
+          aria-hidden="true"
+          data-curtain={c}
+          className="curtain-corner"
+        />
+      ))}
+    </>
+  );
 }

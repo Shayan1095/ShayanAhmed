@@ -12,7 +12,8 @@ test("process is cream with ink text, and the curtain rounds its top corners", a
   await expect(process.locator("h3").first()).toHaveCSS("color", "rgb(17, 17, 17)");
   // Halfway up the screen the sheet's top corners are still rounded.
   await process.evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - window.innerHeight / 2));
-  await expect.poll(() => process.evaluate((el) => getComputedStyle(el).clipPath)).toMatch(/round [1-9]/);
+  const corner = process.locator('[data-curtain="tl"]');
+  await expect.poll(() => corner.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).a)).toBeGreaterThan(0.05);
 });
 
 test("reduced motion: a plain colour change, no curtain", async ({ browser }) => {
@@ -22,7 +23,7 @@ test("reduced motion: a plain colour change, no curtain", async ({ browser }) =>
   const process = page.locator("#process");
   await process.evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - window.innerHeight / 2));
   await page.waitForTimeout(400);
-  expect(await process.evaluate((el) => getComputedStyle(el).clipPath)).not.toMatch(/round [1-9]/);
+  expect(await process.locator('[data-curtain="tl"]').evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).a)).toBe(0);
   await ctx.close();
 });
 
