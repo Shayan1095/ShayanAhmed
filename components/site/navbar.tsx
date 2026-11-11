@@ -157,9 +157,11 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
         Skip to content
       </a>
       <header
+        style={{ viewTransitionName: "site-header" }}
         className={cn(
           // Own layer: the page scrolls under it without repainting it.
           // The same bar on every screen; phones get the menu button instead of the links.
+          // Its own view-transition name keeps it still while pages slide (globals.css).
           "fixed inset-x-0 top-[env(safe-area-inset-top)] z-70 transition-[transform,padding] duration-500 ease-out-expo will-change-transform",
           compact ? "py-2" : "py-3.5",
         )}
@@ -214,7 +216,7 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
                         },
                       })}
                     >
-                      <a
+                      <NavLink
                         href={href}
                         aria-current={current ? (onWork ? "page" : "location") : undefined}
                         {...(isWork && { "aria-expanded": previewOpen, "aria-controls": "work-preview" })}
@@ -240,7 +242,7 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
                             transition={{ type: "spring", stiffness: 380, damping: 30 }}
                           />
                         )}
-                      </a>
+                      </NavLink>
                       {isWork && <WorkPreview open={previewOpen} projects={projects} />}
                     </li>
                   );
@@ -250,7 +252,7 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
 
             <div className="flex items-center gap-4">
               <div className="hidden min-[900px]:inline-flex">
-                <a
+                <NavLink
                   href={sectionHref("contact", onHome)}
                   className="group/cta relative inline-flex min-h-[46px] items-center gap-2 overflow-hidden rounded-control bg-[linear-gradient(180deg,var(--ink-key-top,#2a2826),var(--ink-key-bottom,var(--color-ink)))] px-5 text-[15px] font-semibold text-paper shadow-[inset_0_1px_0_rgb(255_255_255/.14),0_2px_0_#000,0_12px_24px_-10px_rgb(17_17_17/.6)] transition-transform duration-100 active:translate-y-0.5"
                 >
@@ -264,7 +266,7 @@ export function Navbar({ onHome, onWork = false, place, email, linkedin, project
                       →
                     </span>
                   </span>
-                </a>
+                </NavLink>
               </div>
               {/* Phones and small tablets: the menu (a sheet with every chapter, contact and Start). */}
               <button
@@ -568,7 +570,7 @@ function MobileMenu({
                 const href = l.id === "work" && onWork ? "/work" : sectionHref(l.id, onHome);
                 return (
                   <li key={l.id}>
-                    <a
+                    <NavLink
                       href={href}
                       onClick={onClose}
                       aria-current={current ? "location" : undefined}
@@ -585,7 +587,7 @@ function MobileMenu({
                       {current && (
                         <span aria-hidden="true" className="ml-auto size-2 self-center rounded-full bg-copper shadow-glow" />
                       )}
-                    </a>
+                    </NavLink>
                   </li>
                 );
               })}
@@ -628,16 +630,25 @@ function MobileMenu({
                 ))}
               </ul>
             )}
-            <a
+            <NavLink
               href={sectionHref("contact", onHome)}
               onClick={onClose}
               className="raised-sm mt-1 inline-flex min-h-12 items-center justify-center rounded-control font-sans text-[15px] font-semibold tracking-normal text-ink"
             >
               Start a project →
-            </a>
+            </NavLink>
           </div>
         </m.div>
       )}
     </AnimatePresence>
   );
+}
+
+/**
+ * Links to another page go through next/link (client-side navigation: no
+ * reload, and page transitions can play). Same-page "#section" links stay
+ * plain anchors, which the smooth scroll handles.
+ */
+function NavLink({ href, ...rest }: React.ComponentProps<"a"> & { href: string }) {
+  return href.startsWith("#") ? <a href={href} {...rest} /> : <Link href={href} {...rest} />;
 }

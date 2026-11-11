@@ -100,7 +100,7 @@ export async function Footer() {
             <ul className="grid grid-cols-1 gap-3 min-[640px]:grid-cols-3 min-[640px]:gap-5">
               {recent.map((p) => (
                 <li key={p.slug}>
-                  <Link
+                  <Link transitionTypes={["nav-forward"]}
                     href={p.hasCaseStudy ? `/work/${p.slug}` : "/work"}
                     className="group flex items-center gap-4 rounded-[18px] p-2 pr-4 transition-colors hover:bg-white/[0.04] min-[640px]:flex-col min-[640px]:items-stretch min-[640px]:p-0 min-[640px]:pr-0 min-[640px]:hover:bg-transparent"
                   >

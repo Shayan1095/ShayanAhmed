@@ -78,7 +78,7 @@ export function Cartridge({ title, kind, status, summary, fact, shot, href, clas
         </div>
         <h3 className="font-display text-xl font-extrabold leading-[1.1] tracking-[-0.01em]">
           {href ? (
-            <Link href={href} className="after:absolute after:inset-0 after:content-['']">
+            <Link href={href} transitionTypes={["nav-forward"]} className="after:absolute after:inset-0 after:content-['']">
               {title}
             </Link>
           ) : (

@@ -1,7 +1,8 @@
 "use client";
 
 import Lenis from "lenis";
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from "react";
+import { usePathname } from "next/navigation";
+import { createContext, Suspense, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { isLowPowerDevice, markLowPower } from "@/lib/device-power";
 import { gsap, refreshScrollTriggers, ScrollTrigger } from "@/lib/gsap";
 import { useReducedMotion } from "@/hooks/use-media-query";
@@ -24,6 +25,7 @@ const SmoothScrollContext = createContext<SmoothScrollApi | null>(null);
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
   const reduce = useReducedMotion();
   const lenisRef = useRef<Lenis | null>(null);
+
 
   // Web fonts change text heights (and SplitText lines), so re-measure every trigger once they load.
   useEffect(() => {
@@ -161,11 +163,42 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     [scrollTo],
   );
 
-  return <SmoothScrollContext.Provider value={api}>{children}</SmoothScrollContext.Provider>;
+  return (
+    <SmoothScrollContext.Provider value={api}>
+      {children}
+      {/* Reads the URL, so it sits in its own Suspense boundary (pages stay prerenderable). */}
+      <Suspense fallback={null}>
+        <RouteScrollReset />
+      </Suspense>
+    </SmoothScrollContext.Provider>
+  );
 }
 
 export function useSmoothScroll(): SmoothScrollApi {
   const ctx = useContext(SmoothScrollContext);
   if (!ctx) throw new Error("useSmoothScroll must be used inside <SmoothScrollProvider>");
   return ctx;
+}
+
+/**
+ * Client-side navigation: start the new page at the top (or at its #section)
+ * without a visible jump, then re-measure scroll effects once the page
+ * transition has finished (~400ms).
+ */
+function RouteScrollReset() {
+  const pathname = usePathname();
+  const { scrollTo } = useSmoothScroll();
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    const hash = window.location.hash;
+    const target = hash ? document.querySelector<HTMLElement>(hash) : null;
+    scrollTo(target ?? 0, { immediate: true });
+    const t = window.setTimeout(refreshScrollTriggers, 450);
+    return () => window.clearTimeout(t);
+  }, [pathname, scrollTo]);
+  return null;
 }

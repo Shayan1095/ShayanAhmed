@@ -131,7 +131,7 @@ export function WorkSlide({ project, index }: { project: Project; index: number 
           </ul>
         )}
         {project.hasCaseStudy && (
-          <Button href={`/work/${project.slug}`} arrow className="mt-auto self-start">
+          <Button href={`/work/${project.slug}`} transitionTypes={["nav-forward"]} arrow className="mt-auto self-start">
             Read the case study
           </Button>
         )}

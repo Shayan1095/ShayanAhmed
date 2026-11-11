@@ -1,3 +1,4 @@
+import { PageTransition } from "@/components/site/page-transition";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Archive } from "@/components/sections/archive";
@@ -17,7 +18,8 @@ export default async function WorkIndexPage() {
   const [featured, archive] = await Promise.all([getFeaturedProjects(), getArchiveProjects()]);
 
   return (
-    <main id="main">
+    <PageTransition>
+      <main id="main">
       <Band className="pb-14 pt-[calc(env(safe-area-inset-top)+128px)]">
         <div className="wrap">
           <Label>Work</Label>
@@ -69,5 +71,6 @@ export default async function WorkIndexPage() {
         </div>
       </Band>
     </main>
+    </PageTransition>
   );
 }

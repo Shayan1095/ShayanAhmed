@@ -374,14 +374,59 @@ body {
   }
 }
 
-/* View Transition: a project's monitor morphs from the homepage into its case study. */
-::view-transition-group(.morph) {
-  animation-duration: 600ms;
-  animation-timing-function: var(--ease-out-expo);
+/* =========================================================================
+   Page transitions (build brief, Phase 4). Morph: a project's media grows
+   from its card into the case study (400ms). Directional slides: old content
+   leaves in 150ms, new content arrives in 210ms after a 150ms delay, 60px.
+   The navbar stays put; the page underneath never takes clicks mid-transition.
+   ========================================================================= */
+::view-transition {
+  pointer-events: none;
 }
+::view-transition-group(.morph) {
+  animation-duration: var(--dur-base);
+  animation-timing-function: var(--ease-inout);
+}
+/* Only the typed slides animate; the rest of the page doesn't cross-fade. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 260ms;
+  animation: none;
+}
+/* The navbar is anchored: no movement, and its old snapshot is hidden. */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+@keyframes vt-out-left { to { opacity: 0; transform: translateX(-60px); } }
+@keyframes vt-out-right { to { opacity: 0; transform: translateX(60px); } }
+@keyframes vt-in-right { from { opacity: 0; transform: translateX(60px); } }
+@keyframes vt-in-left { from { opacity: 0; transform: translateX(-60px); } }
+::view-transition-old(.nav-forward) {
+  animation: vt-out-left 150ms var(--ease-in) both;
+}
+::view-transition-new(.nav-forward) {
+  animation: vt-in-right 210ms var(--ease-out) 150ms both;
+}
+::view-transition-old(.nav-back) {
+  animation: vt-out-right 150ms var(--ease-in) both;
+}
+::view-transition-new(.nav-back) {
+  animation: vt-in-left 210ms var(--ease-out) 150ms both;
+}
+/* Reduced motion: transitions are instant. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
 }
 
 

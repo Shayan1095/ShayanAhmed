@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { BuiltInIndex } from "./built-in-index";
 import { HeroEntrance } from "./hero-entrance";
@@ -135,13 +136,14 @@ export async function Hero({ caseStudyHref }: { caseStudyHref?: string }) {
                 {HERO_COPY.primaryCta}
                 <ArrowRight aria-hidden="true" className="size-[18px] transition-transform duration-300 group-hover:translate-x-0.5" />
               </a>
-              <a
+              <Link
                 href={caseStudyHref ?? "#work"}
+                transitionTypes={["nav-forward"]}
                 className="inline-flex min-h-[54px] items-center rounded-[12px] px-6 text-[16px] font-semibold transition-colors hover:text-[#E8B27A]"
                 style={{ color: COVER.paper, background: "rgba(18,12,8,.5)", boxShadow: "inset 0 0 0 1px rgba(243,234,219,.4)" }}
               >
                 {HERO_COPY.secondaryCta}
-              </a>
+              </Link>
             </div>
           </div>
 

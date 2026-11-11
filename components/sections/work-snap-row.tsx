@@ -82,7 +82,7 @@ export function WorkSnapRow({
                   <h3 className="font-display text-[26px] font-extrabold leading-[1.02] tracking-[-0.02em]">{p.title}</h3>
                   <p className="line-clamp-3 text-[16px] text-muted">{p.outcome ?? p.summary}</p>
                   {href && (
-                    <Link
+                    <Link transitionTypes={["nav-forward"]}
                       href={href}
                       className="mt-auto inline-flex min-h-11 items-center gap-2 text-[16px] font-semibold text-copper after:absolute after:inset-0 after:content-['']"
                     >

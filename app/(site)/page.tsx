@@ -1,3 +1,4 @@
+import { PageTransition } from "@/components/site/page-transition";
 import { Hero } from "@/components/hero/hero";
 import { MeetBuilder } from "@/components/sections/meet-builder";
 import { About } from "@/components/sections/about";
@@ -63,7 +64,8 @@ export default async function HomePage() {
   const n = (id: string) => String(chapters.indexOf(id) + 1).padStart(2, "0");
 
   return (
-    <main id="main">
+    <PageTransition>
+      <main id="main">
       <Hero caseStudyHref={flagship ? `/work/${flagship.slug}` : undefined} />
       <MeetBuilder
         index={n("builder")}
@@ -93,5 +95,6 @@ export default async function HomePage() {
       <JsonLd data={homeJsonLd(settings, featured)} />
       <BandTransitions />
     </main>
+    </PageTransition>
   );
 }

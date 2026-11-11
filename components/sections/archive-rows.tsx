@@ -80,7 +80,7 @@ export function ProjectSheet({ project, code, onClose }: { project: Project | nu
             )}
             <div className="mt-1 flex flex-wrap gap-3">
               {open.hasCaseStudy && (
-                <Link
+                <Link transitionTypes={["nav-forward"]}
                   href={`/work/${open.slug}`}
                   className="inline-flex min-h-12 items-center gap-2 rounded-control bg-copper px-5 text-[16px] font-bold text-[#140d08]"
                 >

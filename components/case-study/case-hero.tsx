@@ -31,7 +31,7 @@ export function CaseHero({ project, index, total }: { project: Project; index: n
     <section aria-labelledby="case-title" className="pb-16 pt-[calc(env(safe-area-inset-top)+112px)] min-[900px]:pb-24">
       <div className="wrap">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-          <Link href="/#work" className="type-label -my-3 inline-flex min-h-11 items-center text-muted transition-colors hover:text-ink">
+          <Link href="/#work" transitionTypes={["nav-back"]} className="type-label -my-3 inline-flex min-h-11 items-center text-muted transition-colors hover:text-ink">
             ← All work
           </Link>
           <Label>

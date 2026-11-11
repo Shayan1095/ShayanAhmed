@@ -1,3 +1,4 @@
+import { PageTransition } from "@/components/site/page-transition";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ResponsiveMorph } from "@/components/site/responsive-morph";
@@ -73,7 +74,8 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
   };
 
   return (
-    <main id="main">
+    <PageTransition>
+      <main id="main">
       <CaseHero project={project} index={index} total={all.length} />
 
       {project.problem && (
@@ -346,5 +348,6 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
     </main>
+    </PageTransition>
   );
 }

@@ -14,7 +14,11 @@ type CommonProps = {
 };
 
 type ButtonAsLink = CommonProps &
-  Omit<React.ComponentProps<"a">, keyof CommonProps> & { href: string };
+  Omit<React.ComponentProps<"a">, keyof CommonProps> & {
+    href: string;
+    /** Page transition type for internal links, e.g. ["nav-forward"] (ignored for #hash and external links). */
+    transitionTypes?: string[];
+  };
 type ButtonAsButton = CommonProps &
   Omit<React.ComponentProps<"button">, keyof CommonProps> & { href?: undefined };
 
@@ -72,7 +76,7 @@ export function Button(props: ButtonProps) {
 
   let el: React.ReactNode;
   if (typeof rest.href === "string") {
-    const { href, ...anchorProps } = rest as Omit<ButtonAsLink, keyof CommonProps>;
+    const { href, transitionTypes, ...anchorProps } = rest as Omit<ButtonAsLink, keyof CommonProps>;
     // Hash and external links stay plain anchors (Lenis handles #anchors).
     el =
       href.startsWith("#") || isExternal(href) ? (
@@ -80,7 +84,7 @@ export function Button(props: ButtonProps) {
           {content}
         </a>
       ) : (
-        <Link href={href} className={classes} {...anchorProps}>
+        <Link href={href} transitionTypes={transitionTypes} className={classes} {...anchorProps}>
           {content}
         </Link>
       );

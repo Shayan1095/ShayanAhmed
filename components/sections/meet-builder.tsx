@@ -155,7 +155,7 @@ export function MeetBuilder({
               ))}
             </ul>
             {caseHref && (
-              <Link href={caseHref} className="mt-2 inline-flex min-h-11 items-center gap-2 text-[16px] font-semibold text-copper">
+              <Link href={caseHref} transitionTypes={["nav-forward"]} className="mt-2 inline-flex min-h-11 items-center gap-2 text-[16px] font-semibold text-copper">
                 See the Brands Attire build <span aria-hidden="true">→</span>
               </Link>
             )}
