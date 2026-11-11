@@ -19,3 +19,4 @@ export { Switch } from "./switch";
 export { UiFragment } from "./ui-fragment";
 export { CoverGrid } from "./cover-grid";
 export { WipeReveal } from "./wipe-reveal";
+export { Stamp, type StampKind } from "./stamp";

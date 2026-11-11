@@ -72,6 +72,7 @@ export default async function HomePage() {
         video={settings.introVideo}
         alerts={flagship?.uiFragments ?? []}
         caseHref={flagship ? `/work/${flagship.slug}` : undefined}
+        caseTitle={flagship?.title}
         portrait={settings.portrait}
       />
       <VelocityMarquee items={["Websites", "Systems", "Automation", "Storefronts", "Admin panels", "Operations agents"]} />

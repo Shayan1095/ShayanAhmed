@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { ImageRef, UiFragmentData } from "@/lib/content/types";
-import { Band, CoverGrid, Label, SectionHeader, UiFragment } from "@/components/system";
+import { Band, CoverGrid, SectionHeader } from "@/components/system";
+import { AgentFeed } from "./agent-feed";
 import { cn } from "@/lib/utils";
 
 export type IntroVideo = { src: string; poster?: string; captions?: string };
@@ -22,6 +22,7 @@ export function MeetBuilder({
   video,
   alerts,
   caseHref,
+  caseTitle,
   portrait,
 }: {
   /** Chapter number from the page's one ordered list. */
@@ -29,18 +30,16 @@ export function MeetBuilder({
   video?: IntroVideo;
   alerts: UiFragmentData[];
   caseHref?: string;
+  /** The linked case study's name, for the feed's closing link. */
+  caseTitle?: string;
   /** Shown when there is no intro video yet (Admin → Settings). */
   portrait?: ImageRef;
 }) {
   const root = useRef<HTMLDivElement>(null);
   const player = useRef<HTMLVideoElement>(null);
-  const list = useRef<HTMLUListElement>(null);
   const [near, setNear] = useState(false);
   const [inView, setInView] = useState(false);
   const [sound, setSound] = useState(false);
-  // Alerts: hidden once JS is ready (armed), then play once on first view.
-  const [armed, setArmed] = useState(false);
-  const [played, setPlayed] = useState(false);
 
   useEffect(() => {
     const el = root.current;
@@ -53,22 +52,7 @@ export function MeetBuilder({
       { rootMargin: "400px 0px", threshold: [0, 0.35] },
     );
     io.observe(el);
-    // The alerts play once their own list is a third on screen.
-    const listIo = new IntersectionObserver(
-      ([e]) => {
-        if (!e.isIntersecting) return;
-        setPlayed(true);
-        listIo.disconnect();
-      },
-      { threshold: 0.3 },
-    );
-    if (list.current) listIo.observe(list.current);
-    const raf = requestAnimationFrame(() => setArmed(true));
-    return () => {
-      cancelAnimationFrame(raf);
-      io.disconnect();
-      listIo.disconnect();
-    };
+    return () => io.disconnect();
   }, []);
 
   // The muted preview plays only while it is on screen.
@@ -144,22 +128,8 @@ export function MeetBuilder({
             </figure>
           ) : null}
 
-          {/* What an agent hands you: three alerts, one after another. */}
-          <div className="flex flex-col gap-3">
-            <Label accent>This morning, from the agents</Label>
-            <ul ref={list} className={cn("flex flex-col gap-3", armed && "alerts-armed", played && "alerts-play")}>
-              {alerts.slice(0, 3).map((a, i) => (
-                <li key={a.text} className={cn("alert-in", i === 2 && "max-[979px]:hidden")} style={{ "--i": i } as React.CSSProperties}>
-                  <UiFragment tag={a.tag} text={a.text} actions={a.actions} live={i === 0} className="w-full" />
-                </li>
-              ))}
-            </ul>
-            {caseHref && (
-              <Link href={caseHref} transitionTypes={["nav-forward"]} className="mt-2 inline-flex min-h-11 items-center gap-2 text-[16px] font-semibold text-copper">
-                See the Brands Attire build <span aria-hidden="true">→</span>
-              </Link>
-            )}
-          </div>
+          {/* What an agent hands you: a playable queue (example data). */}
+          <AgentFeed items={alerts} caseHref={caseHref} caseTitle={caseTitle} />
         </div>
       </div>
     </Band>

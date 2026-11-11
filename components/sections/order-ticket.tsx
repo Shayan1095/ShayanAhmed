@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap, MQ, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { Stamp } from "@/components/system";
 import { cn } from "@/lib/utils";
 
 /** The four stations of a real Brands Attire flow. */
@@ -298,29 +299,3 @@ function Ticket({ approved, waiting, onApprove }: { approved: boolean; waiting: 
 }
 
 /** Rubber stamps: FLAGGED (risk check) and DISPATCHED (after approval). */
-function Stamp({ kind, show = true, desktop, className }: { kind: "flag" | "sent"; show?: boolean; desktop?: boolean; className?: string }) {
-  const flag = kind === "flag";
-  return (
-    <span
-      data-stamp={desktop ? kind : undefined}
-      className={cn(
-        // One line at every width (it wrapped and clipped on phones); a little room below for the tilt.
-        "my-1 inline-block whitespace-nowrap rounded-[6px] border-2 px-2 py-1 font-mono text-[11px] font-bold uppercase tracking-[0.14em] max-[899px]:tracking-[0.08em]",
-        flag ? "-rotate-[6deg] border-[#c2552f] text-[#c2552f]" : "rotate-[6deg] border-[#4f8a3c] text-[#4f8a3c]",
-        !desktop && "transition-[opacity,transform] duration-300 ease-out-expo",
-        !desktop && !show && "scale-125 opacity-0",
-        desktop && "opacity-0",
-        !desktop && (flag ? "bg-[#c2552f]/10" : "bg-[#4f8a3c]/10"),
-        className,
-      )}
-    >
-      {flag ? (
-        <>
-          Flagged<span className="max-[399px]:hidden"> · dup. address</span>
-        </>
-      ) : (
-        "Dispatched"
-      )}
-    </span>
-  );
-}
