@@ -60,7 +60,12 @@ export const projectSchema = z.object({
   stack: lines,
   layers: z.object({ website: lines, system: lines, automation: lines }),
   features: z.array(z.object({ title: text(80).min(1, "Name the feature, or remove the row"), text: text(400) })).max(20),
-  decisions: z.array(z.object({ title: text(120).min(1, "Name the decision, or remove the row"), text: text(600) })).max(12),
+  decisions: z
+    .array(z.object({ title: text(120).min(1, "Name the decision, or remove the row"), text: text(600), tradeoff: opt(400) }))
+    .max(12),
+  weakPoints: lines.default([]),
+  proves: opt(600),
+  nextSteps: lines.default([]),
   uiFragments: z
     .array(
       z.object({
@@ -109,6 +114,16 @@ export const testimonialSchema = z.object({
   quote: text(800).min(1, "Add the quote"),
   projectSlug: opt(80),
   photo: optImage,
+  // Empty or 0 means "no rating"; otherwise a whole number of stars, 1 to 5.
+  rating: z
+    .number()
+    .int()
+    .min(0)
+    .max(5)
+    .nullish()
+    .transform((v) => (v ? v : undefined)),
+  country: opt(60),
+  sourceUrl: optUrl,
   consent: z.boolean(),
   published: z.boolean(),
 });

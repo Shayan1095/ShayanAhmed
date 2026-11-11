@@ -256,15 +256,18 @@ function CaseStudy() {
         <FormText<Form> name="timeline" label="Timeline" placeholder="e.g. 6 weeks" />
         <FormText<Form> name="outcome" label="Outcome" hint="One line with a real result." />
       </div>
-      <FormTextArea<Form> name="problem" label="The problem" rows={4} />
-      <FormRows<Form, { title: string; text: string }>
+      <FormTextArea<Form> name="problem" label="The problem" hint="What was slow, manual or broken, in the client's terms." rows={4} />
+      <FormLines<Form> name="weakPoints" label="Weak points of the old way" hint="A short list, one per line." />
+      <FormRows<Form, { title: string; text: string; tradeoff: string }>
         name="decisions"
         label="Key decisions"
+        hint="Two to four, each with what it cost."
         max={12}
-        empty={{ title: "", text: "" }}
+        empty={{ title: "", text: "", tradeoff: "" }}
         columns={[
           { key: "title", label: "Decision" },
           { key: "text", label: "Why", kind: "textarea" },
+          { key: "tradeoff", label: "Trade-off (what it cost)", kind: "textarea" },
         ]}
       />
       <FormRows<Form, { label: string; value: string }>
@@ -278,6 +281,13 @@ function CaseStudy() {
           { key: "label", label: "Label", placeholder: "e.g. daily order checks" },
         ]}
       />
+      <FormTextArea<Form>
+        name="proves"
+        label="What this build proves"
+        hint="For product and demo builds (no client results): what the build shows you can do. Shown with a plain note that it is a product build."
+        rows={3}
+      />
+      <FormLines<Form> name="nextSteps" label="What I'd do next" hint="A short list, one per line." />
     </FormSection>
   );
 }

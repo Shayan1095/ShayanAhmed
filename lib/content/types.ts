@@ -57,8 +57,14 @@ export type Project = {
   videoCustomer?: VideoSources;
   videoOwner?: VideoSources;
   screens?: ProjectScreen[];
-  /** extension: key decisions and why they were made. */
-  decisions?: { title: string; text: string }[];
+  /** extension: key decisions, why they were made, and what was given up for them. */
+  decisions?: { title: string; text: string; tradeoff?: string }[];
+  /** Case study (build brief, Phase 3): what was weak about the old way, as a short list. */
+  weakPoints?: string[];
+  /** For product and demo builds: what the build proves (stated plainly, no invented results). */
+  proves?: string;
+  /** What I'd do next, as a short list. */
+  nextSteps?: string[];
   layers: { website: string[]; system: string[]; automation: string[] };
   features: { title: string; text: string }[];
   stack: string[];
@@ -89,6 +95,12 @@ export type Testimonial = {
   role: string;
   company: string;
   photo?: ImageRef;
+  /** Star rating the client gave, 1 to 5 (optional). */
+  rating?: number;
+  /** Where the client is, e.g. "Pakistan" or "UK" (optional). */
+  country?: string;
+  /** Link to the original review (Upwork, Google, LinkedIn...), optional. */
+  sourceUrl?: string;
   quote: string;
   projectSlug?: string;
   consent: boolean;

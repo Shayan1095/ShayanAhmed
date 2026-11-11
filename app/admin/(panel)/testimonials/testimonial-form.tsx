@@ -1,9 +1,10 @@
 "use client";
 
-import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { useState } from "react";
+import { FormProvider, useController, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, Star } from "lucide-react";
 import { toast } from "sonner";
 import { SwitchField } from "@/components/admin/fields";
 import { FormImage, FormSelect, FormText, FormTextArea, serverErrorToField } from "@/components/admin/form";
@@ -87,7 +88,21 @@ export function TestimonialForm({
           />
           <p className="text-[12.5px] text-muted">Also shows on that project&apos;s case study.</p>
         </div>
-        <FormImage<TestimonialDraft> name="photo" label="Photo (optional)" canUpload={canUpload} />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormText<TestimonialDraft> name="country" label="Country" placeholder="e.g. Pakistan" />
+          <FormText<TestimonialDraft>
+            name="sourceUrl"
+            label="Link to the original review"
+            placeholder="https://..."
+          />
+        </div>
+        <StarRating />
+        <FormImage<TestimonialDraft>
+          name="photo"
+          label="Photo (optional)"
+          hint="Their profile picture. Without one, the site shows their initials."
+          canUpload={canUpload}
+        />
         <SwitchField
           label="The client agreed to publish this"
           hint="Required before it can go live."
@@ -117,5 +132,54 @@ export function TestimonialForm({
         </div>
       </form>
     </FormProvider>
+  );
+}
+
+/**
+ * Star rating, 1 to 5, as a radio group: click a star, or use the arrow keys.
+ * "No rating" clears it (the site then shows no stars).
+ */
+function StarRating() {
+  const { field } = useController<TestimonialDraft, "rating">({ name: "rating" });
+  const value = Number(field.value) || 0;
+  const [hover, setHover] = useState(0);
+  const shown = hover || value;
+  return (
+    <fieldset className="flex flex-col gap-1.5">
+      <legend className="mb-1 text-[13px] font-semibold">Rating</legend>
+      <div className="flex flex-wrap items-center gap-3">
+        <div role="radiogroup" aria-label="Rating" className="flex gap-1" onMouseLeave={() => setHover(0)}>
+          {[1, 2, 3, 4, 5].map((n) => (
+            <label
+              key={n}
+              onMouseEnter={() => setHover(n)}
+              className="grid size-10 cursor-pointer place-items-center rounded-md has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-1 has-[:focus-visible]:outline-copper"
+            >
+              <input
+                type="radio"
+                name="rating"
+                value={n}
+                checked={value === n}
+                onChange={() => field.onChange(n)}
+                className="sr-only"
+                aria-label={`${n} star${n > 1 ? "s" : ""}`}
+              />
+              <Star
+                aria-hidden="true"
+                className={n <= shown ? "size-6 fill-[#e8a33d] text-[#e8a33d]" : "size-6 text-paper-edge"}
+              />
+            </label>
+          ))}
+        </div>
+        <span className="text-[13px] text-muted" aria-live="polite">
+          {value ? `${value} out of 5` : "No rating"}
+        </span>
+        {value > 0 && (
+          <Button type="button" variant="ghost" size="sm" onClick={() => field.onChange(undefined)}>
+            Clear
+          </Button>
+        )}
+      </div>
+    </fieldset>
   );
 }

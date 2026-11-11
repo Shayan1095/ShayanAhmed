@@ -51,11 +51,11 @@ export default async function HomePage() {
   const chapters = [
     "builder",
     "work",
+    testimonials.length > 0 && "testimonials",
     "services",
     archive.length > 0 && "archive",
     "process",
     "about",
-    testimonials.length > 0 && "testimonials",
     faqs.length > 0 && "faq",
     showOrbit && "elsewhere",
     "contact",
@@ -74,6 +74,8 @@ export default async function HomePage() {
       />
       <VelocityMarquee items={["Websites", "Systems", "Automation", "Storefronts", "Admin panels", "Operations agents"]} />
       <Work index={n("work")} projects={featured} totalBuilds={buildCount} />
+      {/* Client words right after the case studies; nothing until the first one is published in the admin. */}
+      <Testimonials items={testimonials} index={n("testimonials")} id="testimonials" />
       <Band aria-label="Talk about your project" className="pb-20 max-[767px]:hidden min-[900px]:pb-24">
         <div className="wrap">
           <CtaStrip title="Want a system like this for your business?" />
@@ -85,8 +87,6 @@ export default async function HomePage() {
       <Process index={n("process")} />
       <VelocityMarquee items={["Milestones you approve", "A live link every week", "A clean handover"]} />
       <About settings={settings} index={n("about")} />
-      {/* Testimonials render nothing until the first one is added in the admin. */}
-      <Testimonials items={testimonials} index={n("testimonials")} />
       <FaqSection items={faqs} index={n("faq")} />
       {showOrbit && <SocialOrbit links={orbit} index={n("elsewhere")} />}
       <Contact settings={settings} index={n("contact")} />

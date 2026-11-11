@@ -10,6 +10,7 @@ import { ScrollFx } from "@/components/fx/scroll-fx";
 import { Monitor } from "@/components/site/monitor";
 import { SystemDiagram } from "@/components/case-study/system-diagram";
 import { Testimonials } from "@/components/sections/testimonials";
+import { CaseScreens } from "@/components/case-study/case-screens";
 import { Band, Button, Label, Panel, Rise, RollingNumber, SectionHeader, UiFragment } from "@/components/system";
 import { getProjects, getTestimonials } from "@/lib/content";
 import { site } from "@/lib/site";
@@ -86,6 +87,27 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
         </Band>
       )}
 
+      {project.weakPoints && project.weakPoints.length > 0 && (
+        <Band aria-labelledby="case-weak-title" className="pb-20 min-[900px]:pb-28">
+          <div className="wrap grid grid-cols-1 gap-6 min-[900px]:grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)] min-[900px]:gap-10">
+            <h2 id="case-weak-title" className="type-label pt-2 text-muted">
+              Weak points of the old way
+            </h2>
+            <ul className="flex max-w-[34em] flex-col gap-3">
+              {project.weakPoints.map((w) => (
+                <li key={w} className="flex gap-3 text-[17px] leading-relaxed">
+                  <span aria-hidden="true" className="mt-0.5 text-copper">
+                    ✕
+                  </span>
+                  {w}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Band>
+      )}
+
+      {/* 4. What I built: the three-layer diagram. */}
       <SystemDiagram project={project} />
 
       {project.video && (
@@ -202,6 +224,12 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
                     <div>
                       <h3 className="type-card text-[22px]">{d.title}</h3>
                       <p className="mt-3 text-[15.5px] text-muted">{d.text}</p>
+                      {d.tradeoff && (
+                        <p className="mt-4 border-t border-dashed border-paper-edge pt-3 text-[15px]">
+                          <Label className="mr-2">Trade-off</Label>
+                          <span className="text-muted">{d.tradeoff}</span>
+                        </p>
+                      )}
                     </div>
                   </Panel>
                 </li>
@@ -211,7 +239,11 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
         </Band>
       )}
 
-      {project.results && project.results.length > 0 && (
+      {/* 6. Screens: the captioned gallery from the admin. */}
+      <CaseScreens screens={project.screens} title={project.title} />
+
+      {/* 7. Result / status: real figures only; a product build says so plainly and states what it proves. */}
+      {project.results && project.results.length > 0 ? (
         <Band tone="ink" aria-label="Results" className="section-pad">
           <div className="wrap">
             <SectionHeader label="Results" title={<>What it <em>changed</em></>} />
@@ -229,9 +261,46 @@ async function CaseStudy({ params }: { params: Promise<Params> }) {
             </dl>
           </div>
         </Band>
+      ) : project.status === "product" && project.proves ? (
+        <Band tone="ink" aria-labelledby="case-status-title" className="section-pad">
+          <div className="wrap grid grid-cols-1 gap-6 min-[900px]:grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)] min-[900px]:gap-10">
+            <div>
+              <Label>Status</Label>
+              <h2 id="case-status-title" className="type-section mt-4">
+                What it <em>proves</em>
+              </h2>
+            </div>
+            <div className="flex max-w-[34em] flex-col gap-4">
+              <p className="m-0 font-mono text-[13px] uppercase tracking-[0.12em] text-copper">
+                Product build · not a client project, so no client figures
+              </p>
+              <p className="m-0 text-[18px] leading-relaxed">{project.proves}</p>
+            </div>
+          </div>
+        </Band>
+      ) : null}
+
+      {/* 8. What I'd do next. */}
+      {project.nextSteps && project.nextSteps.length > 0 && (
+        <Band aria-labelledby="case-next-steps-title" className="section-pad">
+          <div className="wrap grid grid-cols-1 gap-6 min-[900px]:grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)] min-[900px]:gap-10">
+            <h2 id="case-next-steps-title" className="type-section">
+              What I&apos;d do <em>next</em>
+            </h2>
+            <ol className="flex max-w-[34em] flex-col gap-4">
+              {project.nextSteps.map((n, i) => (
+                <li key={n} className="flex gap-4 text-[17px] leading-relaxed">
+                  <span className="font-display text-[22px] font-extrabold leading-none text-copper">{String(i + 1).padStart(2, "0")}</span>
+                  {n}
+                </li>
+              ))}
+            </ol>
+          </div>
+        </Band>
       )}
 
-      <Testimonials items={testimonials} />
+      {/* The client's words for this project, when there are any. */}
+      <Testimonials items={testimonials} id="case-testimonials" />
 
       {next && next.slug !== project.slug && (
         <Band aria-label="Next project" className="section-pad border-t border-paper-edge">
