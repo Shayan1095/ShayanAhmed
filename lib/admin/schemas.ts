@@ -164,6 +164,13 @@ export const settingsSchema = z.object({
   projectTypes: lines,
   specSheet: z.array(z.object({ label: text(40).min(1, "Add a label"), value: text(120).min(1, "Add a value") })).max(12),
   portrait: optImage,
+  /** "Meet the builder" intro video: the file, a still shown before it plays, and optional captions (.vtt). */
+  introVideo: z
+    .object({ src: mediaUrl, poster: mediaUrl, captions: mediaUrl })
+    .nullish()
+    .transform((v) =>
+      v?.src ? { src: v.src, ...(v.poster && { poster: v.poster }), ...(v.captions && { captions: v.captions }) } : undefined,
+    ),
 });
 export type SettingsInput = z.input<typeof settingsSchema>;
 

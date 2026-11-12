@@ -39,6 +39,7 @@ export default async function SettingsPage() {
           projectTypes: s.projectTypes,
           specSheet: s.specSheet,
           portrait: s.portrait,
+          introVideo: s.introVideo ?? { src: "" },
         }}
       />
     </>

@@ -181,7 +181,8 @@ export async function saveSettings(input: SettingsInput) {
     const current = await SettingsModel.findOne({ key: "site" }).lean();
     // Keep fields this form doesn't edit (the hero demo) as they are.
     const merged = { ...siteSettings, ...((current?.data as object) ?? {}), ...data };
-    for (const k of Object.keys(data) as (keyof typeof data)[]) {
+    // Every field this form edits: emptied ones arrive missing, so remove them.
+    for (const k of Object.keys(settingsSchema.shape) as (keyof typeof data)[]) {
       if (data[k] === undefined) delete (merged as Record<string, unknown>)[k];
     }
     await SettingsModel.updateOne({ key: "site" }, { $set: { data: merged } }, { upsert: true });

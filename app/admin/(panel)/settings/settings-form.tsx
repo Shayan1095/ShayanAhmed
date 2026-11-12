@@ -112,6 +112,15 @@ export function SettingsForm({ initial, canUpload }: { initial: SettingsInput; c
           />
         </FormSection>
 
+        <FormSection
+          title="Intro video"
+          description="The framed video in Meet the builder. Paste links to the files: a full https:// URL (for example Cloudinary) or a path in /public. Until a video link is saved, the frame shows your logo."
+        >
+          <FormText<SettingsInput> name="introVideo.src" label="Video link (MP4)" placeholder="https://… or /videos/intro.mp4" />
+          <FormText<SettingsInput> name="introVideo.poster" label="Poster image link" hint="The still shown before the video plays: its first frame, as WebP or JPG." placeholder="https://… or /videos/intro-poster.webp" />
+          <FormText<SettingsInput> name="introVideo.captions" label="Captions file link (optional)" hint="A .vtt subtitle file, for viewers who watch without sound." placeholder="https://… or /videos/intro.vtt" />
+        </FormSection>
+
         <div className="sticky bottom-4 flex items-center justify-end gap-3 surface rounded-2xl/95 p-3 backdrop-blur">
           <span role="status" className="text-[13px] text-muted">
             {isDirty ? "Unsaved changes" : "All changes saved"}
