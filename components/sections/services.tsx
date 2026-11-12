@@ -30,7 +30,8 @@ const layers = [
 export function Services({ index = "02" }: { index?: string }) {
   return (
     <Band tone="ink" id="services" aria-labelledby="services-title" className="section-pad">
-      <CoverGrid strength={0.5} />
+      {/* Its own layer: drawn once, not repainted as the pinned stage scrolls past. */}
+      <CoverGrid strength={0.5} className="will-change-transform" />
       <div className="wrap relative">
         <SectionHeader
           index={index}

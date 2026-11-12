@@ -75,6 +75,7 @@ export function OrderTicket() {
             // A shorter hold (it used to sit for 1.5 screens with little changing).
             end: () => `+=${window.innerHeight * 1.1}`,
             pin: true,
+            anticipatePin: 1,
             scrub: 0.6,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
@@ -161,8 +162,9 @@ export function OrderTicket() {
           {/* The track the stations sit on; it fills copper as the ticket advances. */}
           <li aria-hidden="true" className="pointer-events-none absolute inset-x-[12.5%] top-[27px] h-px bg-ink-3">
             <span
-              className="absolute inset-y-0 left-0 bg-copper shadow-glow transition-[width] duration-500 ease-out-expo"
-              style={{ width: `${(Math.min(approved ? 3 : stage, 3) / 3) * 100}%` }}
+              // Grows by scaling (no layout work while the stage is pinned).
+              className="absolute inset-0 origin-left bg-copper shadow-glow transition-transform duration-500 ease-out-expo"
+              style={{ transform: `scaleX(${Math.min(approved ? 3 : stage, 3) / 3})` }}
             />
           </li>
           {stations.map((s, i) => (
@@ -176,7 +178,7 @@ export function OrderTicket() {
                 {"you" in s ? (
                   <span
                     aria-hidden="true"
-                    className={cn("size-3 rounded-full transition-all duration-500", lit(i) ? "bg-copper shadow-glow" : "bg-ink-3")}
+                    className={cn("size-3 rounded-full transition-[background-color,box-shadow] duration-500", lit(i) ? "bg-copper shadow-glow" : "bg-ink-3")}
                   />
                 ) : (
                   String(i + 1).padStart(2, "0")
